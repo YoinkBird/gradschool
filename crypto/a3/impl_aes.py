@@ -23,6 +23,9 @@ if __name__ == "__main__":
     print("9a7e0594961831b321efa7e06bdd4381")
     print("generated ctext:")
     print(bytes.decode(ctext))
+    print("P:" + bytes.decode(binascii.hexlify(ptext)))
+    print("K:" + bytes.decode(binascii.hexlify(key)))
+    print("C:" + bytes.decode(ctext))
 
     print("")
     exit
