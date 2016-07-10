@@ -1,0 +1,54 @@
+﻿EE 382N.16 (76603) - DISTRIBUTED INFORMATION SYSTEM SECURITY
+ASSIGNMENT 3 – 8 JULY
+DUE 22 JULY
+
+################################################################################
+1.  Please read chapters 11 through 15 in Stallings and do the following problems:
+ 
+Chapter 10 - 10.2, 10.14, and 10.15,
+Chapter 11 - 11.5,
+Chapter 12 - 12.2,
+Chapter 13 - 13.2, 13.3,
+Chapter 14 – 14.1
+
+################################################################################
+2.  The program, Pretty Good Privacy or simply PGP, implements many of the information security technologies that we will be discussing in class.  These include symmetric and asymmetric key encryption, message digest functions, and digital signatures.  In addition, the use of PGP requires familiarity with several security administration protocols including key authentication and distribution.  Essentially, PGP represents a general-purpose self-contained system that enables the secure and authenticated exchange of information.  We will employ PGP in several assignments.
+
+Please acquire a copy of the PGP system package for the computer you are using this semester.  The PGP program package contains both the program and documentation describing how to install and operate it.  
+
+PGP is available for PCs, Macs, and Linux systems via the Web from various sites on the Internet.  
+After you have obtained the PGP system package:
+
+1. Read the PGP documentation that came with the program.
+2. Install the PGP program on a computer.
+3. Generate your public and private key pair.  (REMEMBER your pass-phrase.)
+4. Digitally sign your public key.
+5. SAVE your key pair. (We’ll use them again.)
+6. Generate the “fingerprint” of your public key.
+7. Send your signed public key and the fingerprint of the public key to me via email.  (w.bard@utexas.edu)  Do not send them as an encrypted or signed and encrypted message.
+8. I will provide a copy of my public key on Canvas.  Please install my public key on your public key ring in order that we can communicate securely later in the semester.
+
+################################################################################
+3.  Earlier this semester, you obtained the reference implementation source code for the Advanced Encryption Standard (AES).  AES has been approved as a Federal Information Processing Standard (FIPS-197).  Accordingly, it can be expected to begin supplanting the Data Encryption Standard as the symmetric key cryptographic standard of choice in new applications.
+
+Please write an application that employs AES to do the following: 
+
+1.  Encrypt the 128-bit hexadecimal plaintext, P, where:
+
+    P = 8000 7000 6000 5000 4000 3000 2000 1000
+
+    with the 128-bit key, K, where:
+
+    K = 1
+
+    to produce the 128-bit hexadecimal ciphertext, C.
+
+2.  Provide P, K, and C as hexadecimal formatted output.  Please employ the representation used above for P, i.e., eight groups of four hexadecimal digits separated by spaces.
+
+3.  Decrypt the value that you obtained for C, using the same value for K as in (1) above, and provide the result as output formatted as in (2).
+
+4.  To obtain a quantitative approximation of the performance of AES, measure the time required to perform several million of the encryptions specified in (1).  Measure the time required for the same number of decryptions specified in (3).  Provide these two times as output along with the type of processor employed.
+
+5.  Provide a listing of your application, omitting a listing of AES code and the size, in bytes, of the AES memory image excluding your application.
+
+Thank you.
