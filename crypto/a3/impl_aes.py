@@ -28,6 +28,9 @@ if __name__ == "__main__":
     print("C:" + bytes.decode(ctext))
 
     print("")
+    mtext = aes.decrypt( binascii.unhexlify(ctext) )
+    print("decript:")
+    print("M:" + bytes.decode(binascii.hexlify(mtext)))
     exit
 
 
