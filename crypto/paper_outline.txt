@@ -85,7 +85,7 @@ WPA  implements         801.11i
   }
   h1:TKIP{
     h2:role{
-      Temporaral Key Integrity Protocol is a deprecated protocol intended as a stopgap measure intended to replace WEP on existing hardware.
+      Temporal Key Integrity Protocol is a deprecated protocol intended as a stopgap measure intended to replace WEP on existing hardware.
     }
     h2:operation{
       implementation summary
@@ -127,20 +127,20 @@ WPA  implements         801.11i
       #TODO: brief segment on RADIUS
       In some configurations, the EAP Authenticator also functions as the Authentication Server, but functionally the same roles are maintained.
       #TODO: what is EAP passthrough mode? book is unclear on this [https://tools.ietf.org/html/rfc3748#page-12]
-      For an EAP exchange, the EAP_peer connects to the network using a lower-level protocol which implements an EAP-compatible protocoal for the authentication, e.g. 802.1X and EAPEAPOL or PPP and PPP-EAP.
+      For an EAP exchange, the EAP_peer connects to the network using a lower-level protocol which implements an EAP-compatible protocoal for the authentication, e.g. 802.1X and EAP-EAPOL or PPP and PPP-EAP.
       During the ensuing authentication exchange, The EAP_peer and the authentication server exchange EAP messages provided by the EAP-compatible protocol chosen for that connection.
       The authenticator submits a Request to the EAP_peer for identity, to which the EAP_peer sends a Response containing its identity.
       The authenticator then submits an EAP message which contains a Type-field defining the EAP-compatible authentication protocol to be used. 
       If the EAP_peer does not support the protocol, it replies with a Response with a 'Nak' and indicates which protocol it would prefer. [https://tools.ietf.org/html/rfc3748#page-32]
       The authenticator then either accepts the reqeusted protocol or terminates the connection with a failure message.
       If the EAP_peer supports the protocol, it replies with a Response-message with an identical Type-field and the initiation is considered successful.
-      
+
       Subsequently, the authenticator and EAP_peer exchange a number of Request-Response pairs determined by ethe chosen EAP protocol.
       Subsquently, the authentication information is exchanged by the authenticator sending a number of Requests to which the EAP_peer sends a number of Responses.
       The Requests and Responses contain information used to define and execute the chosen EAP-compatible authentication method.
       This exchange goes back and forth until the authenticator either authenticates the EAP_peer and transmits an EAP Success message or cannot authenticate and submits an EAP Failure message.
       The EAP conversation is considered complete upon transmission of the Success or Failure message. [https://tools.ietf.org/html/rfc3748#section-2.1]
-      
+
 
 
     }
@@ -225,16 +225,64 @@ WPA  implements         801.11i
           1. [STA<->AP|EAPOL] The AP issues an EAP-Request/Identity frame to the STA, which then replies with an EAP-Response/Identity frame.
           2. [AP->AS|RADIUS] The AP encapsulates the STA's Response/Identity frame as a RADIUS-Access-Request Packet and passes it to the RADIUS server.
           3. [AS{RADIUS}->AP{EAPOL}->STA] The RADIUS server sends a RADIUS-Access-Challenge packet to the AP, which encapsulates it as an EAP-Request and sends it to the STA.
-            The challenge is is a request for additional information from the STA to be used for authentication.[https://en.wikipedia.org/wiki/RADIUS#Authentication_and_authorization]
+          The challenge is is a request for additional information from the STA to be used for authentication.[https://en.wikipedia.org/wiki/RADIUS#Authentication_and_authorization]
           4. [STA{EAPOL}->AP{RADIUS}->AS] The STA sends an EAP-Response to the AS, which sends it to the AS encapsulated as a RADIUS-Access-Request.
           At this point, note that steps 3 and 4 may be repeated multiple times depending on which protocol is being used.
           The exchange proceeds to step 5 once the number of iterations required by the protocol have been reached.
           5. [AS{RADIUS}->AP->{EAPOL}] Once the AS has successfully verified the STA it sends a RADIUS-Access-Accept packet to the AP, which then sends an EAP-Success frame to the STA.
-             As of now, the 802.1X controlled port is authorized, but the STA cannot access the data channel until the 4-Way Handshake, to be defined subsequently.
+          As of now, the 802.1X controlled port is authorized, but the STA cannot access the data channel until the 4-Way Handshake, to be defined subsequently.
         }
       }
       The Key generation and Distribution Phase{
         Key generation and distribution is the step during which the AP and STA generate and store crytpographic keys for future communication.
+        There are two types of keys which are used depending on the type of communication.
+        Communication between two entities is secured using pairwise keys, e.g. between an STA and AP,
+          and multicast, i.e. group, communications are secured using group keys, e.g. one STA broadcasting to multiple other STAs.
+
+        pairwise keys{
+          {
+            |[MSK(AAAK) || PSK] (Master Session Key, aka AAA-Key AAAK || Pre-Shared Key)
+            |`-- PMK (Pairwise Master Key)
+            |    `-- PTK (Pairwise Transient Key)
+            |        |-- KCK (EAPOL Key Confirmation Key)
+            |        |-- KEK (EAPOL Key Encryption Key)
+            |        `-- TK (Temporal Key)
+          }
+          Communication between two entities, e.g. between an STA and AP, is secured using pairwise keys which form a hierarchy of keys derived from one of two types of master key, the Pre-Shared Key (PSK) or the Master Session Key (MSK).
+          In the case of a the Pre-Shared Key (PSK), the key generation and distribution is not part of the 802.11i standard.
+          #TODO: is this the one used for home networks?
+          In the case of the Master Session Key (MSK), or AAAK, the key generated according to the the 802.1X standard during the previously described EAP authentication phase.
+          Second in the generation hierachy is the Pairwise Master Key (PMK), which is derived from the master key. 
+          The PMK is a 256 bit key generated by truncating the master key to 256 bits; this means that a PSK is used as-is wherease an MSK may need to be truncated.
+          Third in the hierarchy is the Pairwise Transient Key (PTK), which consists of three subkeys generated by applying the HMAC-SHA1 function to ?a combination of? the PMK, the MAC addresses of the STA and AP, and any cryptographic nonces as needed.
+          Integrating the MAC addresses in the key generation helps protect against session hijacking and impersonation (for example, MAC address spoofing would result in a key mismatch).
+          The three keys are the EAPOL Key Confirmation Key (EAPOL-KCK), EAPOL Key Encryption Key(EAPOL-KEK), and the Temporal Key(TK).
+          The EAPOL Key Confirmation Key (EAPOL-KCK) supports the integrity and authenticity of STA-to-AP control frames during the RSN setup. In addition, it provides access control by proving posession of the PMK as any entity posessing the PMK is authorized.
+          The EAPOL Key Encryption Key(EAPOL-KEK) protects the confidentiality of keys and other data during certain RSN procedures.
+          The Temporal Key(TK) is used for protecting user traffic.
+
+          # TODO: finish pairwise_key_distribution
+          distribution{
+            [p582,bottom]
+          }
+        }
+        group keys{
+          {
+            |GMK (Group Master Key)
+            |`-- GTK (Group Temporal Key)
+          }
+
+          [p581,bottom]
+          Communication between several entities, e.g. between one STA and several other STAs, is referred to as multicast communication and is secured using a hierarchy of keys derived from on master key, the Group Master Key (GMK).
+          The Group Master Key (GMK) is used along with other inputs to generate a Group Temporal Key (GTK).
+          The GTK is then transmitted by the AP to the STAs using the already established pairwise keys.
+          The 802.11i standard does not specify how to generate the key other than that it should appear random and must be changed whenever a device leaves the network.
+
+          #TODO: finish group_key_distribution
+          distribution{
+            [p584,top]
+          }
+        }
       }
       The Protected Data transfer Phase{
         Protected data transfer uses the previously generated keys to secure traffic between the STA and AP while the STA is communicating with the End Station.
@@ -254,3 +302,8 @@ WPA  implements         801.11i
 }
 #TODO:
 s/EAP_peer/EAP peer/g
+
+#TODO: coming up next - 
+# finish group_key_distribution
+# finish pairwise_key_distribution
+# finish everything else
