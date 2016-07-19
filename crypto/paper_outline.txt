@@ -233,7 +233,7 @@ WPA  implements         801.11i
           As of now, the 802.1X controlled port is authorized, but the STA cannot access the data channel until the 4-Way Handshake, to be defined subsequently.
         }
       }
-      The Key generation and Distribution Phase{
+      The Key Generation and Distribution Phase{
         KEY GENERATION
         Key generation and distribution is the step during which the AP and STA generate and store crytpographic keys for future communication.
         There are two types of keys which are used depending on the type of communication.
@@ -314,8 +314,17 @@ WPA  implements         801.11i
         }
       }
       The Protected Data transfer Phase{
-        Protected data transfer uses the previously generated keys to secure traffic between the STA and AP while the STA is communicating with the End Station.
-        Protected data transfer refers to the secure connection based on the previously generated keys between the STA and AP while the STA communicates with and End Station.
+        Protected data transfer uses the previously generated and distributed keys to secure traffic between the STA and AP while the STA is communicating with the End Station.
+        To recap, the STAs have connected to the network in the Discovery Phase, are authenticated as being allowed on the network in the Authentication Phase, and share encryption keys with the APs as of the Key Generation and Distribution Phase.
+        The final step is to choose a method to use the keys to encrypt the data exchanged accross the network.
+        802.11i defines two schemes for data protection: the Temporal Key Integrity Protocol (TKIP) and the Counter Mode-CBC MAC Protocol (CCMP).
+        TKIP was used in the WPA protocol as  stopgap upgrade for WEP and has been superceded by CCMP.
+        It is still included in the 802.11i standard for backwards compatibility but should be avoided when possible.
+        CCMP superceded TKIP and is part of the final WPA2 protocol; it is still considered state-of-the-art and is the recommended method.
+        TKIP{
+        }
+        CCMP{
+        }
       }
       The Connection Termination Phase{
         Connection termination is the process of the STA and AP ending the secure connection set up in the previous stages.
