@@ -127,7 +127,7 @@ WPA  implements         801.11i
       #TODO: brief segment on RADIUS
       In some configurations, the EAP Authenticator also functions as the Authentication Server, but functionally the same roles are maintained.
       #TODO: what is EAP passthrough mode? book is unclear on this [https://tools.ietf.org/html/rfc3748#page-12]
-      For an EAP exchange, the EAP_peer connects to the network using a lower-level protocol which implements an EAP-compatible protocoal for the authentication, e.g. 802.1X and EAPOl or PPP and PPP-EAP.
+      For an EAP exchange, the EAP_peer connects to the network using a lower-level protocol which implements an EAP-compatible protocoal for the authentication, e.g. 802.1X and EAPEAPOL or PPP and PPP-EAP.
       During the ensuing authentication exchange, The EAP_peer and the authentication server exchange EAP messages provided by the EAP-compatible protocol chosen for that connection.
       The authenticator submits a Request to the EAP_peer for identity, to which the EAP_peer sends a Response containing its identity.
       The authenticator then submits an EAP message which contains a Type-field defining the EAP-compatible authentication protocol to be used. 
@@ -176,7 +176,7 @@ WPA  implements         801.11i
         The supplicant sends an EAPOL-Start packet to this address to announce intent to authenticate,
         upon which the authenticator replies with an EAPOL-EAP packet containing an EAP-Request Identity message.
         If the supplicant is authenticated, the authenticator sends an EAP-Key packet containing cryptographic keys to the supplicant.
-        When the supplicant wishes to leave the network it submits an EAP-Logoff packet indicating intent to be disconnected.
+        When the supplicant is ready to leave the network it submits an EAP-Logoff packet indicating intent to be disconnected.
       }
     }
     h2:security services{
@@ -204,10 +204,33 @@ WPA  implements         801.11i
       }
       The Authentication Phase{
         Authentication is the stage at which the device and Authentication server (AS) verify each others identity.
-        Until the authentication is successful, the AP prevents unauthorised access to the network by only allowing authentication-related traffic between the device and the AS.
         801.1X{
+          The 802.1X standard is used for the authentication and access control.
+          Until the authentication is successful, the AP prevents unauthorised access to the network by only allowing authentication-related traffic between the device and the AS.
+          This is described in more detail in its own section.
         }
-        MPDU Transfer{
+        MPDU (data) Exchange{
+          The wireless standard 802.11 defines the procedure for exchanging data between the STA and AS, where data is technically referred to as the MAC Protocol Data Unit (MPDU).
+          After the discovery phase, the STA is connected to the network via the AP but not yet authenticated.
+          The authentication exchange between STA and AS is performed using an EAP Exchange, upon which the AS generates a master session key (MSK) and sends it to the STA; the MSK is also known as the Authentication, Authorization, and Accounting (AAA or Triple A) key.
+          This MSK is used to generate subsequent keys for secure communication between STA and the AP.
+          It is important to note that the MSK is not used directly for secure communication.
+        }
+        EAP Exchange {
+          EAP supports several different protocols that can be used between the STA, AP, and AS during the authentication phase.
+          A common configuration is to use the EAP over LAN (EAPOL) protocol between the STA and AP and the AAA protocol "Remote Authentication Dial In User Service" (RADIUS) protocol between the AP and AS.
+          The EAP exchange using EAPOL and RADIUS is summarised in the following steps.
+          Note that the authentication server AS may be referred to as AAA-server, which is a specific type of AS, or RADIUS-server, which is a specific implementation of AS.
+          # TODO: is this EAP or EAPOL?
+          1. [STA<->AP|EAPOL] The AP issues an EAP-Request/Identity frame to the STA, which then replies with an EAP-Response/Identity frame.
+          2. [AP->AS|RADIUS] The AP encapsulates the STA's Response/Identity frame as a RADIUS-Access-Request Packet and passes it to the RADIUS server.
+          3. [AS{RADIUS}->AP{EAPOL}->STA] The RADIUS server sends a RADIUS-Access-Challenge packet to the AP, which encapsulates it as an EAP-Request and sends it to the STA.
+            The challenge is is a request for additional information from the STA to be used for authentication.[https://en.wikipedia.org/wiki/RADIUS#Authentication_and_authorization]
+          4. [STA{EAPOL}->AP{RADIUS}->AS] The STA sends an EAP-Response to the AS, which sends it to the AS encapsulated as a RADIUS-Access-Request.
+          At this point, note that steps 3 and 4 may be repeated multiple times depending on which protocol is being used.
+          The exchange proceeds to step 5 once the number of iterations required by the protocol have been reached.
+          5. [AS{RADIUS}->AP->{EAPOL}] Once the AS has successfully verified the STA it sends a RADIUS-Access-Accept packet to the AP, which then sends an EAP-Success frame to the STA.
+             As of now, the 802.1X controlled port is authorized, but the STA cannot access the data channel until the 4-Way Handshake, to be defined subsequently.
         }
       }
       The Key generation and Distribution Phase{
