@@ -8,7 +8,6 @@ how these protocols address wireless vulnerabilities and secure WLANs.
   h1:Intro{
     Wireless LAN security has changed a lot over the past 20 years.
     Here is a brief progression of IEEE standards, their most common implementation, and the technologies they implement:
-    802.1X uses EAP
     802.11 implemented as WEP
     802.11i (draft) implemented as WPA using TKIP
     802.11i (complete) implemented as WPA2+RSN, uses 802.1X which includes EAP,CCMP,TKIP, and others
@@ -28,17 +27,17 @@ how these protocols address wireless vulnerabilities and secure WLANs.
       h3: Shared Key Authentication {
         With Shared Key authentication, the client has to have a key in order to join the network.
         The basic authentication mechanism is a 4-step handshake:
-        The AP sends a so-called challenge to the client; this is essentially plain-text data.
+        The AP sends a plain-text challenge to the client, where a challenge is essentially data meant to serve an authentication purpose.
         The client uses the shared key to encrypt the data, then sends it back to the AP.
         The AP decrypts the data and checks the decrypted plaintext against the originally submitted challenge.
         If the text matches, the AP can assume that the client has the correct key and authorises it for access to the network.
-        This is summarised below:
+        This is exemplified below:
         4-step handshake:
-        client-[authreq]->AP
-        AP-[clear-text challenge]->client
-        client-[E(K,text)]->AP
-        AP[D(E(K,text))==text]-[accept]->client
-        AP: diff(submitted cleartext, received cleartext)
+        client--[auth request]-->AP
+        AP--[cleartext challenge]-->client
+        client--[E(K,challenge)]-->AP
+        AP[if { D(E(K,challenge)) == original challenge } ]--[accept]-->client
+        (AP: authorise if original challenge == decrypted response)
       }
     }
     h2:security services{
@@ -116,19 +115,17 @@ how these protocols address wireless vulnerabilities and secure WLANs.
       The Requests and Responses contain information used to define and execute the chosen EAP-compatible authentication method.
       This exchange goes back and forth until the authenticator either authenticates the EAP Peer and transmits an EAP Success message or cannot authenticate and submits an EAP Failure message.
       The EAP conversation is considered complete upon transmission of the Success or Failure message. [https://tools.ietf.org/html/rfc3748#section-2.1]
-
-
-
     }
     h2:security services{
-      [https://tools.ietf.org/html/rfc3748#page-42]
+      EAP itself does not provide security services, but does require implementations to include a threat-model and how the implementation addresses these threats.  [https://tools.ietf.org/html/rfc3748#page-42]
     }
     h2:security vulnerabilities{
+      As there are many different implementations of EAP it is difficult to concisely summarise the vulnerabilities.
+      Essentially, EAP security also depends on the overall network security; if an attacker is able to gain access to the network then there are several methods available to further compromise network security. [https://depthsecurity.com/blog/when-802-1x-peap-eap-ttls-is-worse-than-no-wireless-security.]
+      However, this is beyond the scope of this paper.
     }
   }
   h1:802.1X{
-    #TODO: mention that PSK bypasses most of the security features (src: that one ppt)
-    # mention also how master key generates per-session keys and blah blah
     h2:role{
       The IEEE 802.1X Port-Based Network Access Control provides access control functions for LANs.
       In essence, it allows a device on a network to be authenticated without accessing data on the network.
@@ -142,11 +139,10 @@ how these protocols address wireless vulnerabilities and secure WLANs.
       Authentication Server (AS) determines whether a supplicant is authorised to access the LAN
       The authenticator passes the supplicant's credentials to the AS to determine whether to provide access to the LAN.
       The authenticator designates the logical entity 'port' as an abstraction referring to a phyiscal connection to the network.
-      # TODO: fact-check - wikipedia and sans.org differ slightly, book is very vague
       The port is controlled by the PAE (Port Access Entity) which either sets it to the 'uncontrolled' (unauthorised), state or the 'controlled' (authorised) state. [https://www.sans.org/reading-room/whitepapers/networkdevs/wired-8021x-security-1654]
       In the uncontrolled state, only 802.1X traffic is allowed, i.e. the supplicant can only communicate with the AS (via the authenticator).
       Upon successful authentication, the port is changed to the 'controlled' state and the supplicant can access other network services (i.e. the data channel).
-      EAP authentication mechanism{
+      h3:EAP authentication mechanism{
         802.11X uses EAPOL (Extensible Authentication Protocol Over Lan) as the authentication protocol between the supplicant and the authenticator.
         A specific group-multicast address is reserved for the authentication procedure, which can be either initated by the supplicant when it joins the network or by the authenticator when it detects a new supplicant.
         The supplicant sends an EAPOL-Start packet to this address to announce intent to authenticate,
@@ -156,9 +152,13 @@ how these protocols address wireless vulnerabilities and secure WLANs.
       }
     }
     h2:security services{
+      802.1X provides authentication via the Authentication Server, confidentiality through its use of keys to encrypt data, and data integrity through the checksums used in the encryption methods.
     }
     h2:security vulnerabilities{
-      [https://en.wikipedia.org/wiki/IEEE_802.1X#Vulnerabilities_in_802.1X-2001_and_802.1X-2004]
+      802.1X is susceptible to a man-in-the-middle attack as it only authenticates at the beginning of the session.
+      This means that an attacker with physical access to the network could insert a device between the authenticated computer and the port in order to gain access to the network.
+      To address this, IEEE is already working on an update to the specification, and several vendors have worked on proprietary extensions to the protocol with various authentication schemes.  [https://en.wikipedia.org/wiki/IEEE_802.1X#Vulnerabilities_in_802.1X-2001_and_802.1X-2004]
+      As with all security, it is recommended to use different complementary technologies instead of relying on any one system.
     }
   }
   h1:WPA2+RSN{
@@ -170,7 +170,7 @@ how these protocols address wireless vulnerabilities and secure WLANs.
       the authentication server (AS) which verifies the identity of the STA,
         and the end station to which the STA is connection, e.g. a server.
       RSN has five phases of operation: discovery, authentication, key generation and distribution, protected data transfer, and connection termination.
-      The Discovery Phase{
+      h3:The Discovery Phase{
         Discovery allows devices to discover access points (AP). The AP broadcasts messages in order to advertise their presense, which allows a device to discover the AP and associate with it, i.e. join the network.
         At this point the following security capabilities are determined for this connection: the confidentiality and data integrity protocols, the authentication mechanism, and the key management approach.
         The AP dictates the confidentiality and integrity protocols to be used by the STAs as all STAs must use the same protocols and encryption techniques in order to communicate accross the network.
@@ -178,21 +178,21 @@ how these protocols address wireless vulnerabilities and secure WLANs.
         The authentication mechanism and key management approach are defined in the Authentication and Key Management (AKM) suite, which defines the method for the STA and AP to mutually authenticate as well the proceure for generating a root key used for generating other keys.
         The AKM suites can be IEEE 802.1X, pre-shared key (PSK) which has no explicit authentication, or vendor-defined methods.
       }
-      The Authentication Phase{
+      h3:The Authentication Phase{
         Authentication is the stage at which the device and Authentication server (AS) verify each others identity.
-        801.1X{
+        h4:801.1X{
           The 802.1X standard is used for the authentication and access control.
           Until the authentication is successful, the AP prevents unauthorised access to the network by only allowing authentication-related traffic between the device and the AS.
           This is described in more detail in its own section.
         }
-        MPDU (data) Exchange{
+        h4:MPDU (data) Exchange{
           The wireless standard 802.11 defines the procedure for exchanging data between the STA and AS, where data is technically referred to as the MAC Protocol Data Unit (MPDU).
           After the discovery phase, the STA is connected to the network via the AP but not yet authenticated.
           The authentication exchange between STA and AS is performed using an EAP Exchange, upon which the AS generates a master session key (MSK) and sends it to the STA; the MSK is also known as the Authentication, Authorization, and Accounting (AAA or Triple A) key.
           This MSK is used to generate subsequent keys for secure communication between STA and the AP.
           It is important to note that the MSK is not used directly for secure communication.
         }
-        EAP Exchange {
+        h4:EAP Exchange {
           EAP supports several different protocols that can be used between the STA, AP, and AS during the authentication phase.
           A common configuration is to use the EAP over LAN (EAPOL) protocol between the STA and AP and the AAA protocol "Remote Authentication Dial In User Service" (RADIUS) protocol between the AP and AS.
           The EAP exchange using EAPOL and RADIUS is summarised in the following steps.
@@ -209,14 +209,14 @@ how these protocols address wireless vulnerabilities and secure WLANs.
           As of now, the 802.1X controlled port is authorized, but the STA cannot access the data channel until the 4-Way Handshake, to be defined subsequently.
         }
       }
-      The Key Generation and Distribution Phase{
-        KEY GENERATION
+      h3:The Key Generation and Distribution Phase{
+        h4:KEY GENERATION
         Key generation and distribution is the step during which the AP and STA generate and store crytpographic keys for future communication.
         There are two types of keys which are used depending on the type of communication.
         Communication between two entities is secured using pairwise keys, e.g. between an STA and AP,
           and multicast, i.e. group, communications are secured using group keys, e.g. one STA broadcasting to multiple other STAs.
 
-        pairwise keys{
+        h5:pairwise keys{
           {
             |[MSK(AAAK) || PSK] (Master Session Key, aka AAA-Key AAAK || Pre-Shared Key)
             |`-- PMK (Pairwise Master Key)
@@ -238,7 +238,7 @@ how these protocols address wireless vulnerabilities and secure WLANs.
           The EAPOL Key Encryption Key(EAPOL-KEK) protects the confidentiality of keys and other data during certain RSN procedures.
           The Temporal Key(TK) is used for protecting user traffic.
         }
-        group keys{
+        h5:group keys{
           {
             |GMK (Group Master Key)
             |`-- GTK (Group Temporal Key)
@@ -251,14 +251,13 @@ how these protocols address wireless vulnerabilities and secure WLANs.
           The 802.11i standard does not specify how to generate the key other than that it should appear random and must be changed whenever a device leaves the network.
 
         }
-        KEY DISTRIBUTION
+        h4:KEY DISTRIBUTION
         Once the keys have been generated, the pairwise keys are distributed using a Four-Way Handshake and then the group keys are distributed using a Group Key Handshake.
         # TODO: brief explanation of MIC/MAC https://en.wikipedia.org/wiki/Message_authentication_code
         #          essentially, MIC (or MAC) is used to authenticate a message, i.e. prove that msg not altered in transit
         # TODO: super brief explanation of PRF, perhaps inline?
         # wiki: The PTK is generated by concatenating the following attributes: PMK, AP nonce (ANonce), STA nonce (SNonce), AP MAC address, and STA MAC address. The product is then put through a pseudo random function. The handshake also yields the GTK (Group Temporal Key), used to decrypt multicast and broadcast traffic.
-        # TODO: finish pairwise_key_distribution
-        pairwise_key_distribution{
+        h5:pairwise_key_distribution{
           [p582,bottom]
           The Four-Way Handshake is designed such that the STA and AP can verify that each know the PMK without disclosing it.
           This is done by exchanging data that proves knowledge of the PMK without actually transmitting the PMK.
@@ -274,8 +273,7 @@ how these protocols address wireless vulnerabilities and secure WLANs.
           4. [STA->AP] The STA sends an acknowedgement message to the AP with a MIC.
           This concludes the 4-Way handshake.
         }
-        #TODO: finish
-        group_key_distribution{
+        h5:group_key_distribution{
           [p584,top]
           The Group Key Handshake is used to distribute Group Temporal Keys (GTK) to STAs in a multicast group once the initial PTKs have been generated.
           The GTK needs to be updated after certain events:
@@ -289,7 +287,7 @@ how these protocols address wireless vulnerabilities and secure WLANs.
 
         }
       }
-      The Protected Data transfer Phase{
+      h3:The Protected Data transfer Phase{
         Protected data transfer uses the previously generated and distributed keys to secure traffic between the STA and AP while the STA is communicating with the End Station.
         To recap, the STAs have connected to the network in the Discovery Phase, are authenticated as being allowed on the network in the Authentication Phase, and share encryption keys with the APs as of the Key Generation and Distribution Phase.
         The final step is to choose a method to use the keys to encrypt the data exchanged accross the network.
@@ -298,11 +296,11 @@ how these protocols address wireless vulnerabilities and secure WLANs.
         It is still included in the 802.11i standard for backwards compatibility but should be avoided when possible.
         CCMP superceded TKIP and is part of the final WPA2 protocol; it is still considered state-of-the-art and is the recommended method.
 
-        TKIP{
-          h2:role{
+        h4:TKIP{
+          h5:role{
             Temporal Key Integrity Protocol (TKIP) is a legacy protocol intended as a stopgap measure intended to replace WEP on existing hardware.
           }
-          h2:operation{
+          h5:operation{
             TKIP introduced three features to address WEP vulnerabilites while maintaining backwards compatibility with WEP by using RC4.
             1. Key Mixing to avoid correlation between data and key
             2. Sequence Counter to avoid replay attacks
@@ -324,17 +322,17 @@ how these protocols address wireless vulnerabilities and secure WLANs.
             3. Michael MIC (msg integ check) 64-bit
             The MIC is generated by an algorithm called Michael which is a function of a key, the STA- and AP-MAC addresses, and the data field.
           }
-          h2:security services{
+          h5:security services{
             TKIP provides two services, Message Integrity, i.e. ensuring that the message is intact and unaltered, and Data Confidentiality, i.e. encrypting the data.
             Message Integrity is provided by adding a Message Integrity Code (MIC) after the data field of the 802.11 MAC frame.
             Data Confidentiality is provided by encrypting the data frame and the Michael MIC value using the RC4 algorithm.
           }
-          h2:security vulnerabilities{
+          h5:security vulnerabilities{
             MIC key recovery attach
             royal holloway
           }
         }
-        CCMP{
+        h4:CCMP{
           CCMP provides the same services as TKIP, Message Integrity, i.e. ensuring that the message is intact and unaltered, and Data Confidentiality, i.e. encrypting the data.
           Message Integrity is provided by using a message authentication code (MAC) called "Cipher Block Chaining Message Authentication Code (CBC-MAC)", which verifies both message integrity (message is intact) and authenticity (message is from the indicated sender and not someone else).
           Data Confidentiality is provided by using AES encryption with the CTR block cipher mode of operation. This means that each new encrypted block has an incremented counter as an additional input.
@@ -342,7 +340,7 @@ how these protocols address wireless vulnerabilities and secure WLANs.
           To prevent replay attacks, a 48-bit packet number is used as a nonce.
         }
       }
-      The Connection Termination Phase{
+      h3:The Connection Termination Phase{
         Connection termination is the process of the STA and AP ending the secure connection set up in the previous stages.
       }
     }
