@@ -18,9 +18,13 @@ def encrypt():
     ## ensure key is correct length
     # aes_obj.key_size=128
     ctext = aes.encrypt(ptext)
+    ctext = binascii.hexlify(ctext)
     return ctext
 
-def decrypt():
+def decrypt(*args):
+    ctext = '9a7e0594961831b321efa7e06bdd4381'
+    if( len(args) > 1 ):
+        ctext = args[0]
     # 128-bit key k
     key = '00000000000000000000000000000001'
     key = binascii.unhexlify(key)
@@ -39,19 +43,18 @@ if __name__ == "__main__":
     aes=AES.new(key)
     ## ensure key is correct length
     # aes_obj.key_size=128
-    ctext = aes.encrypt(ptext)
-    ctext = binascii.hexlify(ctext)
+    ctext = encrypt()
     print("reference ctext:")
     print("9a7e0594961831b321efa7e06bdd4381")
-    print("generated ctext:")
+    print("-I-: encrypt:")
     print(bytes.decode(ctext))
     print("P:" + bytes.decode(binascii.hexlify(ptext)))
     print("K:" + bytes.decode(binascii.hexlify(key)))
     print("C:" + bytes.decode(ctext))
 
     print("")
-    mtext = aes.decrypt( binascii.unhexlify(ctext) )
-    print("decript:")
+    mtext = decrypt( binascii.unhexlify(ctext))
+    print("-I-: decript:")
     print("M:" + bytes.decode(binascii.hexlify(mtext)))
 
     print("timing\n")
