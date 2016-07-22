@@ -11,7 +11,6 @@ import sys
 def encrypt():
     # 128-bit key k
     key = '00000000000000000000000000000001'
-    #key = key.decode("hex")
     key = binascii.unhexlify(key)
     ptext = '80007000600050004000300020001000'
     ptext = binascii.unhexlify(ptext)
@@ -19,46 +18,14 @@ def encrypt():
     ## ensure key is correct length
     # aes_obj.key_size=128
     ctext = aes.encrypt(ptext)
-#    ctext = binascii.hexlify(ctext)
-#    print("reference ctext:")
-#    print("9a7e0594961831b321efa7e06bdd4381")
-#    print("generated ctext:")
-#    print(bytes.decode(ctext))
-#    print("P:" + bytes.decode(binascii.hexlify(ptext)))
-#    print("K:" + bytes.decode(binascii.hexlify(key)))
-#    print("C:" + bytes.decode(ctext))
-
-#    print("")
-#    mtext = aes.decrypt( binascii.unhexlify(ctext) )
-#    print("decript:")
-#    print("M:" + bytes.decode(binascii.hexlify(mtext)))
     return ctext
 
 def decrypt():
     # 128-bit key k
     key = '00000000000000000000000000000001'
-    #key = key.decode("hex")
     key = binascii.unhexlify(key)
-#    ptext = '80007000600050004000300020001000'
-#    ptext = binascii.unhexlify(ptext)
     aes=AES.new(key)
-    ## ensure key is correct length
-    # aes_obj.key_size=128
-#    ctext = aes.encrypt(ptext)
-#    ctext = binascii.hexlify(ctext)
-#    print("reference ctext:")
-#    print("9a7e0594961831b321efa7e06bdd4381")
-#    print("generated ctext:")
-#    print(bytes.decode(ctext))
-#    print("P:" + bytes.decode(binascii.hexlify(ptext)))
-#    print("K:" + bytes.decode(binascii.hexlify(key)))
-#    print("C:" + bytes.decode(ctext))
-
-#    print("")
     mtext = aes.decrypt( binascii.unhexlify(ctext) )
-#    print("decript:")
-#    print("M:" + bytes.decode(binascii.hexlify(mtext)))
-
     return mtext
 
 # encode/decode: http://pythoncentral.io/encoding-and-decoding-strings-in-python-3-x/
