@@ -55,8 +55,8 @@ if __name__ == "__main__":
     print("M:" + bytes.decode(binascii.hexlify(mtext)))
 
     print("timing\n")
-    loops=10
-    if( len(sys.argv[1]) > 1 ):
+    loops=1
+    if( len(sys.argv) > 1 ):
         loops = int(sys.argv[1])
     timeEn = str(timeit.timeit('encrypt()','from __main__ import encrypt',number=loops))
     print("time for " + str(loops) + " encrypt cycles")
