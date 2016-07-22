@@ -1,9 +1,3 @@
-WEP operation, services and security vulnerabilities;
-the goals of the IEEE 802.11i effort;
-the role and operation of new and adapted protocols including Wi-Fi Protected Access (WPA), Temporal Key Integrity Protocol (TKIP), and the IEEE 802.1x authentication protocol;
-WPA2 and Extensible Authentication Protocol (EAP)
-how these protocols address wireless vulnerabilities and secure WLANs.
-
 {
   h1:Intro{
     Wireless LAN security has changed a lot over the past 20 years.
@@ -14,11 +8,11 @@ how these protocols address wireless vulnerabilities and secure WLANs.
 
   }
   h1:WEP{
-    h2:role{
+    h2:Role{
       Wired Equivalent Privacy (WEP) is a deprecated protocol intended to secure wireless networks.
       However, it is no longer recommended for use as its security mechanism is easily bypassed.
     }
-    h2:operation{
+    h2:Operation{
       WEP has two modes of operation: Open System authentication and Shared Key authentication.
       h3: Open System Authentication{
         For Open System authentication, any client can connect to the network without using credentials.
@@ -40,10 +34,10 @@ how these protocols address wireless vulnerabilities and secure WLANs.
         (AP: authorise if original challenge == decrypted response)
       }
     }
-    h2:security services{
+    h2:Security Services{
       WEP provides authentication using the shared key, confidentiality by encrypting the data, and data integrity by running a checksum on the transmitted data.  [http://webcache.googleusercontent.com/search?q=cache:IdmQq0MnkZUJ:cs.sjsu.edu/faculty/stamp/CS158B/syllabus/papers/WEPandWPA.doc]
     }
-    h2:security vulnerabilities{
+    h2:Security Vulnerabilities{
       WEP is no longer recommended for use due to numerous security vulnerabilites.
       h3: Chop Chop
       One of the kost common attacks is the Chop Chop attack, which essentially consists of guessing the encryption key by modifying a transmitted data packet until the AP accepts it [http://security.stackexchange.com/questions/72987/how-chopchop-attack-against-wep-actually-works]
@@ -58,7 +52,7 @@ how these protocols address wireless vulnerabilities and secure WLANs.
       The first is WPA, which implements TKIP and was introduced as a replacement for WEP.
       The final form of 802.11i is referred to as WPA2 as well as Robust Security Network (RSN).
     }
-    h2:security vulnerabilites{
+    h2:Security Vulnerabilites{
       The recommended protocols used in 802.11i are considered secure, but certain implementation features introduce security risks.
       h3:Backwards Compatibility{
         The 802.11i standard still includes older, less secure standards such as TKIP for backwards compatibility with older hardware.
@@ -72,31 +66,31 @@ how these protocols address wireless vulnerabilities and secure WLANs.
     }
   }
   h1:WPA{
-    h2:role{
+    h2:Role{
       WPA was an intermediate measure based on an intermediary version of the 802.11i standard and is intended to address security vulnerabilities in WEP.
       It was designed within the confines of the original WEP protocol in order to be a software upgrade to patch older systems, which limits the effectiveness of the security.
     }
-    h2:operation{
+    h2:Operation{
       WPA uses TKIP as the security mechanism, which is explained in further detail in its own section.
       The protocol improves on WEP by using a stronger message integrity check, which addresses the vulnerability which WEP had, namely that it was relatively easy for an attacker to convince the AP to accept forged messages. [https://en.wikipedia.org/wiki/Wi-Fi_Protected_Access#WPA]
       Another way that WPA addresses WEP's vulnerabilities is by introducing a long timeout after receiving a few invalid packets and then changing the key.
       This delays a potential attacker from being able to submit altered packets using a guessed key; the timeout prevents any transmission, and changing the key means the attacker has to start from scratch.
     }
-    h2:security services{
+    h2:Security Services{
       As with WEP, WPA provides similar services: authentication using the shared key, confidentiality by encrypting the data, and data integrity by running a checksum on the transmitted data.
     }
-    h2:security vulnerabilities{
+    h2:Security Vulnerabilities{
       The design limitations placed on WPA have lead to a fw vulnerabilities as the protocols used were weakened by the limitations of older WEP hardware.  [http://arstechnica.com/security/2008/11/wpa-cracked/]
       This is not considered a large risk, however, as WPA was intended as a stopgap measure and the full 802.11i implementation, WPA2, was released shortly after WPA.
 
     }
   }
   h1:EAP{
-    h2:role{
+    h2:Role{
       The Extensible Authentication Protocol (EAP) provides a flexible framework for network access and authentication that allows almost any authentication protocols to be used.
       Within the context of the 802.11i standard, the 802.1X protocol uses EAP to define the EAPOL authentication mechanism.
     }
-    h2:operation{
+    h2:Operation{
       EAP is a generic transport service that defines message formats which any protocol can encapsulate in order to be EAP compatible.
       The most typical network configuration in which EAP is used is between an EAP Peer (e.g. computer joining the network), the EAP Authenticator (e.g. access point), and the Authentication Server (AS), a server which validates the credentials and authorises network access.
       #TODO: brief segment on RADIUS
@@ -116,22 +110,22 @@ how these protocols address wireless vulnerabilities and secure WLANs.
       This exchange goes back and forth until the authenticator either authenticates the EAP Peer and transmits an EAP Success message or cannot authenticate and submits an EAP Failure message.
       The EAP conversation is considered complete upon transmission of the Success or Failure message. [https://tools.ietf.org/html/rfc3748#section-2.1]
     }
-    h2:security services{
+    h2:Security Services{
       EAP itself does not provide security services, but does require implementations to include a threat-model and how the implementation addresses these threats.  [https://tools.ietf.org/html/rfc3748#page-42]
     }
-    h2:security vulnerabilities{
+    h2:Security Vulnerabilities{
       As there are many different implementations of EAP it is difficult to concisely summarise the vulnerabilities.
       Essentially, EAP security also depends on the overall network security; if an attacker is able to gain access to the network then there are several methods available to further compromise network security. [https://depthsecurity.com/blog/when-802-1x-peap-eap-ttls-is-worse-than-no-wireless-security.]
       However, this is beyond the scope of this paper.
     }
   }
   h1:802.1X{
-    h2:role{
+    h2:Role{
       The IEEE 802.1X Port-Based Network Access Control provides access control functions for LANs.
       In essence, it allows a device on a network to be authenticated without accessing data on the network.
       Within the context of the 802.11i standard, 802.1X is used for authentication and access control.
     }
-    h2:operation{
+    h2:Operation{
       #TODO: add sub-headers
       The following entities connected to the LAN are involved in the authentication process:
       Supplicant refers to an entity, e.g. a computer, seeking to be authenticated on the LAN.
@@ -151,10 +145,10 @@ how these protocols address wireless vulnerabilities and secure WLANs.
         When the supplicant is ready to leave the network it submits an EAP-Logoff packet indicating intent to be disconnected.
       }
     }
-    h2:security services{
+    h2:Security Services{
       802.1X provides authentication via the Authentication Server, confidentiality through its use of keys to encrypt data, and data integrity through the checksums used in the encryption methods.
     }
-    h2:security vulnerabilities{
+    h2:Security Vulnerabilities{
       802.1X is susceptible to a man-in-the-middle attack as it only authenticates at the beginning of the session.
       This means that an attacker with physical access to the network could insert a device between the authenticated computer and the port in order to gain access to the network.
       To address this, IEEE is already working on an update to the specification, and several vendors have worked on proprietary extensions to the protocol with various authentication schemes.  [https://en.wikipedia.org/wiki/IEEE_802.1X#Vulnerabilities_in_802.1X-2001_and_802.1X-2004]
@@ -162,9 +156,9 @@ how these protocols address wireless vulnerabilities and secure WLANs.
     }
   }
   h1:WPA2+RSN{
-    h2:role{
+    h2:Role{
     }
-    h2:operation{
+    h2:Operation{
       The RSN connects various devices in a network, the station (STA) connecting to a network, e.g. a compture or mobile device,
       the access point (AP) to which the STA connects, 
       the authentication server (AS) which verifies the identity of the STA,
@@ -216,7 +210,7 @@ how these protocols address wireless vulnerabilities and secure WLANs.
         Communication between two entities is secured using pairwise keys, e.g. between an STA and AP,
           and multicast, i.e. group, communications are secured using group keys, e.g. one STA broadcasting to multiple other STAs.
 
-        h5:pairwise keys{
+        h5:Pairwise Keys{
           {
             |[MSK(AAAK) || PSK] (Master Session Key, aka AAA-Key AAAK || Pre-Shared Key)
             |`-- PMK (Pairwise Master Key)
@@ -238,7 +232,7 @@ how these protocols address wireless vulnerabilities and secure WLANs.
           The EAPOL Key Encryption Key(EAPOL-KEK) protects the confidentiality of keys and other data during certain RSN procedures.
           The Temporal Key(TK) is used for protecting user traffic.
         }
-        h5:group keys{
+        h5:Group Keys{
           {
             |GMK (Group Master Key)
             |`-- GTK (Group Temporal Key)
@@ -257,7 +251,7 @@ how these protocols address wireless vulnerabilities and secure WLANs.
         #          essentially, MIC (or MAC) is used to authenticate a message, i.e. prove that msg not altered in transit
         # TODO: super brief explanation of PRF, perhaps inline?
         # wiki: The PTK is generated by concatenating the following attributes: PMK, AP nonce (ANonce), STA nonce (SNonce), AP MAC address, and STA MAC address. The product is then put through a pseudo random function. The handshake also yields the GTK (Group Temporal Key), used to decrypt multicast and broadcast traffic.
-        h5:pairwise_key_distribution{
+        h5:Pairwise Key Distribution{
           [p582,bottom]
           The Four-Way Handshake is designed such that the STA and AP can verify that each know the PMK without disclosing it.
           This is done by exchanging data that proves knowledge of the PMK without actually transmitting the PMK.
@@ -273,7 +267,7 @@ how these protocols address wireless vulnerabilities and secure WLANs.
           4. [STA->AP] The STA sends an acknowedgement message to the AP with a MIC.
           This concludes the 4-Way handshake.
         }
-        h5:group_key_distribution{
+        h5:Group Key Distribution{
           [p584,top]
           The Group Key Handshake is used to distribute Group Temporal Keys (GTK) to STAs in a multicast group once the initial PTKs have been generated.
           The GTK needs to be updated after certain events:
@@ -297,10 +291,10 @@ how these protocols address wireless vulnerabilities and secure WLANs.
         CCMP superceded TKIP and is part of the final WPA2 protocol; it is still considered state-of-the-art and is the recommended method.
 
         h4:TKIP{
-          h5:role{
+          h5:Role{
             Temporal Key Integrity Protocol (TKIP) is a legacy protocol intended as a stopgap measure intended to replace WEP on existing hardware.
           }
-          h5:operation{
+          h5:Operation{
             TKIP introduced three features to address WEP vulnerabilites while maintaining backwards compatibility with WEP by using RC4.
             1. Key Mixing to avoid correlation between data and key
             2. Sequence Counter to avoid replay attacks
@@ -322,14 +316,10 @@ how these protocols address wireless vulnerabilities and secure WLANs.
             3. Michael MIC (msg integ check) 64-bit
             The MIC is generated by an algorithm called Michael which is a function of a key, the STA- and AP-MAC addresses, and the data field.
           }
-          h5:security services{
+          h5:Security Services{
             TKIP provides two services, Message Integrity, i.e. ensuring that the message is intact and unaltered, and Data Confidentiality, i.e. encrypting the data.
             Message Integrity is provided by adding a Message Integrity Code (MIC) after the data field of the 802.11 MAC frame.
             Data Confidentiality is provided by encrypting the data frame and the Michael MIC value using the RC4 algorithm.
-          }
-          h5:security vulnerabilities{
-            MIC key recovery attach
-            royal holloway
           }
         }
         h4:CCMP{
