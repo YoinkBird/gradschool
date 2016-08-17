@@ -1,0 +1,43 @@
+                                      %    
+                                      %    
+                                      %    
+                                      %    
+              Alice                   %                   Bob 
+                                      %    
+    Sending     |     Receiving       %      Receiving     |     Sending
+                                      %    
+MK      CK      RK      CK      MK    %    MK      CK      RK      CK      MK
+--      --      --      --      --    %    --      --      --      --      --
+            ECDH(A0,B0)               %                ECDH(A0,B0)
+                |                     %                    |
+                |                     %                    |
+    ECDH(A1,B0) +                     %        ECDH(A1,B0) + 
+               /|                     %                   /|
+              / |                     %                  / |
+             /  + ECDH(A1,B1)         %                 /  + ECDH(A1,B1)
+     CK-A1-B0   |\                    %         CK-A1-B0   |\
+         |      | \                   %             |      | \
+MK-0 ----+      |  \                  %    MK-0 ----+      |  \
+         |      |   CK-A1-B1          %             |      |   CK-A1-B1
+MK-1 ----+      |       |             %    MK-1 ----+      |       |
+         |      |       +---- MK-0    %             |      |       +---- MK-0
+MK-2 ----+      |       |             %    MK-2 ----+      |       |
+                |       +---- MK-1    %                    |       +---- MK-1
+    ECDH(A2,B1) +                     %        ECDH(A2,B1) +
+               /|                     %                   /|
+              / |                     %                  / |
+             /  |                     %                 /  |
+     CK-A2-B1   |                     %         CK-A2-B1   |
+         |      + ECDH(A2,B2)         %             |      + ECDH(A2,B2)
+MK-0 ----+       \                    %    MK-0 ----+       \
+                  \                   %                      \
+                   \                  %                       \
+                    CK-A2-B2          %                        CK-A2-B2
+                        |             %                            |
+                        +---- MK-0    %                            +---- MK-0
+                        |             %                            |
+                        +---- MK-1    %                            +---- MK-1
+                                      %    
+                                      %    
+                                      %    
+                                      %    

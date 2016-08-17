@@ -1,0 +1,48 @@
+Root Key Derivation
+
+During the intialisation of the double ratchet each party computes a shared secret Root Key (RK).
+
+The RK is a combination of keys generated via DH key exchanges and each party arrives at the same value, essentially making it a symmetric key.
+
+This is accomplished by running a key derivation function (KDF) on a master secret created by concatenating series of shared DH key-exchange secrets.
+
+
+Key Definitions
+For the following key definitions, 'kp' denotes a private key and 'kr' denotes a public key.
+
+Public Key Types
+IdentityKey   : Ikp,Ikr   - long-term ID key pair
+SignedPreKey  : SPkp      - temporary (but not ephemeral) signed pre-key
+BaseKey       : Ekp,Ekr   - ephemeral key pair
+OneTimePreKey : OPkp,OPkr - ephemeral one-time key pair
+
+Session Key Types
+RootKey    : RK - long-term symmetric key used to authenticate two parties and generate Chain Keys
+ChainKey   : CK - incrementing key used to generate Message Keys
+MessageKey : MK - single-use key used to encrypt message contents
+
+master_secret = ECDH(SPkp_B, Ikp_A) || ECDH(Ikp_B, Ekp_A) || ECDH(SPkp, Ekp_A) || ECDH(OPkp_B, Ekp_A)
+Omit the final concatenation if a one-time prekey is not present
+
+Derive RK and CK from the master_secret:
+(RK, CK) = HKDF(master_secret)
+
+ECDH Ratcheting:
+The RK is ratched forward for each new generated ECDH pair (ephemeral_secret), at which time a new hash ratchet and corresponding CK is also generated:
+ephemeral_secret = ECDH(EA,EB)
+(RK', CK) = HKDF(RK,ephemeral_secret)
+
+
+Each ECDH ratchet advancement creates a new hash ratchet initialised using a Chain Key (CK) derived from the Root Key (RK).
+Advancing the hash ratchet generates new CKs, from which individual Message Keys (MK) are derived.
+
+# The initial CK is derived as part of the ECDH ratchet
+MK  = HMAC(CK, 0x01)
+CK' = HMAC(CK, 0x02)
+
+This process deterministically chains the CKs together, hence the name Chain Key.
+However, each MK depends only on one input CK and cannot be used to derive the next MK.
+
+This is important for future secrecy as a compromised MK cannot be used to decrypt future messages.
+Other protocols rely only on the CKs for encryption and thus have no future secrecy.
+

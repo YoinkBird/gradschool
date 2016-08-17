@@ -1,0 +1,66 @@
+The signal protocol provides several services
+confidentiality
+integrity
+authentication
+participant consistency
+destination validation
+forward secrecy
+backward secrecy (aka future secrecy)
+causality preservation
+message unlinkability
+message repudiation
+participation repudiation
+asynchronicity.[47]
+
+Confidentiality: Only the intended recipients are able to
+read a message. Specifically, the message must not be readable
+by a server operator that is not a conversation participant.
+
+Integrity: No honest party will accept a message that has
+been modified in transit.
+
+Authentication: Each participant in the conversation re-
+ceives proof of possession of a known long-term secret from
+all other participants that they believe to be participating in
+the conversation. In addition, each participant is able to verify
+that a message was sent from the claimed source.
+
+Participant Consistency: At any point when a message is
+accepted by an honest party, all honest parties are guaranteed
+to have the same view of the participant list.
+
+Destination Validation: When a message is accepted by an
+honest party, they can verify that they were included in the set
+of intended recipients for the message.
+
+Forward Secrecy: Compromising all key material does not
+enable decryption of previously encrypted data.
+
+Backward Secrecy: Compromising all key material does
+not enable decryption of succeeding encrypted data. This
+property is also often called future secrecy [43]. The terms
+are controversial and vague in literature [44]–[46].
+
+Causality Preserving: Implementations can avoid display-
+ing a message before messages that causally precede it.
+
+
+Message Unlinkability: If a judge is convinced that a
+participant authored one message in the conversation, this does
+not provide evidence that they authored other messages.
+
+Message Repudiation: Given a conversation transcript and
+all cryptographic keys, there is no evidence that a given
+message was authored by any particular user. We assume that
+the accuser has access to the session keys because it is trivial
+to deny writing a plaintext message when the accuser cannot
+demonstrate that the ciphertext corresponds to this plaintext.
+We also assume that the accuser does not have access to the
+accused participant’s long-term secret keys because then it is
+simple for the accuser to forge the transcript (and thus any
+messages are repudiable).
+
+Participation Repudiation: Given a conversation transcript
+and all cryptographic key material for all but one accused
+participant, there is no evidence that the honest participant
+was in a conversation with any of the other participants.

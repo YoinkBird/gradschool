@@ -1,0 +1,41 @@
+#combines best of both
+#explanation of double-ratchet
+#MAKE sure that the local message storage is also described, i.e. the actual E2E encryption
+#TODO-shortdesc_ratchet
+#TODO-shortdesc_future_secrecy
+The double ratchet algorithm enables offline asyncronous message exchanges while addressing weaknesses found in other analogous algorithms.
+It achieves this by combining the strengths of two different ratcheting algorithms.
+One algorithm has future secrecy but only works if both parties are online (synchronous) and the other algorithm works for offline (asynchronous) messages but has no future secrecy.
+
+The first algorithm, called the Elliptic Curve Diffie-Hellman (ECDH) ratchet, provides future secrecy (keys cannot be derived from each other) but only works if both parties are online in order to generate the message keys together.
+The second algorithm, a hash iteration (HMAC)[1] ratchet, allows both parties to independently derive the same key, thus enabling offline communication but at the cost of future secrecy, as a compromised key can be used to decrypt all future messages.
+<footnote>
+[1]This paper will refer to the hash iteration ratchet as an HMAC-ratchet to reflect the hashing algorithm used and to provide for consistent naming conventions.
+It should be noted that none of the literature consulted when writing this paper uses the term HMAC-ratchet, but then again most of the literature is in draft form and as such does not tend to use consistent naming conventions.
+</footnote>
+
+The Double Ratchet Algorithm combines the two algorithms by using the ECDH ratchet to generate shared keys any time both parties are online and the HMAC ratchet to generate new keys when either party is offline.
+
+The ECDH ratchet is advanced (i.e. a new key is generated) each time either party is able to receive a new key, e.g. when both are online or a roundtrip message-response exchange happens[#TODO:footnote:A sent to B, B sent to A].
+As the ratchet advances, previously keys are discarded as they are no longer needed - the ratchet only advances after a complete key exchange which means that both parties have already advertised a new key.
+
+The HMAC ratchet is advanced in between ECDH ratchet clicks to ensure that new keys can be generated for offline messages, e.g. if one party is sending messages while the other is offline
+  [#TODO:footnote:The signal protocol uses a server to relay messages sent to an offline user, but this is not required to implement a double ratchet. For example, a p2p messaging client could wait to send all messages until the recipient is online.]
+When a new shared key is derived, a new HMAC ratchet is initialised with that shared key.
+
+This combination reduces the risk of using an HMAC ratchet for offline communications as a compromised key can only be used to decrypt messages until the next ECDH key exchange, i.e. the next online exchange.
+
+This works as follows:
+* The initial ECDH key exchange takes place between Alice and Bob, this generates the Root Key (RK)
+* Each new DH ratchet, i.e. new ECDH key exchange, is used to derive a new RK as well as a Chain Key (CK)
+* The initial Chain Key (CK) forms a new HMAC ratchet which persists until the next advancement of the ECDH ratchet
+Each CK is used to derive a Message Key (MK) for each new message and is then advanced.
+The term "Chain Key" stems from the fact that each key is derived from the previous one, thus metaphorically chaining them together.
+
+The resulting algorithm has several advantages.
+The use of a hash ratchet provides forward secrecy.
+The hash ratchet guarantees that compromised key cannot be used to decode previous messages within a chain, thus providing forward secrecy.
+The ECDH ratchet keys can neither be used to decode previous nor future messages, thus providing both forward secrecy and future secrecy.
+Message ordering is cryptographically enforced, as each message corresponds to specific position in a chain of keys.
+Replay protection is built in due to the fact that unique keys are used for each message and then discarded.
+If an attacker captures and re-sends a packet it will be discarded as the recipient cannot decrypt it.
