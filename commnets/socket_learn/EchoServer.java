@@ -29,11 +29,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */ 
 
+/* notes
+  http://stackoverflow.com/questions/10182798/why-are-ports-below-1024-privileged
+  http://stackoverflow.com/a/25545052
+  use port > 1024
+ */
 import java.net.*;
 import java.io.*;
 
 public class EchoServer {
     public static void main(String[] args) throws IOException {
+        //static, won't work:  String className = this.getClass().getSimpleName();
+        // http://stackoverflow.com/a/1577359
+        String className = new Throwable().getStackTrace()[0].getClassName();
         
         if (args.length != 1) {
             System.err.println("Usage: java EchoServer <port number>");
@@ -51,9 +59,14 @@ public class EchoServer {
             BufferedReader in = new BufferedReader(
                 new InputStreamReader(clientSocket.getInputStream()));
         ) {
+            System.out.println("[" + className + "][-I-]: listening on " + "<whateverhost>" + ":" + portNumber);
             String inputLine;
             while ((inputLine = in.readLine()) != null) {
-                out.println(inputLine);
+//                System.out.println("-I-: [input] " + inputLine);
+                System.out.println("[EchoServer][-I-]: " + inputLine);
+//                System.out.println("[" + className + "][-I-]: " + in.readLine());
+                System.out.println("[" + className + "][-I-][in]: " + inputLine);
+                out.println("echo: " + inputLine);
             }
         } catch (IOException e) {
             System.out.println("Exception caught when trying to listen on port "

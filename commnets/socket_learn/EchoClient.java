@@ -55,10 +55,11 @@ public class EchoClient {
                 new BufferedReader(
                     new InputStreamReader(System.in))
         ) {
+          System.out.println("[EchoClient][-I-]: connected to " + hostName + ":" + portNumber);
             String userInput;
             while ((userInput = stdIn.readLine()) != null) {
                 out.println(userInput);
-                System.out.println("echo: " + in.readLine());
+                System.out.println("[EchoClient][-I-][return]: " + in.readLine());
             }
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);
