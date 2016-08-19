@@ -1,11 +1,13 @@
 #!/bin/sh -xu
+scriptdir=`dirname $0`
+
 echo $*
 
 # compile
-javac EchoServer.java EchoClient.java
+$scriptdir/build.sh
 if [ $? -ne 0 ] ;then
   exit
 fi
 
 # now run
-./run.sh $*
+$scriptdir/run.sh $*
