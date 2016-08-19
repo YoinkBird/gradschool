@@ -1,0 +1,15 @@
+Tutorials:
+
+UDP: http://docs.oracle.com/javase/tutorial/networking/datagrams/index.html
+LOGGING:
+http://stackoverflow.com/questions/5950557/good-examples-using-java-util-logging
+
+http://stackoverflow.com/questions/9199598/using-java-util-logging-to-log-on-the-console
+
+
+PORT LISTEN:
+<so-post, didn't copy correctly>
+lsof -i :<port>
+
+git remove commit permanently
+http://stackoverflow.com/a/12883611
