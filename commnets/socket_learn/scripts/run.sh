@@ -9,6 +9,7 @@ java EchoServer $port &
 sleep 1
 lsof -i :${port}
 
+cmd_client="java EchoClient $host $port"
 
 usepipe=1
 if [[ $usepipe -eq 1 ]];then
@@ -26,6 +27,14 @@ if [[ $usepipe -eq 1 ]];then
   done
   echo "TERMINATE" > $inputPipe
   # resolves buffer issues in which java output appears after everything is done
+else
+  for i in {0..5}; do
+    testVal=test${i};
+    jobs
+    echo $testVal | $cmd_client
+  done
+  echo "TERMINATE" | $cmd_client
+
 fi
 sleep 2
 jobs

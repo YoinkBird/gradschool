@@ -61,7 +61,11 @@ public class EchoServer {
         ) {
             System.out.println("[" + className + "][-I-]: listening on " + "<whateverhost>" + ":" + portNumber);
             String inputLine;
-            while ((inputLine = in.readLine()) != null) {
+            while (true) {
+                inputLine = in.readLine();
+                if ( inputLine == null ){
+                  continue;
+                }
 //                System.out.println("-I-: [input] " + inputLine);
                 System.out.println("[EchoServer][-I-]: " + inputLine);
 //                System.out.println("[" + className + "][-I-]: " + in.readLine());
