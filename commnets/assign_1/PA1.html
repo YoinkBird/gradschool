@@ -1,0 +1,980 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type">
+
+  
+  <meta content="Mozilla/4.76 [en] (Windows NT 5.0; U) [Netscape]" name="GENERATOR">
+
+  
+  
+  <title>Chat System</title>
+  <meta content="Ramesh Yerraballi" name="author">
+
+  
+  <meta content="Implement a Chat Client and Server Program using TCP and UDP" name="description">
+</head>
+
+
+<body>
+
+<center>
+<h1><span style="color: rgb(153, 153, 255);">Project 1: Implement a Chat System (Client and Server)</span><br>
+
+</h1>
+
+</center>
+
+<center>EE 382K-15, Fall 2016 <br>
+
+Dr. Ramesh Yerraballi<br>
+
+Due Date: <span style="font-weight: bold;">Friday 9/16 11:59pm</span><br>
+
+</center>
+
+<h3>
+<span style="color: rgb(153, 153, 255);">Statement</span></h3>
+Implement the Client and Server part of a Chatroom facility following
+the
+pre-defined protocol. The implementation follows a classic
+client-server paradigm. The single server maintains and conveys
+membership information for the various clients. Server is only involved
+for entry&nbsp;and exit of Clients. Clients communicate messages with
+each other directly (using UDP) without the Server's involvement.<br>
+
+<h3 style="color: rgb(153, 153, 255);"><b>Outline</b><br>
+
+</h3>
+
+<div style="text-align: center;"><img alt="Chatter Interaction with MemD Server" src="MemD-Design.png" style="width: 509px; height: 518px;"><br>
+
+<br>
+
+</div>
+
+You have to implement a chat client (Chatter) that can be used by users anywhere
+in the Internet to talk to each other using a Membership server
+(MemD
+- Membership Daemon). The outline of the client is as
+follows:<br>
+
+<ol>
+
+  <li>Create a TCP socket to connect to the server at its Welcome
+Socket. The server must be running at a known port, which is given as a
+command-line argument to the client when it is run (see below).<br>
+
+  </li>
+
+  <li>Send its screen name and UDP to the server once connected. Let
+the Server validate the screen name.<br>
+
+  </li>
+
+  <li>If validated, receive a list of members who are already in the
+chatroom (including yourself). Specifically, thei IP addresses and UDP
+Socket port numbers are sent. <br>
+
+  </li>
+
+  <li>Provide a GUI with a <span style="font-family: monospace;">JTextField</span>,
+a <span style="font-family: monospace;">JtextArea</span>, a <span style="font-family: monospace;">JButton</span>. (see
+help on website)</li>
+
+  <li>Continuously read UDP socket for messages from other clients
+(chatters) and display
+messages in the <span style="font-family: monospace;">JTextArea</span></li>
+
+  <li>Read input typed in the client <span style="font-family: monospace;">JTextField</span> and display it in <span style="font-family: monospace;">JTextArea</span> (obviously
+prefaced by the client&rsquo;s screen name) and send it
+to all the clients over UDP (to their corresponding UDP socket ports)
+formatted as shown below in the Protocol.</li>
+
+  <li>If the chat user quits the chat then send a message over TCP to
+the membership server. The membership server will confirm your quit on
+your UDP socket. Receive confirmation and then quit.</li>
+
+  <li>When one of the other chatters quits, you will receive a "quit"
+message over UDP informing you this. In response to this remove the
+specific member from your list of active members.<span style="font-weight: bold;"></span></li>
+
+</ol>
+The outline of the&nbsp;Membership server
+(MemD
+- Membership Daemon) is as follows:<br>
+<ol>
+  <li>The server has to be Multi-threaded (like the ConTCPServer
+example discussed in class).<br>
+
+  </li>
+  <li>The Server waits for connections from clients (Chatters) on the
+TCP Welcome Socket (port is taken from command-line arg). Each Chatter
+is accepted on a separate TCP socket (connectionSocket) and a thread is
+created to serve the Chater (we will call this the servant thread).</li>
+  <li>The first message received by the servant thread from the Chatter
+(on the connectionSocket) is the Chatter&rsquo;s identity (Screen Name, IP
+Address and UDP Port). The Servant thread validates the Screen Name by
+looking it up in the Membership list (a Data Structure maintained at
+the Server).&nbsp;</li>
+  <ol style="list-style-type: lower-alpha;">
+    <li>If there is no other member in the list with the same
+requested Screen Name then, the new Chatter is added to the List and an
+Acceptance message is sent back to the Chatter. The acceptance message
+contains a list of the identities of all the Chatter&rsquo;s currently in the
+chatroom.</li>
+    <li>If there is a member with the requested Screen Name
+already
+in the list then, it sends a Rejection message to the client and quits.</li>
+  </ol>
+</ol>
+
+<div style="margin-left: 40px;">The Servant thread now blocks on
+reading the connectionSocket to be notified when the Chatter exits the
+chatroom.<br>
+
+</div>
+
+<ol start="4">
+  <li>When a new client is added to the membership list (3-a above),
+the server sends a message to all the Chatters (in the Membership list)
+at their UDP ports conveying to them the identity of the new Chatter.
+Note that the message is sent to ALL members in the list including the
+Chatter who just joined.</li>
+  <li>When a Chatter exits the chatroom the Chatter notifies the
+corresponding Servant thread over its connectionSocket. The servant
+thread then, removes the Chatter from the Membership list and sends a
+Member_Exit notification to ALL members (including the Chatter who is
+exiting) in the Membership list at their UDP Ports. It then quits.</li>
+</ol>
+
+<h3 style="color: rgb(153, 153, 255);">Implementation</h3>
+
+You are expected to implement this project in two main iterations. In the first iteration you will write the <span style="font-weight: bold;">Chatter </span>code and&nbsp;use my <span style="font-weight: bold;">YMemD</span><span style="font-weight: bold;"> </span>solution to test it. In the second iteration, you will write the <span style="font-weight: bold;">MemD</span><span style="font-weight: bold;"> </span>code and use my <span style="font-weight: bold;">YChatter</span>
+solution to test it. In the second iteration, you can also use your own
+Chatter code developed&nbsp; the first iteration in conjunction with my
+Chatter solution&nbsp;to test your <span style="font-weight: bold;">MemD</span> code.<br>
+<br>
+<span style="font-weight: bold; text-decoration: underline;">First Iteration:</span><br>
+&nbsp;The Membership Server (<span style="font-weight: bold;">YMemD)</span> provided to you has to be run first. For testing
+purposes,
+you can run the server and the multiple clients on your local machine.
+Once you have it working, you can test your client by running the
+server on a machine like gamma.uta.edu and running your clients on your
+local machine.<br>
+
+<div style="margin-left: 40px;">Run Server as:<br>
+
+<div style="margin-left: 40px;"><span style="font-family: monospace;">java
+-jar YMemD.jar
+&lt;MemD_welcome_tcp_port&gt;</span><br>
+
+<span style="font-family: monospace;"></span></div>
+
+<div style="margin-left: 40px;"><span style="font-family: monospace;"><br>
+
+<span style="text-decoration: underline;">Examples</span> <br>
+
+&nbsp;1.(on localhost):<br>
+
+</span>
+<div style="margin-left: 40px;"><span style="font-family: monospace;">%
+java -jar YMemD.jar 2244<br>
+
+</span></div>
+
+</div>
+
+
+<div style="margin-left: 40px;"><span style="font-family: monospace;"></span></div>
+
+
+Run Client as:<br>
+
+<div style="margin-left: 40px;"><span style="font-family: monospace;">java
+-jar Chatter.jar &lt;screen_name&gt;
+&lt;MemD_server_hostname&gt; &lt;MemD_welcome_tcp_port&gt;</span><br>
+
+<span style="font-family: monospace;"></span></div>
+
+<div style="margin-left: 40px;"><span style="font-family: monospace;">or</span><br>
+
+<span style="font-family: monospace;"></span></div>
+
+<span style="font-family: monospace;"></span>
+<div style="margin-left: 40px;"><span style="font-family: monospace;"><span style="font-family: monospace;">java Chatter
+&lt;screen_name&gt; &lt;MemD_server_hostname&gt;
+&lt;MemD_welcome_tcp_port&gt;<br>
+
+<br>
+
+</span></span><span style="font-family: monospace;"><span style="font-family: monospace;"><span style="font-family: monospace;"><span style="text-decoration: underline;">Examples</span> <br>
+
+(on localhost - open one cmd window per chatter and run in each
+window):<br>
+
+</span>
+</span></span>
+<div style="margin-left: 40px;"><span style="font-family: monospace;"></span>
+<table style="text-align: left; width: 70%;" border="1" cellpadding="2" cellspacing="2">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 70%;"><span style="font-family: monospace;">% java Chatter Anne localhost 2244</span></td>
+
+    </tr>
+
+  
+  </tbody>
+</table>
+
+<span style="font-family: monospace;"></span>
+<table style="text-align: left; width: 70%;" border="1" cellpadding="2" cellspacing="2">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top;"><span style="font-family: monospace;">% </span><span style="font-family: monospace;"><span style="font-family: monospace;">java
+Chatter Bob localhost 2244</span></span></td>
+
+    </tr>
+
+  
+  </tbody>
+</table>
+
+<span style="font-family: monospace;"><span style="font-family: monospace;">...<br>
+
+</span></span><span style="font-family: monospace;"><span style="font-family: monospace;"><span style="font-family: monospace;"><span style="font-family: monospace;"></span></span></span></span>
+<table style="text-align: left; width: 70%;" border="1" cellpadding="2" cellspacing="2">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top;"><span style="font-family: monospace;"><span style="font-family: monospace;">%
+      </span></span><span style="font-family: monospace;"><span style="font-family: monospace;"><span style="font-family: monospace;"><span style="font-family: monospace;">java Chatter Zoe localhost 2244</span></span></span></span></td>
+
+    </tr>
+
+  
+  </tbody>
+</table>
+
+<span style="font-family: monospace;"><span style="font-family: monospace;"><span style="font-family: monospace;"><span style="font-family: monospace;"></span></span></span></span><span style="font-family: monospace;"><span style="font-family: monospace;"><span style="font-family: monospace;"><span style="font-family: monospace;"><span style="font-family: monospace;"></span></span></span></span></span><span style="font-family: monospace;"><span style="font-family: monospace;"></span></span></div>
+</div>
+
+</div>
+
+<h3 style="color: rgb(153, 153, 255); margin-left: 40px;">Protocol - Client Perspective</h3>
+
+<div style="margin-left: 40px;">Here is the interesting part of the
+project. Your code for the client has to follow a protocol. What this
+implies is that your client, if implemented correctly (protocol
+compliant) should be able to talk to my Membership Server that follows
+the same
+protocol.&nbsp; What is more it should also work with somebody else's
+protocol compliant client implementation. Here are the
+conventions used in the protocol
+description.<br>
+
+<ul>
+
+  <li>Keywords (Commands) are in uppercase</li>
+
+  <li>A blank space is indicated by &ldquo;<span style="font-family: monospace; color: rgb(51, 51, 255);">&curren;</span>&rdquo;.</li>
+
+  <li>The newline character is &lsquo;<span style="font-family: monospace; color: rgb(51, 51, 255);">\n</span>&rsquo;.</li>
+
+  <li>Angled braces <span style="color: rgb(51, 51, 255); font-family: monospace;">&lt;&gt;</span>
+are used to enclose information which has special meaning. <span style="font-weight: bold;">Please note that the actual messages do not
+have these angled braces.</span><br>
+
+  </li>
+
+</ul>
+
+</div>
+
+<div style="margin-left: 40px;">
+<table style="text-align: left; width: 90%; height: 354px;" border="1" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; text-align: center;"><span style="font-weight: bold;">Message</span><br>
+
+      </td>
+
+      <td style="vertical-align: top; text-align: center;"><span style="font-weight: bold;">Meaning</span><br>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 45%;">[<span style="font-style: italic;">Send</span>]&nbsp; <br>
+
+      <span style="font-family: monospace; color: rgb(51, 51, 255);">HELO&curren;&lt;screen_name&gt;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&curren;&lt;IP&gt;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&curren;&lt;Port&gt;</span><span style="font-family: monospace; color: rgb(51, 51, 255);"> \n</span><br>
+
+      </td>
+
+      <td style="vertical-align: top;">This message is sent as the
+first greeting from the client to the server immediately after
+connecting. <br>
+
+The screen_name must not have spaces in it. The Port is the UDP Port at
+which you intend to receive and send chat messages. The <span style="color: rgb(51, 51, 255);">screen_name</span> must not
+have spaces in it. <br>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 45%;">[<span style="font-style: italic;">Send</span>]&nbsp; <br>
+
+      <span style="font-family: monospace; color: rgb(51, 51, 255);">MESG</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&curren;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&lt;screen_name&gt;:&curren;&lt;message&gt;\n</span><br>
+
+      </td>
+
+      <td style="vertical-align: top;">This message is sent to the UDP
+ports of all members in the membership list, when a chat user types in
+a <span style="color: rgb(102, 51, 255);"><span style="color: rgb(51, 51, 255);">message</span> </span>(in the
+JTextField). <br>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 45%;">[<span style="font-style: italic;">Send</span>]<br>
+
+      <span style="font-family: monospace; color: rgb(51, 51, 255);">EXIT\n</span><br>
+
+      </td>
+
+      <td style="vertical-align: top;">When the Chat Client wants to
+terminate (or exit) the chat it sends this to the Membership Server
+over TCP.<br>
+
+The exit should take effect ONLY when the client clicks on the EXIT
+button provided in the GUI. The Client must read a response (see
+below)back from the server over the UDP Socket and then terminate.<br>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 45%;">[<span style="font-style: italic;">Recv</span>]<br>
+
+      <span style="font-family: monospace; color: rgb(51, 51, 255);">ACPT&curren;&lt;SN1&gt;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&curren;&lt;IP1&gt;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&curren;&lt;PORT1&gt;:<br>
+
+&lt;SN2&gt;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&curren;&lt;IP2&gt;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&curren;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&lt;PORT2&gt;:<br>
+
+...<br>
+
+...<br>
+
+&lt;SNn&gt;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&curren;&lt;IPn&gt;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&curren;&lt;PORTn&gt;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">\n</span><br>
+
+      </td>
+
+      <td style="vertical-align: top;">The server sends this message in
+response to the Greeting, to acknowledge the validity of the screen
+name and to inform the Chatter Client of the Identities of the ALL
+Chatters (<span style="font-style: italic; font-weight: bold;">including
+yourself</span>). <br>
+
+Each identity is separated by a &ldquo;:&rdquo;.<br>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 45%;">[<span style="font-style: italic;">Recv</span>]<br>
+
+      <span style="font-family: monospace; color: rgb(51, 51, 255);">RJCT&curren;&lt;screen_name&gt;\n</span><br>
+
+      </td>
+
+      <td style="vertical-align: top;">The server sends this message in
+response to the Greeting, to let the Chat Client know that the screen
+name is already in use.<br>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 45%;">[<span style="font-style: italic;">Recv</span>]<br>
+
+      <span style="color: rgb(51, 51, 255); font-family: monospace;">MESG&curren;&lt;screen_name&gt;:</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&curren;</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&lt;message&gt;\n</span><br>
+
+      </td>
+
+      <td style="vertical-align: top;">This is a message received on
+the UDP Socket. It is another Chatter&rsquo;s chat message. Parse it and
+display the message in the <span style="font-family: monospace;">JtextArea</span>
+as shown in the GUI<br>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 45%;">[<span style="font-style: italic;">Recv</span>]<br>
+
+      <span style="color: rgb(51, 51, 255);"></span><span style="font-family: monospace; color: rgb(51, 51, 255);">JOIN</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&curren;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&lt;screen_name&gt;</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&curren;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&lt;IP&gt;</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&curren;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&lt;Port&gt;\n</span><br>
+
+      </td>
+
+      <td style="vertical-align: top;">This is a message received on
+the UDP Socket. It is sent by the Server to indicate that a Chatter (it
+could be yourself) has joined the chatroom. If the identity is yours
+then use this as a confirmation that you have been registered in the
+Servers Membership List. If it is a &ldquo;new&rdquo; Chatter, add this Chatter
+identity to the local Membership list.<br>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td style="vertical-align: top;">[Recv]<br>
+
+      <span style="color: rgb(51, 51, 255); font-family: monospace;">EXIT</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&curren;</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&lt;screen_name&gt;\n</span><br>
+
+      <br>
+
+      </td>
+
+      <td style="vertical-align: top;">This is a message received on
+the UDP Socket. It is from the Membership Server notifying the exit of
+a member from the chatroom. Parse it and display an appropriate message
+in the <span style="font-family: monospace;">JtextArea</span><span style="font-family: monospace;"> </span>(Elvis has left the
+Building); Remove from local list.<br>
+
+      </td>
+
+    </tr>
+
+  
+  </tbody>
+</table>
+
+<br>
+
+</div>
+
+<h3 style="margin-left: 40px; color: rgb(153, 153, 255);">Skeleton</h3>
+
+<div style="margin-left: 40px;">
+<table style="text-align: left; width: 90%; height: 463px;" border="1" cellpadding="1" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top;">
+      
+      <div style="text-align: center;"> <font size="-1"><u>Chatter
+Client
+(Chatter.java)</u> <br>
+
+      </font></div>
+
+      <font size="-1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <tt>public
+class Chatter extends JFrame {</tt> <br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Variables here: Sockets, List Data Structure (A Vector) </font>
+      
+      <blockquote>
+        
+        <blockquote><font size="-1"><tt>Chat (args) {</tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// Constructor <br>
+
+&nbsp;&nbsp;&nbsp; Create and Configure GUI; <br>
+
+&nbsp;&nbsp;&nbsp; Create socket to connect to Server; Get IP and port
+from args; <br>
+
+&nbsp;&nbsp;&nbsp; Setup to listen for activity in the JTextField (user
+types stuff); //ActionListener <br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; on Action event, read what the
+user types in and send to Server <br>
+
+&nbsp;&nbsp; Setup for quit button click event <br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; on Action event send EXIT message
+to server<br>
+
+&nbsp; &nbsp; Create UDP Socket, get port assigned by system, say </font><font size="-1"><span style="font-family: monospace;">udp_port</span></font><font size="-1">.<br>
+
+          <tt>}</tt></font>
+          
+          <p><font size="-1">Other private routines here;</font></p>
+
+        </blockquote>
+
+      </blockquote>
+
+      
+      <blockquote>
+        
+        <blockquote><font size="-1"><tt>public static void main (String
+args[]) {</tt> <br>
+
+&nbsp;&nbsp;&nbsp; Create an object <tt>X</tt> of type <tt>Chat</tt>ter;
+//Invoke constructor, with command line args as inputs <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// Use X to refer to all socket created in the Contrcutor <br>
+
+&nbsp;&nbsp;&nbsp; Send&nbsp; "Greeting" to server - HELO including my
+IP and </font><font size="-1"><span style="font-family: monospace;">X.udp_port</span></font><font size="-1">; <br>
+
+&nbsp;&nbsp;&nbsp; Receive Response - ACPT/RJCT; <br>
+
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; ACPT message
+gives list, save to the List Data Structure. <br>
+
+&nbsp;&nbsp;&nbsp; While (true) <tt>{</tt> <br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Read message from on UDP
+port; <br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Act according to message
+contents (See protocol)<br>
+
+&nbsp;&nbsp;&nbsp; <tt>}</tt> <br>
+
+          <tt>}</tt></font></blockquote>
+
+        <font size="-1"><tt>}</tt> <br>
+
+Any Supporting classes you deem useful go here</font></blockquote>
+
+      </td>
+
+    </tr>
+
+  
+  </tbody>
+</table>
+
+<br>
+<br>
+
+</div>
+
+<span style="font-weight: bold; text-decoration: underline;">Second Iteration:</span>
+
+You have to implement a Membership Server (<span style="font-weight: bold;">MemD.jar</span>)&nbsp; that can be contacted by
+users anywhere
+in the Internet to talk to each other using a Chatter Client&nbsp;
+provided to you (<span style="font-weight: bold;">YChatter.jar</span>). Your Membership Server has to be run first. For testing
+purposes,
+you can run the server and the multiple clients on your local machine.&nbsp;<br>
+
+<div style="margin-left: 40px;">Run Server as:<br>
+
+<div style="margin-left: 40px;"><span style="font-family: monospace;">java
+-jar MemD.jar
+&lt;MemD_welcome_tcp_port&gt;<br>
+or<br>
+</span><span style="font-family: monospace;">java&nbsp;MemD.java
+&lt;MemD_welcome_tcp_port&gt;</span><br>
+
+<span style="font-family: monospace;"></span></div>
+
+<div style="margin-left: 40px;"><span style="font-family: monospace;"><br>
+
+<span style="text-decoration: underline;">Examples</span> <br>
+
+&nbsp;(on localhost):<br>
+
+</span>
+<div style="margin-left: 40px;"><span style="font-family: monospace;">%
+java -jar MemD.jar 2244<br>
+
+</span></div>
+
+</div>
+
+<div style="margin-left: 80px;"><br>
+
+</div>
+
+Run Client as:<br>
+
+<div style="margin-left: 40px;"><span style="font-family: monospace;">java
+-jar YChatter.jar &lt;screen_name&gt;
+&lt;MemD_server_hostname&gt; &lt;MemD_welcome_tcp_port&gt;</span><br>
+
+<span style="font-family: monospace;"></span></div>
+<div style="margin-left: 40px;"><span style="font-family: monospace;"><span style="font-family: monospace;"><br>
+
+</span></span><span style="font-family: monospace;"><span style="font-family: monospace;"><span style="font-family: monospace;"><span style="text-decoration: underline;">Examples</span> <br>
+
+(on localhost - open one cmd window per chatter and run in each
+window):<br>
+
+</span>
+</span></span>
+<div style="margin-left: 40px;"><span style="font-family: monospace;"></span>
+<table style="text-align: left; width: 70%;" border="1" cellpadding="2" cellspacing="2">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 70%;"><span style="font-family: monospace;">% java YChatter Anne localhost 2244</span></td>
+
+    </tr>
+
+  
+  </tbody>
+</table>
+
+<span style="font-family: monospace;"></span>
+<table style="text-align: left; width: 70%;" border="1" cellpadding="2" cellspacing="2">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top;"><span style="font-family: monospace;">% </span><span style="font-family: monospace;"><span style="font-family: monospace;">java
+YChatter Bob localhost 2244</span></span></td>
+
+    </tr>
+
+  
+  </tbody>
+</table>
+
+<span style="font-family: monospace;"><span style="font-family: monospace;">...<br>
+
+</span></span><span style="font-family: monospace;"><span style="font-family: monospace;"><span style="font-family: monospace;"><span style="font-family: monospace;"></span></span></span></span>
+<table style="text-align: left; width: 70%;" border="1" cellpadding="2" cellspacing="2">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top;"><span style="font-family: monospace;"><span style="font-family: monospace;">%
+      </span></span><span style="font-family: monospace;"><span style="font-family: monospace;"><span style="font-family: monospace;"><span style="font-family: monospace;">java YChatter Zoe localhost 2244</span></span></span></span></td>
+
+    </tr>
+
+  
+  </tbody>
+</table>
+
+<span style="font-family: monospace;"><span style="font-family: monospace;"><span style="font-family: monospace;"><span style="font-family: monospace;"><br>
+
+</span></span></span></span><span style="font-family: monospace;"><span style="font-family: monospace;"><span style="font-family: monospace;"><span style="font-family: monospace;"><span style="font-family: monospace;"></span></span></span></span></span>&nbsp;<span style="font-family: monospace;"><span style="font-family: monospace;"></span></span></div>
+</div>
+
+</div>
+
+<h3 style="color: rgb(153, 153, 255); margin-left: 40px;">Protocol - Server Perspective</h3>
+
+<div style="margin-left: 40px;">Here is the Server side of the
+Protocol.&nbsp;</div>
+
+<div style="margin-left: 40px;">
+<table style="text-align: left; width: 90%; height: 354px;" border="1" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; text-align: center;"><span style="font-weight: bold;">Message</span><br>
+
+      </td>
+
+      <td style="vertical-align: top; text-align: center;"><span style="font-weight: bold;">Meaning</span><br>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 45%;"><span style="font-family: monospace; color: rgb(51, 51, 255);"></span><span style="color: rgb(0, 0, 0);">[<span style="font-style: italic;">Send</span>]</span><span style="font-family: monospace; color: rgb(51, 51, 255);"><br>
+
+ACPT&curren;&lt;SN1&gt;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&curren;&lt;IP1&gt;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&curren;&lt;PORT1&gt;:<br>
+
+&lt;SN2&gt;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&curren;&lt;IP2&gt;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&curren;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&lt;PORT2&gt;:<br>
+
+...<br>
+
+...<br>
+
+&lt;SNn&gt;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&curren;&lt;IPn&gt;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&curren;&lt;PORTn&gt;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">\n</span> </td>
+
+      <td style="vertical-align: top;">The server sends this message in
+response to the Greeting, to acknowledge the validity of the screen
+name and to inform the Chatter Client of the Identities of the ALL
+Chatters (<span style="font-style: italic; font-weight: bold;">including
+yourself</span>). <br>
+
+Each identity is separated by a &ldquo;:&rdquo;. [TCP] </td>
+
+    </tr>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 45%;">[<span style="font-style: italic;">Send</span>]<br>
+
+      <span style="font-family: monospace; color: rgb(51, 51, 255);">RJCT&curren;&lt;screen_name&gt;\n</span><span style="font-family: monospace; color: rgb(51, 51, 255);"></span> </td>
+
+      <td style="vertical-align: top;"> Meaning same as in Project 1
+[TCP]<br>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td style="vertical-align: top;">[<span style="font-style: italic;"><span style="font-style: italic;">Send</span></span>]<br>
+
+      <span style="color: rgb(51, 51, 255);"></span><span style="font-family: monospace; color: rgb(51, 51, 255);">JOIN</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&curren;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&lt;screen_name&gt;</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&curren;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&lt;IP&gt;</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&curren;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&lt;Port&gt;\n</span></td>
+
+      <td style="vertical-align: top;">Notification sent to ALL Chatter
+clients over their UDP ports to let them know that a new member has
+entered the chatroom. [UDP]<br>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 45%;">[<span style="font-style: italic;">Send</span>]<br>
+
+      <span style="color: rgb(51, 51, 255); font-family: monospace;">EXIT</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&curren;</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&lt;screen_name&gt;\n</span><br>
+
+      </td>
+
+      <td style="vertical-align: top;">Notification sent to ALL Chatter
+clients over their UDP ports to let them know that a member has left.
+[UDP]<br>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 45%;">[<span style="font-style: italic;">Recv</span>]<br>
+
+      <span style="font-family: monospace; color: rgb(51, 51, 255);"></span><span style="font-family: monospace; color: rgb(51, 51, 255);"></span><span style="color: rgb(51, 51, 255); font-family: monospace;">HELO</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&curren;</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&lt;screen_name&gt;</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&curren;&lt;IP&gt;</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&curren;&lt;Port&gt;</span><span style="color: rgb(51, 51, 255); font-family: monospace;">\n</span> </td>
+
+      <td style="vertical-align: top;">A Chatter client sends this to
+enter the chatroom; [TCP] </td>
+
+    </tr>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 45%;"><span style="font-family: monospace; color: rgb(51, 51, 255);"></span>[<span style="font-style: italic;">Recv</span>]<br>
+
+      <span style="font-family: monospace; color: rgb(51, 51, 255);"></span><span style="font-family: monospace; color: rgb(51, 51, 255);"></span><span style="color: rgb(51, 51, 255); font-family: monospace;">EXIT</span><span style="color: rgb(51, 51, 255); font-family: monospace;">\n</span><span style="color: rgb(51, 51, 255); font-family: monospace;"></span> </td>
+
+      <td style="vertical-align: top;">A Chatter client sends this to
+indicate exit from the chatroom; [TCP]<br>
+
+      </td>
+
+    </tr>
+
+  
+  </tbody>
+</table>
+
+<br>
+
+</div>
+
+<h3 style="margin-left: 40px; color: rgb(153, 153, 255);">Skeleton</h3>
+
+<div style="margin-left: 40px;">
+<table style="text-align: left; width: 90%; height: 463px;" border="1" cellpadding="1" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top;">
+      
+      <div style="text-align: center;">&nbsp; <font size="-1"><u>MemD
+Server(MemD.java)</u> <br>
+
+      </font></div>
+
+&nbsp; <font size="-1"><br>
+
+      </font><tt>Public class MemD {</tt> <br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Variables here - <tt>ud</tt> - udp socket; <tt>list</tt> - Data
+Structure; <tt>tc</tt>
+= tcp welcome socket;
+&nbsp;&nbsp;&nbsp; <tt><br>
+
+      <br>
+
+&nbsp; MemD (args) {</tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+//Constructor<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Create TCP Welcome Socket
+and UDP Socket - Port number for Welcome Socket is in args; <br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Create DataStructure
+(HashTable)
+to hold Clients' information; <br>
+
+&nbsp;&nbsp;&nbsp; <tt>}</tt> <tt>&nbsp;&nbsp; public static void
+main( String args[]) {</tt> <br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Create an object <span style="font-family: monospace;">Y</span>
+of type <tt>Memd</tt>; //Invoke constructor, with command line args as
+inputs <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// Use <span style="font-family: monospace;">Y</span> to refer to all
+Variables declared in the class and initialized<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// in the Constructor <br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <tt>while (true) {</tt> <br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+connectionSocket = Accept new connection;<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; get
+inFromClient and outToClient streams for the connectionSocket; <br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Read Message <span style="font-family: monospace;">m</span> from
+client; <br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Act according to content of m: <br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+HELO: Check screename and respond appropriately:<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+1. Verify that the screenname is not taken. If screenname is taken send
+RJCT message<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+2.&nbsp; If the screenname is not taken then send a JOIN message to
+each member in the MemberList;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Form an ACPT message with all members in the MemberList in it;<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+3. Add the new Member to the&nbsp; MemberList<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+4. Send the ACPT message to the client<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Create a Child thread to serve this client (pass it the
+screenName, inFromClient and handle to main thread <span style="font-family: monospace;">Y</span>)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <tt>}</tt> <br>
+
+      <tt>&nbsp;&nbsp; }</tt> <br>
+
+      <tt>}</tt> <br>
+
+      <tt><br>
+
+      </tt><tt>class Child implements Runnable {</tt> <br>
+
+&nbsp;&nbsp;&nbsp; String screenName; BufferedReader out;&nbsp; MemD
+app; <br>
+
+&nbsp;&nbsp;&nbsp; <tt>Child(String s, BufferedReader o, Memd y) {</tt>
+      <br>
+
+      <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; screenName = s;
+out =
+o app = y;</tt><br>
+
+      <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Thread t = new
+Thread(this);</tt> <br>
+
+      <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t.start();</tt> <br>
+
+      <tt>&nbsp;&nbsp;&nbsp; }</tt> <br>
+
+&nbsp;&nbsp;&nbsp; <tt>public void run() {</tt> <br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+block on a read on the&nbsp; <span style="font-family: monospace;">out</span>;<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+when you read something check if it is an EXIT message<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+yes =&gt; Make and Send an EXIT message to ALL clients (including the
+one that just Exited<br>
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; use the app.list
+and app.ud;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Remove the client that just exited from the app.list;<br>
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp;&nbsp; no =&gt; There is a problem with client implementation;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <tt>}</tt> <br>
+
+      <tt>}</tt></td>
+
+    </tr>
+
+  
+  </tbody>
+</table>
+
+<br>
+
+</div>
+
+<h3 style="color: rgb(153, 153, 255);">Submission</h3>
+Create a folder with the name yourEID_PA1 (e.g., abc123_PA1) . Copy
+both your Chatter.jar and MemD.jar&nbsp; into the folder (If you have
+your code as class files then make sure and create&nbsp;jars of them).
+Create a zip file of the folder making sure it is named yourEID_PA1.zip
+(e.g., abs123_PA1.zip). Turn in this single zip file on Canvas through
+the upload page for Project1.&nbsp;
+ </body>
+</html>
