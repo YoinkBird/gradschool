@@ -5,7 +5,9 @@ scriptdir="$(dirname "$0")"
 source "$scriptdir/config.sh"
 
 # test config
-source "$scriptdir/test_basic.sh"
+if [ ! -z $THIS_TEST_CFG ]; then
+  source $THIS_TEST_CFG
+fi
 
 # main section
 echo $*
