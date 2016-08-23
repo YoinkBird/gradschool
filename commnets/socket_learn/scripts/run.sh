@@ -1,16 +1,19 @@
 #!/bin/bash -xu
+scriptdir="$(dirname "$0")"
+source "$scriptdir/config.sh"
 echo $*
 echo $1
 echo $2
 host=$1
 port=$2
 
-java EchoServer $port &
+java_cmd="java $javaOpts"
+$java_cmd $THIS_SERVER $port &
 java_cmd_pid=$!
 sleep 1
 lsof -i :${port}
 
-cmd_client="java EchoClient $host $port"
+cmd_client="$java_cmd $THIS_CLIENT $host $port"
 
 usepipe=1
 if [[ $usepipe -eq 1 ]];then
@@ -21,7 +24,7 @@ if [[ $usepipe -eq 1 ]];then
   cat > /tmp/javaEchoClient_input &
   cat_cmd_pid=$!
   echo $cat_cmd_pid > /tmp/javaEchoClient_input-cat-pid
-  cat /tmp/javaEchoClient_input | java EchoClient $host $port &
+  cat /tmp/javaEchoClient_input | $cmd_client &
 
   for i in {0..5}; do
     testVal=test${i};

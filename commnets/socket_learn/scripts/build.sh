@@ -1,6 +1,9 @@
-#!/bin/sh -xu
+#!/bin/bash -xu
 echo $*
 
+# options
+scriptdir="$(dirname "$0")"
+source "$scriptdir/config.sh"
 # compile
-javac EchoServer.java EchoClient.java
+javac ${javacOpts:-} $*
 exit $?
