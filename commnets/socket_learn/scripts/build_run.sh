@@ -1,7 +1,13 @@
-#!/bin/sh -xu
-scriptdir=`dirname $0`
-scriptdir="$(dirname "$0")"
+#!/bin/bash -xu
 
+# common configs
+scriptdir="$(dirname "$0")"
+source "$scriptdir/config.sh"
+
+# test config
+source "$scriptdir/test_basic.sh"
+
+# main section
 echo $*
 
 java=$THIS_JAVAFILES
@@ -12,4 +18,4 @@ if [ $? -ne 0 ] ;then
 fi
 
 # now run
-$scriptdir/run.sh $*
+$scriptdir/run.sh $THIS_CLI_OPTS
