@@ -6,6 +6,7 @@ host=$1
 port=$2
 
 java EchoServer $port &
+java_cmd_pid=$!
 sleep 1
 lsof -i :${port}
 
@@ -18,7 +19,8 @@ if [[ $usepipe -eq 1 ]];then
   inputPipe="/tmp/javaEchoClient_input"
   mkfifo /tmp/javaEchoClient_input
   cat > /tmp/javaEchoClient_input &
-  echo $! > /tmp/javaEchoClient_input-cat-pid
+  cat_cmd_pid=$!
+  echo $cat_cmd_pid > /tmp/javaEchoClient_input-cat-pid
   cat /tmp/javaEchoClient_input | java EchoClient $host $port &
 
   for i in {0..5}; do
@@ -36,6 +38,10 @@ else
   echo "TERMINATE" | $cmd_client
 
 fi
+sleep 2
+jobs
+kill -9 $java_cmd_pid
+kill -9 $cat_cmd_pid
 sleep 2
 jobs
 echo "done"
