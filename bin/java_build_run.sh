@@ -41,6 +41,7 @@ main(){
   if [ $# -ne 0 ]; then
     fileRoot=$1;
   fi
+  targetArgs=""
   if [ $# -gt 1 ]; then
     # http://stackoverflow.com/questions/2701400/remove-first-element-from-in-bash
     shift
