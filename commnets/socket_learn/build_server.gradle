@@ -1,0 +1,32 @@
+/*
+# build: 
+gradle -q --build-file build_server.gradle build
+# run:
+gradle -q --build-file build_server.gradle run
+ */
+
+apply plugin: 'java'
+apply plugin: 'application'
+
+version = '1.0.2'
+
+mainClassName = "EchoServer"
+
+//sourceSets.main.java.srcDirs = ["."]
+sourceSets {
+    main {
+        java {
+            //srcDirs = ["src","."]
+            srcDirs = ["."]
+        }
+    }
+}
+/*
+*/
+
+// http://stackoverflow.com/a/28610276
+run {
+//  args += 'localhost'
+  args += '1024'
+}
+

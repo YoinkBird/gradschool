@@ -1,0 +1,53 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+version = '1.0.2'
+
+//mainClassName = "EchoClient.main"
+mainClassName = "EchoClient"
+//mainClassName = "Client.main"
+
+//applicationDefaultJvmArgs = ["-Dgreeting.language=en"]
+
+// https://docs.gradle.org/current/userguide/tutorial_using_tasks.html#sec:manipulating_existing_tasks
+// run.dependsOn build
+
+// http://stackoverflow.com/questions/26634000/gradle-skipping-task-compilejava-as-it-has-no-source-files
+//sourceSets.main.java.srcDirs = ["."]
+sourceSets {
+    main {
+        java {
+            //srcDirs = ["src","."]
+            srcDirs = ["."]
+        }
+    }
+}
+/*
+*/
+
+// http://stackoverflow.com/a/28610276
+run {
+  args += 'localhost'
+  args += '1024'
+}
+
+/* notes
+debug build:
+# extracted from output of 'build --info'
+gradle compileJava --info
+
+http://stackoverflow.com/questions/11345193/gradle-does-not-find-tools-jar
+"> Could not find tools.jar. Please check that C:\Program Files\Java\jre8 contains a valid JDK installation."
+solution: setup JAVA_HOME
+*/
+
+/* cmd
+gradle build --console=rich
+gradle run --console=rich
+*/
+
+/* misc
+https://docs.gradle.org/current/userguide/tutorial_gradle_command_line.html
+list tasks: 
+gradle -q tasks
+*/
