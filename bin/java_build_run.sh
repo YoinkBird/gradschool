@@ -38,8 +38,12 @@ main(){
     fileRoot=$1;
   fi
   if [ $# -gt 1 ]; then
-    targetArgs=$2;
+    # http://stackoverflow.com/questions/2701400/remove-first-element-from-in-bash
+    shift
+    targetArgs=$*;
   fi
+  # strip.java
+  fileRoot=$(echo $fileRoot | perl -ple 's|.java$||')
   #TODO: check that it is a file and not a dir
   if [ ! -r $fileRoot ]; then
     fileName=${fileRoot}.java;
