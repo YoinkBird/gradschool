@@ -11,3 +11,5 @@ javaFiles="${this_server}.java ${this_client}.java"
 export THIS_JAVAFILES="$javaFiles"
 export THIS_CLI_OPTS="localhost 1025"
 
+#export THIS_JAVAC_DESTDIR="bin"
+export THIS_TEST_USEPIPE="1"

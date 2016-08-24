@@ -9,13 +9,22 @@ port=$2
 
 cmd_server="$java_base_cmd $javaOpts $THIS_SERVER $port"
 $cmd_server &
+rc=$?
 java_cmd_pid=$!
+# exit if bad compile
+if [ $rc -ne 0 ] ;then
+  kill $java_cmd_pid
+  exit $rc
+fi
 sleep 1
 lsof -i :${port}
 
 cmd_client="$java_base_cmd $THIS_CLIENT $host $port"
 
-usepipe=1
+usepipe=0
+if [ ! -z ${THIS_TEST_USEPIPE:-} ];then
+  usepipe=$THIS_TEST_USEPIPE
+fi
 if [[ $usepipe -eq 1 ]];then
   # named pipe
   # http://serverfault.com/a/297095 
@@ -44,7 +53,9 @@ fi
 sleep 2
 jobs
 kill -9 $java_cmd_pid
-kill -9 $cat_cmd_pid
+if [[ $usepipe -eq 1 ]];then
+  kill -9 $cat_cmd_pid
+fi
 sleep 2
 jobs
 echo "done"

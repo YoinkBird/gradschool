@@ -2,7 +2,6 @@
 repodir=`git rev-parse --show-toplevel`
 # globals
 # optional: write class files to a specific dir
-export THIS_JAVAC_DESTDIR="bin"
 javacOpts=""
 javaOpts=""
 if [[ ! -z ${THIS_JAVAC_DESTDIR:-} ]]; then
