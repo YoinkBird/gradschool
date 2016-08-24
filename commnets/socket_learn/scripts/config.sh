@@ -13,3 +13,7 @@ fi
 
 javac_base_cmd="javac"
 java_base_cmd="java"
+
+# override
+javac_base_cmd="${repodir}/bin/java_build.sh"
+java_base_cmd="${repodir}/bin/java_run.sh"

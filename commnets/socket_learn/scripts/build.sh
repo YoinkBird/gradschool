@@ -8,5 +8,9 @@ source "$scriptdir/config.sh"
 echo $*
 
 # compile
-javac_base_cmd ${javacOpts:-} $*
+#javac ${javacOpts:-} $*
+for file in "$@"; do
+  #$javac_base_cmd ${javacOpts:-} $file
+  $javac_base_cmd $file
+done
 exit $?

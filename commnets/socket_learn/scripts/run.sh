@@ -7,6 +7,7 @@ echo $2
 host=$1
 port=$2
 
+#cmd_server=$(env THIS_OPT_PRINTONLY=0 $java_base_cmd $THIS_SERVER $port)
 cmd_server="$java_base_cmd $javaOpts $THIS_SERVER $port"
 $cmd_server &
 rc=$?
@@ -19,6 +20,7 @@ fi
 sleep 1
 lsof -i :${port}
 
+#cmd_client=$(env THIS_OPT_PRINTONLY=0 $java_base_cmd $THIS_CLIENT $host $port)
 cmd_client="$java_base_cmd $THIS_CLIENT $host $port"
 
 usepipe=0
@@ -42,6 +44,7 @@ if [[ $usepipe -eq 1 ]];then
   echo "TERMINATE" > $inputPipe
   # resolves buffer issues in which java output appears after everything is done
 else
+  set +x
   for i in {0..5}; do
     testVal=test${i};
     jobs
