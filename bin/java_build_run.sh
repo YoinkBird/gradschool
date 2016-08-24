@@ -24,16 +24,20 @@ extract_package(){
 
 main(){
   # print usage
-  echo_usage
-  #args=("$@")
-  set -x
-  echo $@
+  ##echo_usage
+  printonly=0;
+  if [ !  -z ${THIS_OPT_PRINTONLY:-} ]; then
+    printonly=1;
+  fi
+
+  #set -x
+  #echo $@
   # get filename, classpath based on pwd and package
   curDir=`pwd`;
   fileRoot=`basename $curDir`;
-  mainClassFile=`grep -Pl '\bmain\b\s*\(String.*?args.*?\)' $curDir/*`;
-  mainClassFile=`basename $mainClassFile`;
-  mainClassFileRoot=`echo $mainClassFile | perl -nle 'if(m|(.*?).java|g){print $1}'`
+  #no# mainClassFile=`grep -Pl '\bmain\b\s*\(String.*?args.*?\)' $curDir/*`;
+  #no# mainClassFile=`basename $mainClassFile`;
+  #no# mainClassFileRoot=`echo $mainClassFile | perl -nle 'if(m|(.*?).java|g){print $1}'`
   if [ $# -ne 0 ]; then
     fileRoot=$1;
   fi
@@ -48,11 +52,11 @@ main(){
   if [ ! -r $fileRoot ]; then
     fileName=${fileRoot}.java;
   fi
-  # if dir-based name detection doesn't work, try the experimental 'grep main' detection
-  if [ ! -r $fileName ]; then
-    fileName=$mainClassFile
-    fileRoot=$mainClassFileRoot
-  fi
+  #no# # if dir-based name detection doesn't work, try the experimental 'grep main' detection
+  #no# if [ ! -r $fileName ]; then
+  #no#   fileName=$mainClassFile
+  #no#   fileRoot=$mainClassFileRoot
+  #no# fi
   # error if file not found
   if [ ! -r $fileName ]; then
     echo "-E- file not found: $fileName";
@@ -61,7 +65,7 @@ main(){
   # fn's are basically processes ( http://stackoverflow.com/a/17338371 )
   # and therefore have to return non-status values by echo'ing http://stackoverflow.com/a/17336953
   package=$(extract_package "$curDir/$fileName")
-  echo $package
+  #echo $package
   packagePath=''
   target=${fileRoot};
   if [ ! -z $package ]; then
@@ -79,21 +83,34 @@ main(){
   # build_run javac java
   # build     javac
   # run             java
+  rc=0
   if [[ "$scriptName" =~ build  ]]; then
-    mkdir -p class
-    javac -d class ${fileRoot}.java
-    rc=$?
-    # exit if bad compile
-    if [ $rc -ne 0 ] ;then
-      exit $rc
+    cmd="mkdir -p class"
+    cmd2="javac -d class ${fileRoot}.java"
+    if [ $printonly -eq 0 ];then
+      $cmd
+      $cmd2
+      rc=$?
+      # exit if bad compile
+      if [ $rc -ne 0 ] ;then
+        exit $rc
+      fi
+    else
+      echo $cmd
+      echo $cmd2
     fi
   fi
   if [[ "$scriptName" =~ run ]]; then
-    java -cp class ${target} ${targetArgs}
-    rc=$?
-    # exit if bad run
-    if [ $rc -ne 0 ] ;then
-      exit $rc
+    cmd="java -cp class ${target} ${targetArgs}"
+    if [ $printonly -eq 0 ];then
+      $cmd
+      rc=$?
+      # exit if bad run
+      if [ $rc -ne 0 ] ;then
+        exit $rc
+      fi
+    else
+      echo $cmd
     fi
   fi
   exit $rc
