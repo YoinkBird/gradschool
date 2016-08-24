@@ -12,3 +12,5 @@ if [[ ! -z ${THIS_JAVAC_DESTDIR:-} ]]; then
   javaOpts="-cp $destDir"
 fi
 
+javac_base_cmd="javac"
+java_base_cmd="java"

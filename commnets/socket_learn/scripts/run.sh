@@ -7,13 +7,13 @@ echo $2
 host=$1
 port=$2
 
-java_cmd="java $javaOpts"
-$java_cmd $THIS_SERVER $port &
+cmd_server="$java_base_cmd $javaOpts $THIS_SERVER $port"
+$cmd_server &
 java_cmd_pid=$!
 sleep 1
 lsof -i :${port}
 
-cmd_client="$java_cmd $THIS_CLIENT $host $port"
+cmd_client="$java_base_cmd $THIS_CLIENT $host $port"
 
 usepipe=1
 if [[ $usepipe -eq 1 ]];then
