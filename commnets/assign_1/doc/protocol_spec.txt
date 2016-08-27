@@ -1,0 +1,115 @@
+// Protocol - Client Perspective
+/*
+ * Meaning
+ */
+// Message
+
+/*
+This message is sent as the first greeting from the client to the server immediately after connecting.
+The Port is the UDP Port at which you intend to receive and send chat messages.
+The screen_name must not have spaces in it.
+*/
+// state: [send] 
+// parties: [tcp|client,server]
+HELO¤<screen_name>¤<IP>¤<Port> \n"
+/*
+This message is sent to the UDP ports of all members in the membership list, when a chat user types in a message (in the JTextField).
+*/
+//state: [send] 
+// parties: [udp|client,clients]
+MESG¤<screen_name>:¤<message>\n"
+/*
+When the Chat Client wants to terminate (or exit) the chat it sends this to the Membership Server over TCP.
+The exit should take effect ONLY when the client clicks on the EXIT button provided in the GUI.
+The Client must read a response (see below) back from the server over the UDP Socket and then terminate.
+*/
+//state: [send]
+// parties: [tcp|client,server]
+EXIT\n"
+/*
+The server sends this message in response to the Greeting, to acknowledge the validity of the screen name
+ and to inform the Chatter Client of the Identities of the ALL Chatters (including yourself).
+Each identity is separated by a “:”.
+*/
+//state: [recv]
+// parties: [tcp|server,client]
+ACPT¤<SN1>¤<IP1>¤<PORT1>:
+<SN2>¤<IP2>¤<PORT2>:
+...
+...
+<SNn>¤<IPn>¤<PORTn>\n"
+/*
+The server sends this message in response to the Greeting, to let the Chat Client know that the screen name is already in use.
+*/
+//state: [recv]
+RJCT¤<screen_name>\n"
+/*
+This is a message received on the UDP Socket.
+It is another Chatter’s chat message.
+Parse it and display the message in the JtextArea as shown in the GUI
+*/
+//state: [recv]
+MESG¤<screen_name>:¤<message>\n"
+/*
+This is a message received on the UDP Socket.
+It is sent by the Server to indicate that a Chatter (it could be yourself) has joined the chatroom.
+If the identity is yours then use this as a confirmation that you have been registered in the Servers Membership List.
+If it is a “new” Chatter, add this Chatter identity to the local Membership list.
+*/
+//state: [recv]
+JOIN¤<screen_name>¤<IP>¤<Port>\n"
+/*
+This is a message received on the UDP Socket.
+It is from the Membership Server notifying the exit of a member from the chatroom.
+Parse it and display an appropriate message in the JtextArea (Elvis has left the Building); Remove from local list.
+*/
+//state: [recv]
+EXIT¤<screen_name>\n"
+
+
+
+
+
+
+
+
+// Protocol - Server Perspective
+/*
+Meaning
+*/
+// Message
+/*
+The server sends this message in response to the Greeting, to acknowledge the validity of the screen name and to inform the Chatter Client of the Identities of the ALL Chatters (including yourself).
+Each identity is separated by a “:”. [TCP]
+*/
+//state: [send]
+ACPT¤<SN1>¤<IP1>¤<PORT1>:
+<SN2>¤<IP2>¤<PORT2>:
+...
+...
+<SNn>¤<IPn>¤<PORTn>\n "
+/*
+Meaning same as in Project 1 [TCP]
+*/
+//state: [send]
+RJCT¤<screen_name>\n "
+/*
+Notification sent to ALL Chatter clients over their UDP ports to let them know that a new member has entered the chatroom. [UDP]
+*/
+//state: [send]
+JOIN¤<screen_name>¤<IP>¤<Port>\n"
+/*
+Notification sent to ALL Chatter clients over their UDP ports to let them know that a member has left. [UDP]
+*/
+//state: [send]
+EXIT¤<screen_name>\n"
+/*
+A Chatter client sends this to enter the chatroom; [TCP]
+*/
+//state: [recv]
+HELO¤<screen_name>¤<IP>¤<Port>\n "
+/*
+A Chatter client sends this to indicate exit from the chatroom; [TCP]
+*/
+//state: [recv]
+EXIT\n "
