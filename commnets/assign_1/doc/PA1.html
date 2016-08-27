@@ -320,7 +320,7 @@ have these angled braces.</span><br>
 
     <tr>
 
-      <td style="vertical-align: top; width: 45%;">[<span style="font-style: italic;">Send</span>]&nbsp; <br>
+      <td style="vertical-align: top; width: 45%;">[Tx|tcp|client,server]&nbsp; <br>
 
       <span style="font-family: monospace; color: rgb(51, 51, 255);">HELO&curren;&lt;screen_name&gt;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&curren;&lt;IP&gt;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&curren;&lt;Port&gt;</span><span style="font-family: monospace; color: rgb(51, 51, 255);"> \n</span><br>
 
@@ -340,7 +340,7 @@ have spaces in it. <br>
 
     <tr>
 
-      <td style="vertical-align: top; width: 45%;">[<span style="font-style: italic;">Send</span>]&nbsp; <br>
+      <td style="vertical-align: top; width: 45%;">[Tx|udp|client,clients]&nbsp; <br>
 
       <span style="font-family: monospace; color: rgb(51, 51, 255);">MESG</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&curren;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&lt;screen_name&gt;:&curren;&lt;message&gt;\n</span><br>
 
@@ -357,7 +357,7 @@ JTextField). <br>
 
     <tr>
 
-      <td style="vertical-align: top; width: 45%;">[<span style="font-style: italic;">Send</span>]<br>
+      <td style="vertical-align: top; width: 45%;">[Tx|tcp|client,server]<br>
 
       <span style="font-family: monospace; color: rgb(51, 51, 255);">EXIT\n</span><br>
 
@@ -377,7 +377,7 @@ below)back from the server over the UDP Socket and then terminate.<br>
 
     <tr>
 
-      <td style="vertical-align: top; width: 45%;">[<span style="font-style: italic;">Recv</span>]<br>
+      <td style="vertical-align: top; width: 45%;">[Rx|tcp|server,client]<br>
 
       <span style="font-family: monospace; color: rgb(51, 51, 255);">ACPT&curren;&lt;SN1&gt;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&curren;&lt;IP1&gt;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&curren;&lt;PORT1&gt;:<br>
 
@@ -405,7 +405,7 @@ Each identity is separated by a &ldquo;:&rdquo;.<br>
 
     <tr>
 
-      <td style="vertical-align: top; width: 45%;">[<span style="font-style: italic;">Recv</span>]<br>
+      <td style="vertical-align: top; width: 45%;">[Rx|tcp|server,client]<br>
 
       <span style="font-family: monospace; color: rgb(51, 51, 255);">RJCT&curren;&lt;screen_name&gt;\n</span><br>
 
@@ -421,7 +421,7 @@ name is already in use.<br>
 
     <tr>
 
-      <td style="vertical-align: top; width: 45%;">[<span style="font-style: italic;">Recv</span>]<br>
+      <td style="vertical-align: top; width: 45%;">[Rx|udp|client,clients]<br>
 
       <span style="color: rgb(51, 51, 255); font-family: monospace;">MESG&curren;&lt;screen_name&gt;:</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&curren;</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&lt;message&gt;\n</span><br>
 
@@ -438,7 +438,7 @@ as shown in the GUI<br>
 
     <tr>
 
-      <td style="vertical-align: top; width: 45%;">[<span style="font-style: italic;">Recv</span>]<br>
+      <td style="vertical-align: top; width: 45%;">[Rx|udp|server,client]<br>
 
       <span style="color: rgb(51, 51, 255);"></span><span style="font-family: monospace; color: rgb(51, 51, 255);">JOIN</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&curren;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&lt;screen_name&gt;</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&curren;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&lt;IP&gt;</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&curren;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&lt;Port&gt;\n</span><br>
 
@@ -457,7 +457,7 @@ identity to the local Membership list.<br>
 
     <tr>
 
-      <td style="vertical-align: top;">[Recv]<br>
+      <td style="vertical-align: top;">[Rx|udp|server,client]<br>
 
       <span style="color: rgb(51, 51, 255); font-family: monospace;">EXIT</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&curren;</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&lt;screen_name&gt;\n</span><br>
 
@@ -720,7 +720,7 @@ Protocol.&nbsp;</div>
 
     <tr>
 
-      <td style="vertical-align: top; width: 45%;"><span style="font-family: monospace; color: rgb(51, 51, 255);"></span><span style="color: rgb(0, 0, 0);">[<span style="font-style: italic;">Send</span>]</span><span style="font-family: monospace; color: rgb(51, 51, 255);"><br>
+      <td style="vertical-align: top; width: 45%;"><span style="color: rgb(0, 0, 0);">[Tx|tcp|server,client]</span><br><span style="font-family: monospace; color: rgb(51, 51, 255);">
 
 ACPT&curren;&lt;SN1&gt;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&curren;&lt;IP1&gt;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&curren;&lt;PORT1&gt;:<br>
 
@@ -744,7 +744,7 @@ Each identity is separated by a &ldquo;:&rdquo;. [TCP] </td>
 
     <tr>
 
-      <td style="vertical-align: top; width: 45%;">[<span style="font-style: italic;">Send</span>]<br>
+      <td style="vertical-align: top; width: 45%;">[Tx|tcp|server,client]<br>
 
       <span style="font-family: monospace; color: rgb(51, 51, 255);">RJCT&curren;&lt;screen_name&gt;\n</span><span style="font-family: monospace; color: rgb(51, 51, 255);"></span> </td>
 
@@ -757,8 +757,7 @@ Each identity is separated by a &ldquo;:&rdquo;. [TCP] </td>
 
     <tr>
 
-      <td style="vertical-align: top;">[<span style="font-style: italic;"><span style="font-style: italic;">Send</span></span>]<br>
-
+      <td style="vertical-align: top;">[<span style="font-style: italic;">Send</span>]<br>[Tx|udp|server,clients]
       <span style="color: rgb(51, 51, 255);"></span><span style="font-family: monospace; color: rgb(51, 51, 255);">JOIN</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&curren;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&lt;screen_name&gt;</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&curren;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&lt;IP&gt;</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&curren;</span><span style="font-family: monospace; color: rgb(51, 51, 255);">&lt;Port&gt;\n</span></td>
 
       <td style="vertical-align: top;">Notification sent to ALL Chatter
@@ -771,7 +770,7 @@ entered the chatroom. [UDP]<br>
 
     <tr>
 
-      <td style="vertical-align: top; width: 45%;">[<span style="font-style: italic;">Send</span>]<br>
+      <td style="vertical-align: top; width: 45%;">[Tx|udp|server,clients]<br>
 
       <span style="color: rgb(51, 51, 255); font-family: monospace;">EXIT</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&curren;</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&lt;screen_name&gt;\n</span><br>
 
@@ -787,7 +786,7 @@ clients over their UDP ports to let them know that a member has left.
 
     <tr>
 
-      <td style="vertical-align: top; width: 45%;">[<span style="font-style: italic;">Recv</span>]<br>
+      <td style="vertical-align: top; width: 45%;">[Rx|tcp|client,server]<br>
 
       <span style="font-family: monospace; color: rgb(51, 51, 255);"></span><span style="font-family: monospace; color: rgb(51, 51, 255);"></span><span style="color: rgb(51, 51, 255); font-family: monospace;">HELO</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&curren;</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&lt;screen_name&gt;</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&curren;&lt;IP&gt;</span><span style="color: rgb(51, 51, 255); font-family: monospace;">&curren;&lt;Port&gt;</span><span style="color: rgb(51, 51, 255); font-family: monospace;">\n</span> </td>
 
@@ -798,7 +797,7 @@ enter the chatroom; [TCP] </td>
 
     <tr>
 
-      <td style="vertical-align: top; width: 45%;"><span style="font-family: monospace; color: rgb(51, 51, 255);"></span>[<span style="font-style: italic;">Recv</span>]<br>
+      <td style="vertical-align: top; width: 45%;"><span style="font-family: monospace; color: rgb(51, 51, 255);"></span>[Rx|tcp|client,server]<br>
 
       <span style="font-family: monospace; color: rgb(51, 51, 255);"></span><span style="font-family: monospace; color: rgb(51, 51, 255);"></span><span style="color: rgb(51, 51, 255); font-family: monospace;">EXIT</span><span style="color: rgb(51, 51, 255); font-family: monospace;">\n</span><span style="color: rgb(51, 51, 255); font-family: monospace;"></span> </td>
 
