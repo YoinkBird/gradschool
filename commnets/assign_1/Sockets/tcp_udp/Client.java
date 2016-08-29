@@ -170,12 +170,10 @@ public class Client {
       }
 
 
-//      udpSocket.close();
 
     // TODO: for now, loop until receive new message
     boolean udpReceived = false;
-//    while(! udpReceived){
-    for(;;){
+    while(! udpReceived){
       /*
          This is a message received on the UDP Socket.
          It is another Chatter’s chat message.
@@ -191,7 +189,6 @@ public class Client {
       udpSocket.receive(receivePacket);
       }
       catch (IOException localIOException) {}
-      //udpSocket.close();
       System.out.println("[" + className + "][-I-]: received reply " + udpSocket.getLocalPort());
 
       String response =
@@ -199,6 +196,10 @@ public class Client {
 
       //System.out.println("[" + className + "][-I-]: [Rx(peer)|udp|" + todoIP + ":" + todoPort + "|" + response + "]");
       System.out.println("[" + className + "][-I-]: [Rx(peer)|udp|" + ServerHostname + ":" + ServerPort + "|" + response + "]");
+      String[] respArr = thisClient.parseIncoming(response);
+      if(respArr[0].equals("MESG")){
+        udpReceived = true;
+      }
     }
 
 
