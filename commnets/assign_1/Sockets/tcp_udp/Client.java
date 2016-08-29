@@ -2,6 +2,7 @@ package tcp_udp;
 
 import java.io.*;
 import java.net.*;
+import java.util.Hashtable;
 
 /**
  *
@@ -46,12 +47,13 @@ public class Client {
     String ServerHostname = args[0];
     InetAddress ServerIPAddress = InetAddress.getByName(args[0]);
     int ServerPort = java.lang.Integer.parseInt(args[1]);
+    // screen_name
+    String userName = args[2];
     
     // UDP - for datagram
     byte[] sendData = new byte[1024];
     byte[] receiveData = new byte[1024];
 
-    String userName = args[2];
     System.out.println("[" + className + "][-I-]: will transmit to " + ServerHostname + ":" + ServerPort);
     try {
       tcpSocket = new Socket(ServerHostname, ServerPort);
@@ -68,9 +70,12 @@ public class Client {
     BufferedReader inFromServer =
       new BufferedReader(new InputStreamReader(tcpSocket.getInputStream()));
 
+    Hashtable protocolStrings = new Hashtable();
+    // HELO¤<screen_name>¤<IP>¤<Port>\n
+    protocolStrings.put("HELO", "HELO " + userName + " " + ServerHostname + " " + myPort);
     // parties: [Tx|tcp|client,server]
     // HELO¤<screen_name>¤<IP>¤<Port> \n
-    sentence = "HELO " + userName + " " + ServerHostname + " " + myPort + "\n";
+    sentence = protocolStrings.get("HELO") + "\n";
     System.out.println("[" + className + "][-I-]: [Tx(server)|" + ServerHostname + ":" + ServerPort + "|" + sentence + "]");
 
     outToServer.writeBytes(sentence + '\n');
