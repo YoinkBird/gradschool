@@ -19,6 +19,7 @@ import java.util.*;
  *
  */
 public class Client {
+  private ArrayList<String[]> peerList;// = new ArrayList<String[]>();
 
   /**
    * @param args args[0] is the server's host ip and args[1] is its port number
@@ -117,11 +118,11 @@ public class Client {
       System.exit(2);
     }
     // parse reply
-    ArrayList<String[]> peerList = thisClient.parseAccept(modifiedSentence);
+    thisClient.parseAccept(modifiedSentence);
     System.out.println("-D-: printing out user array");
     // print out table/retrieve element/whatever
     {
-      for (String[] peerDataArr : peerList){
+      for (String[] peerDataArr : thisClient.getPeerList()){
         for (String data : peerDataArr){
           System.out.print(data + "|");
         }
@@ -198,7 +199,13 @@ public class Client {
       String[] peerInfo = iter.split("[\\s]");
       peerArr.add(peerInfo);
     }
+    this.peerList = peerArr;
     return peerArr;
+  }
+
+  public ArrayList<String[]> getPeerList(){
+    // TODO: remove self
+    return this.peerList;
   }
 
 }
