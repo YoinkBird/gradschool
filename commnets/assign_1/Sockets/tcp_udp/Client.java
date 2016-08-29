@@ -203,6 +203,53 @@ public class Client {
     }
 
 
+
+    // parties: [Tx|tcp|client,server]
+    // EXIT\n
+    sentence = "EXIT\n";
+    System.out.println("[" + className + "][-I-]: [Tx(server)|" + ServerHostname + ":" + ServerPort + "|" + sentence + "]");
+
+    outToServer.writeBytes(sentence + '\n');
+
+    System.out.println("[" + className + "][-I-]: [Rx(server)|" + ServerHostname + ":" + ServerPort + "|" + modifiedSentence + "]");
+
+
+    // TODO: for now, loop until receive new message
+    udpReceived = false;
+    while(! udpReceived){
+      /*
+         This is a message received on the UDP Socket.
+         It is from the Membership Server notifying the exit of a member from the chatroom.
+         Parse it and display an appropriate message in the JtextArea (Elvis has left the Building); Remove from local list.
+         // parties: [Rx|udp|server,client]
+         EXIT¤<screen_name>\n
+         */
+      DatagramPacket receivePacket =
+        new DatagramPacket(receiveData, receiveData.length);
+
+      System.out.println("[" + className + "][-I-]: waiting for reply on " + udpSocket.getLocalPort());
+      try{
+      udpSocket.receive(receivePacket);
+      }
+      catch (IOException localIOException) {}
+      System.out.println("[" + className + "][-I-]: received reply " + udpSocket.getLocalPort());
+
+      String response =
+        new String(receivePacket.getData());
+
+
+      System.out.println("[" + className + "][-I-]: [Rx(peer)|udp|" + ServerHostname + ":" + ServerPort + "|" + response + "]");
+      String[] respArr = thisClient.parseIncoming(response);
+      if(respArr[0].equals("EXIT")){
+        if(respArr[1].startsWith(userName)){
+          udpReceived = true;
+        }
+      }
+    }
+    // done
+    tcpSocket.close();
+    udpSocket.close();
+
   }
 
   // parse incomming messages
