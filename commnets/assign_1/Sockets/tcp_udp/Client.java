@@ -64,6 +64,9 @@ public class Client {
 
     } // end of try-catch
     int myPort = tcpSocket.getLocalPort();
+    // UDP
+    DatagramSocket udpSocket = new DatagramSocket();
+    int udpPort = udpSocket.getLocalPort();
 
     //	        Socket tcpSocket = new Socket("data.uta.edu", 6789);
 
@@ -77,7 +80,7 @@ public class Client {
     // when calling, add the dynamic components
     Hashtable<String, String> protocolStrings = new Hashtable<>();
     // HELO¤<screen_name>¤<IP>¤<Port>\n
-    protocolStrings.put("HELO", "HELO " + userName + " " + ServerHostname + " " + myPort);
+    protocolStrings.put("HELO", "HELO " + userName + " " + ServerHostname + " " + udpPort);
     // RJCT¤<screen_name>\n
     protocolStrings.put("RJCT", "RJCT " + userName);
     // MESG¤<screen_name>:¤<message>\n
@@ -133,8 +136,6 @@ public class Client {
     }
     // UDP section
     {
-      // UDP
-      DatagramSocket udpSocket = new DatagramSocket();
       // process response
       // TODO: remove hard-code
 
@@ -168,27 +169,36 @@ public class Client {
         }
       }
 
-      DatagramPacket sendPacket =
-        new DatagramPacket(sendData, sendData.length, todoIP, todoPort);
-      //         new DatagramPacket(sendData, sendData.length, todoIP, 9876);
-      System.out.println("[" + className + "][-I-]: UDP packet created");
-      udpSocket.send(sendPacket);
 
-      System.out.println("[" + className + "][-I-]: UDP packet sent");
+//      udpSocket.close();
 
+    // TODO: for now, loop until receive new message
+    boolean udpReceived = false;
+//    while(! udpReceived){
+    for(;;){
+      /*
+         This is a message received on the UDP Socket.
+         It is another Chatter’s chat message.
+         Parse it and display the message in the JtextArea as shown in the GUI
+      // parties: [Rx|udp|client,clients]
+      MESG¤<screen_name>:¤<message>\n
+      */
       DatagramPacket receivePacket =
         new DatagramPacket(receiveData, receiveData.length);
 
-      /*
+      System.out.println("[" + className + "][-I-]: waiting for reply on " + udpSocket.getLocalPort());
+      try{
       udpSocket.receive(receivePacket);
+      }
+      catch (IOException localIOException) {}
+      //udpSocket.close();
+      System.out.println("[" + className + "][-I-]: received reply " + udpSocket.getLocalPort());
 
       String response =
         new String(receivePacket.getData());
 
-      System.out.println("[" + className + "][-I-]: [Rx(peer)|udp|" + todoIP + ":" + todoPort + "|" + response + "]");
-      */
-
-      udpSocket.close();
+      //System.out.println("[" + className + "][-I-]: [Rx(peer)|udp|" + todoIP + ":" + todoPort + "|" + response + "]");
+      System.out.println("[" + className + "][-I-]: [Rx(peer)|udp|" + ServerHostname + ":" + ServerPort + "|" + response + "]");
     }
 
 
