@@ -19,6 +19,7 @@ import java.util.*;
  *
  */
 public class Client {
+  private String userName;
   private ArrayList<String[]> peerList;// = new ArrayList<String[]>();
 
   /**
@@ -52,6 +53,7 @@ public class Client {
     int ServerPort = java.lang.Integer.parseInt(args[1]);
     // screen_name
     String userName = args[2];
+    thisClient.userName = userName;
     
     System.out.println("[" + className + "][-I-]: will transmit to " + ServerHostname + ":" + ServerPort);
     try {
@@ -295,6 +297,14 @@ public class Client {
     for (String iter: replyArr) {
       //System.out.println(iter);
       String[] peerInfo = iter.split("[\\s]");
+      // TODO: remove this hack.
+      // sending msg to self removes need to manually start a client and type a reply
+      // skip self
+      /*
+      if(peerInfo[0].equals(this.userName)){
+        continue;
+      }
+      */
       peerArr.add(peerInfo);
       System.out.print("[");
       for ( String val : peerInfo ){
