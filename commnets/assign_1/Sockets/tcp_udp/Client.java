@@ -83,11 +83,13 @@ public class Client {
     // MESG¤<screen_name>:¤<message>\n
     protocolStrings.put("MESG", "MESG " + userName);
     // ACPT¤<SNn>¤<IPn>¤<PORTn>
-    protocolStrings.put("ACPT", "ACPT ");
+    protocolStrings.put("ACPT", "ACPT");
+    // EXIT\n
+    protocolStrings.put("EXIT", "EXIT");
 
     // parties: [Tx|tcp|client,server]
     // HELO¤<screen_name>¤<IP>¤<Port> \n
-    sentence = protocolStrings.get("HELO") + "\n";
+    sentence = protocolStrings.get("HELO");
     System.out.println("[" + className + "][-I-]: [Tx(server)|" + ServerHostname + ":" + ServerPort + "|" + sentence + "]");
 
     outToServer.writeBytes(sentence + '\n');
