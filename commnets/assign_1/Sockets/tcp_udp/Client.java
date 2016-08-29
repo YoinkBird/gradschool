@@ -73,6 +73,8 @@ public class Client {
     Hashtable protocolStrings = new Hashtable();
     // HELO¤<screen_name>¤<IP>¤<Port>\n
     protocolStrings.put("HELO", "HELO " + userName + " " + ServerHostname + " " + myPort);
+    // RJCT¤<screen_name>\n
+    protocolStrings.put("RJCT", "RJCT " + userName);
     // parties: [Tx|tcp|client,server]
     // HELO¤<screen_name>¤<IP>¤<Port> \n
     sentence = protocolStrings.get("HELO") + "\n";
@@ -83,6 +85,16 @@ public class Client {
     modifiedSentence = inFromServer.readLine();
 
     System.out.println("[" + className + "][-I-]: [Rx(server)|" + ServerHostname + ":" + ServerPort + "|" + modifiedSentence + "]");
+
+    /*
+    The server sends this message in response to the Greeting, to let the Chat Client know that the screen name is already in use.
+    // parties: [Rx|tcp|server,client]
+    RJCT¤<screen_name>\n
+    */
+    if ( modifiedSentence.equals(protocolStrings.get("RJCT")) ){
+      System.out.println("bad username, exiting");
+      System.exit(2);
+    }
 
 
   }
