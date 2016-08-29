@@ -3,6 +3,7 @@ package tcp_udp;
 import java.io.*;
 import java.net.*;
 import java.util.Hashtable;
+import java.util.*;
 
 /**
  *
@@ -26,6 +27,7 @@ public class Client {
   public static void main(String[] args) throws Exception{
     // class name for debug messages
     String className = new Throwable().getStackTrace()[0].getClassName();
+    Client thisClient = new Client();
     // TODO Auto-generated method stub
     String sentence;
     String modifiedSentence;
@@ -114,6 +116,18 @@ public class Client {
       System.out.println("bad ACPT response, exiting");
       System.exit(2);
     }
+    // parse reply
+    ArrayList<String[]> peerList = thisClient.parseAccept(modifiedSentence);
+    System.out.println("-D-: printing out user array");
+    // print out table/retrieve element/whatever
+    {
+      for (String[] peerDataArr : peerList){
+        for (String data : peerDataArr){
+          System.out.print(data + "|");
+        }
+        System.out.println();
+      }
+    }
     // UDP section
     {
       // UDP
@@ -164,6 +178,27 @@ public class Client {
     }
 
 
+  }
+
+  // parse ACPT reply
+  public ArrayList<String[]> parseAccept(String response) {
+    ArrayList<String[]> peerArr = new ArrayList<String[]>();
+    //System.out.println("-D-: parsing ACPT reply");
+    // reply format: ACPT¤<SNn>¤<IPn>¤<PORTn>:<SNn+1>¤<IPn+1>¤<PORTn+1>:
+    // extract,remove keyword
+    // then split on ':'
+    // then split on ' '
+    String type = response.substring(0,4);
+    String sequence = response.substring(5,response.length()-1);
+    //System.out.println("-D-:" + type + "|" + sequence);
+    //System.out.println("-D-: ACPT List");
+    String[] replyArr = sequence.split("[:]");
+    for (String iter: replyArr) {
+      //System.out.println(iter);
+      String[] peerInfo = iter.split("[\\s]");
+      peerArr.add(peerInfo);
+    }
+    return peerArr;
   }
 
 }
