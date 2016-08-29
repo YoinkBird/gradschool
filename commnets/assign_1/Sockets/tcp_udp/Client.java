@@ -204,6 +204,19 @@ public class Client {
 
   }
 
+  // parse incomming messages
+  public String[] parseIncoming(String response) {
+    String[] replyArr = new String[2];
+    // reply format: <keyword>¤<content>
+    // extract,remove keyword
+    String type = response.substring(0,4);
+    replyArr[0] = type;
+    String content = response.substring(5,response.length());
+    if(content != null){
+      replyArr[1] = content;
+    }
+    return replyArr;
+  }
   // parse ACPT reply
   public ArrayList<String[]> parseAccept(String response) {
     ArrayList<String[]> peerArr = new ArrayList<String[]>();
@@ -213,7 +226,10 @@ public class Client {
     // then split on ':'
     // then split on ' '
     String type = response.substring(0,4);
-    String sequence = response.substring(5,response.length()-1);
+    String sequence = response.substring(5,response.length());
+    String[] replyArr1 = this.parseIncoming(response);
+    type = replyArr1[0];
+    sequence = replyArr1[1];
     //System.out.println("-D-:" + type + "|" + sequence);
     //System.out.println("-D-: ACPT List");
     String[] replyArr = sequence.split("[:]");
