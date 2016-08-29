@@ -70,11 +70,18 @@ public class Client {
     BufferedReader inFromServer =
       new BufferedReader(new InputStreamReader(tcpSocket.getInputStream()));
 
-    Hashtable protocolStrings = new Hashtable();
+    // store the deterministic components of the protocol strings, e.g. username
+    // when calling, add the dynamic components
+    Hashtable<String, String> protocolStrings = new Hashtable<>();
     // HELO¤<screen_name>¤<IP>¤<Port>\n
     protocolStrings.put("HELO", "HELO " + userName + " " + ServerHostname + " " + myPort);
     // RJCT¤<screen_name>\n
     protocolStrings.put("RJCT", "RJCT " + userName);
+    // MESG¤<screen_name>:¤<message>\n
+    protocolStrings.put("MESG", "MESG " + userName);
+    // ACPT¤<SNn>¤<IPn>¤<PORTn>
+    protocolStrings.put("ACPT", "ACPT ");
+
     // parties: [Tx|tcp|client,server]
     // HELO¤<screen_name>¤<IP>¤<Port> \n
     sentence = protocolStrings.get("HELO") + "\n";
