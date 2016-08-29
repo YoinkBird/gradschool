@@ -103,6 +103,18 @@ public class Client {
       System.exit(2);
     }
 
+    /*
+    The server sends this message in response to the Greeting, to acknowledge the validity of the screen name
+     and to inform the Chatter Client of the Identities of the ALL Chatters (including yourself).
+    Each identity is separated by a “:”.
+    // parties: [Rx|tcp|server,client]
+    ACPT¤<SNn>¤<IPn>¤<PORTn>\n
+    */
+    if (! modifiedSentence.startsWith(protocolStrings.get("ACPT")) ){
+      System.out.println("bad ACPT response, exiting");
+      System.exit(2);
+    }
+
 
   }
 
