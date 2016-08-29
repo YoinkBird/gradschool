@@ -1,4 +1,4 @@
-package tcp;
+package tcp_udp;
 
 import java.io.*;
 import java.net.*;

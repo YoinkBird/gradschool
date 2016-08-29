@@ -53,10 +53,6 @@ public class Client {
     // screen_name
     String userName = args[2];
     
-    // UDP - for datagram
-    byte[] sendData = new byte[1024];
-    byte[] receiveData = new byte[1024];
-
     System.out.println("[" + className + "][-I-]: will transmit to " + ServerHostname + ":" + ServerPort);
     try {
       tcpSocket = new Socket(ServerHostname, ServerPort);
@@ -76,6 +72,7 @@ public class Client {
     BufferedReader inFromServer =
       new BufferedReader(new InputStreamReader(tcpSocket.getInputStream()));
 
+    // src: http://stackoverflow.com/a/31550047
     // store the deterministic components of the protocol strings, e.g. username
     // when calling, add the dynamic components
     Hashtable<String, String> protocolStrings = new Hashtable<>();
@@ -146,11 +143,17 @@ public class Client {
       // MESG¤<screen_name>:¤<message>\n
       // TODO: remove hard-code
       //sentence = inFromUser.readLine();
+      // add timestamp for easierdebug
+      // http://stackoverflow.com/a/6953926
+      //String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
+      //sentence = "[" + timeStamp + "]";
       sentence = "where is sauce";
 
       sentence = protocolStrings.get("MESG") + " " + sentence;
       sentence += "\n";
+      byte[] sendData = new byte[1024];
       sendData = sentence.getBytes();
+
       // print out table/retrieve element/whatever
       {
         for (String[] peerDataArr : thisClient.getPeerList()){
@@ -162,6 +165,7 @@ public class Client {
 
           DatagramPacket sendPacket =
             new DatagramPacket(sendData, sendData.length, todoIP, todoPort);
+          //         new DatagramPacket(sendData, sendData.length, todoIP, 9876);
           System.out.println("[" + className + "][-I-]: UDP packet created");
           udpSocket.send(sendPacket);
 
@@ -180,6 +184,8 @@ public class Client {
       // parties: [Rx|udp|client,clients]
       MESG¤<screen_name>:¤<message>\n
       */
+      byte[] receiveData = new byte[1024];
+
       DatagramPacket receivePacket =
         new DatagramPacket(receiveData, receiveData.length);
 
@@ -203,8 +209,13 @@ public class Client {
 
 
 
+    /*
+    When the Chat Client wants to terminate (or exit) the chat it sends this to the Membership Server over TCP.
+    The exit should take effect ONLY when the client clicks on the EXIT button provided in the GUI.
+    The Client must read a response (see below) back from the server over the UDP Socket and then terminate.
     // parties: [Tx|tcp|client,server]
-    // EXIT\n
+    EXIT\n
+    */
     sentence = "EXIT\n";
     System.out.println("[" + className + "][-I-]: [Tx(server)|" + ServerHostname + ":" + ServerPort + "|" + sentence + "]");
 
@@ -223,6 +234,7 @@ public class Client {
          // parties: [Rx|udp|server,client]
          EXIT¤<screen_name>\n
          */
+      byte[] receiveData = new byte[1024];
       DatagramPacket receivePacket =
         new DatagramPacket(receiveData, receiveData.length);
 
@@ -284,6 +296,13 @@ public class Client {
       //System.out.println(iter);
       String[] peerInfo = iter.split("[\\s]");
       peerArr.add(peerInfo);
+      System.out.print("[");
+      for ( String val : peerInfo ){
+        System.out.print(val);
+        System.out.print("|");
+      }
+      System.out.print("]");
+      System.out.println();
     }
     this.peerList = peerArr;
     return peerArr;
