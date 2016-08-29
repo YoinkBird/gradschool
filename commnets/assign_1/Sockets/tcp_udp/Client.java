@@ -135,11 +135,6 @@ public class Client {
       DatagramSocket udpSocket = new DatagramSocket();
       // process response
       // TODO: remove hard-code
-      String todoSN = "basgetti";
-      //String todoIP = ServerHostname;
-      InetAddress todoIP = ServerIPAddress;
-      //String todoPort = "57362";
-      int todoPort = 54811;
 
       /*
       This message is sent to the UDP ports of all members in the membership list, when a chat user types in a message (in the JTextField).
@@ -152,8 +147,24 @@ public class Client {
 
       sentence = protocolStrings.get("MESG") + " " + sentence;
       sentence += "\n";
-      System.out.println("[" + className + "][-I-]: [Tx(peer)|udp|" + todoIP + ":" + todoPort + "|" + sentence + "]");
       sendData = sentence.getBytes();
+      // print out table/retrieve element/whatever
+      {
+        for (String[] peerDataArr : thisClient.getPeerList()){
+          String todoSN = peerDataArr[0];
+          InetAddress todoIP = InetAddress.getByName(peerDataArr[1]);
+          int todoPort = java.lang.Integer.parseInt(peerDataArr[2]);
+
+          System.out.println("[" + className + "][-I-]: [Tx(peer)|udp|" + todoSN + "|" + todoIP + ":" + todoPort + "|" + sentence + "]");
+
+          DatagramPacket sendPacket =
+            new DatagramPacket(sendData, sendData.length, todoIP, todoPort);
+          System.out.println("[" + className + "][-I-]: UDP packet created");
+          udpSocket.send(sendPacket);
+
+          System.out.println("[" + className + "][-I-]: UDP packet sent");
+        }
+      }
 
       DatagramPacket sendPacket =
         new DatagramPacket(sendData, sendData.length, todoIP, todoPort);
