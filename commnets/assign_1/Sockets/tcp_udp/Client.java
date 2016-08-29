@@ -168,8 +168,7 @@ public class Client {
           System.out.println("[" + className + "][-I-]: UDP packet sent");
         }
       }
-
-
+    }
 
     // TODO: for now, loop until receive new message
     boolean udpReceived = false;
