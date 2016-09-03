@@ -60,7 +60,7 @@ public class Client {
     thisClient.connectToServer();
   }
 
-  private void connectToServer() throws Exception{
+  public void connectToServer() throws Exception{
     String className = this.className;
     String sentence;
     String modifiedSentence;
