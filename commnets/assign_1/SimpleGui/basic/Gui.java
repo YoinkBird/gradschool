@@ -25,9 +25,12 @@ public class Gui extends JFrame{
   private JTextArea display;
   private JButton qbutton;
 
-  public Gui(String ar)
+  public Client myClient;
+
+  public Gui(Client initClient)
   {
-    super( ar );	// Call JFrame's constructor to set the title of the Window	
+    super( initClient.getUserName() );	// Call JFrame's constructor to set the title of the Window
+    this.myClient = initClient;
     Container c = getContentPane(); // To add components to a JFrame we need a handle to its Content Pane
 
     // Create a new TextField
@@ -35,6 +38,9 @@ public class Gui extends JFrame{
     // Set its editability to be true; One can toggle this property to temporarily disable  entering of text in it;
     //  Enabled by default though
     enter.setEnabled( true );
+    /*
+     *   MESG
+     */
     // There are several ways to register a Callback on a Gui component, here is the simplest
     //  We are creating a new anonymous object that implements the ActionListener Interface
     //   The ActionListener interface requires that you implement the ActionPerformed method
@@ -45,6 +51,10 @@ public class Gui extends JFrame{
         new ActionListener() {
           public void actionPerformed( ActionEvent e )
           {
+            try{
+              initClient.communicateWithServer();
+            } catch ( Exception e1) {
+            }
             WriteData( e.getActionCommand() ); // e.getActionCommand() returns the text typed in
           }
         }
@@ -54,6 +64,9 @@ public class Gui extends JFrame{
     display = new JTextArea();	// Create a JTextArea
     c.add( new JScrollPane( display ), 
         BorderLayout.CENTER ); // Attach a Scrollpane to it before adding so we can scroll
+    /*
+     *   EXIT
+     */
     // Also add it to the CENTER 
     qbutton = new JButton("QUIT"); // Create a JButton
     qbutton.setEnabled( true );	   // Enable Button so user can click on it
@@ -64,6 +77,11 @@ public class Gui extends JFrame{
           public void actionPerformed( ActionEvent e )
           {
             System.out.println("Quit Pressed");
+            try{
+              initClient.disconnectFromServer();
+              System.exit( 0 );
+            } catch ( Exception e1) {
+            }
             System.exit(1);
           }
         }
@@ -99,9 +117,12 @@ public class Gui extends JFrame{
       System.out.println("Must run with one command Line argument as: java Gui <Title>");
 //      System.exit(-1);
     }
-    Client thisClient = new Client(args);
-    thisClient.connectToServer();
-    Gui app = new Gui(thisClient.getUserName());
+    Client myClient = new Client(args);
+    /*
+     *   HELO,ACPT
+     */
+    myClient.connectToServer();
+    Gui app = new Gui(myClient);
     // The following listener responds to the close event on the window
     // invoked when the user presses on the X at top right of the window in Windows
     // or the red button  at the top left in MacOSX
@@ -109,7 +130,12 @@ public class Gui extends JFrame{
         new WindowAdapter() {
           public void windowClosing( WindowEvent e )
           {
-            System.exit( 0 );
+            System.out.println("-I-: pressed [x]");
+            try{
+              app.myClient.connectToServer();
+              System.exit( 0 );
+            } catch ( Exception e1) {
+            }
           }
         }
         );
