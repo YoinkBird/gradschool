@@ -55,11 +55,6 @@ public class Client {
     Client thisClient = new Client(args);
     // cannot do this in the constructor for some reason
     thisClient.ServerIPAddress = InetAddress.getByName(args[0]);
-    //tmp vars during transition to using class/oop/whatever
-    String ServerHostname = thisClient.ServerHostname;
-    int ServerPort = thisClient.ServerPort;
-    // screen_name
-    String userName = thisClient.userName;
     // </init ritual>
     // TODO Auto-generated method stub
     String sentence;
@@ -72,9 +67,9 @@ public class Client {
       new BufferedReader(new InputStreamReader(System.in));
 
     
-    System.out.println("[" + className + "][-I-]: will transmit to " + ServerHostname + ":" + ServerPort);
+    System.out.println("[" + className + "][-I-]: will transmit to " + thisClient.ServerHostname + ":" + thisClient.ServerPort);
     try {
-      tcpSocket = new Socket(ServerHostname, ServerPort);
+      tcpSocket = new Socket(thisClient.ServerHostname, thisClient.ServerPort);
     } catch ( Exception e) {
 
     } // end of try-catch
@@ -96,7 +91,7 @@ public class Client {
     // when calling, add the dynamic components
     Hashtable<String, String> protocolStrings = new Hashtable<>();
     // HELO¤<screen_name>¤<IP>¤<Port>\n
-    protocolStrings.put("HELO", "HELO " + thisClient.userName + " " + ServerHostname + " " + udpPort);
+    protocolStrings.put("HELO", "HELO " + thisClient.userName + " " + thisClient.ServerHostname + " " + udpPort);
     // RJCT¤<screen_name>\n
     protocolStrings.put("RJCT", "RJCT " + thisClient.userName);
     // MESG¤<screen_name>:¤<message>\n
@@ -109,13 +104,13 @@ public class Client {
     // parties: [Tx|tcp|client,server]
     // HELO¤<screen_name>¤<IP>¤<Port> \n
     sentence = protocolStrings.get("HELO");
-    System.out.println("[" + className + "][-I-]: [Tx(server)|" + ServerHostname + ":" + ServerPort + "|" + sentence + "]");
+    System.out.println("[" + className + "][-I-]: [Tx(server)|" + thisClient.ServerHostname + ":" + thisClient.ServerPort + "|" + sentence + "]");
 
     outToServer.writeBytes(sentence + '\n');
 
     modifiedSentence = inFromServer.readLine();
 
-    System.out.println("[" + className + "][-I-]: [Rx(server)|" + ServerHostname + ":" + ServerPort + "|" + modifiedSentence + "]");
+    System.out.println("[" + className + "][-I-]: [Rx(server)|" + thisClient.ServerHostname + ":" + thisClient.ServerPort + "|" + modifiedSentence + "]");
 
     /*
     The server sends this message in response to the Greeting, to let the Chat Client know that the screen name is already in use.
@@ -219,7 +214,7 @@ public class Client {
         new String(receivePacket.getData());
 
       //System.out.println("[" + className + "][-I-]: [Rx(peer)|udp|" + todoIP + ":" + todoPort + "|" + response + "]");
-      System.out.println("[" + className + "][-I-]: [Rx(peer)|udp|" + ServerHostname + ":" + ServerPort + "|" + response + "]");
+      System.out.println("[" + className + "][-I-]: [Rx(peer)|udp|" + thisClient.ServerHostname + ":" + thisClient.ServerPort + "|" + response + "]");
       String[] respArr = thisClient.parseIncoming(response);
       if(respArr[0].equals("MESG")){
         udpReceived = true;
@@ -236,11 +231,11 @@ public class Client {
     EXIT\n
     */
     sentence = "EXIT\n";
-    System.out.println("[" + className + "][-I-]: [Tx(server)|" + ServerHostname + ":" + ServerPort + "|" + sentence + "]");
+    System.out.println("[" + className + "][-I-]: [Tx(server)|" + thisClient.ServerHostname + ":" + thisClient.ServerPort + "|" + sentence + "]");
 
     outToServer.writeBytes(sentence + '\n');
 
-    System.out.println("[" + className + "][-I-]: [Rx(server)|" + ServerHostname + ":" + ServerPort + "|" + modifiedSentence + "]");
+    System.out.println("[" + className + "][-I-]: [Rx(server)|" + thisClient.ServerHostname + ":" + thisClient.ServerPort + "|" + modifiedSentence + "]");
 
 
     // TODO: for now, loop until receive new message
@@ -268,7 +263,7 @@ public class Client {
         new String(receivePacket.getData());
 
 
-      System.out.println("[" + className + "][-I-]: [Rx(peer)|udp|" + ServerHostname + ":" + ServerPort + "|" + response + "]");
+      System.out.println("[" + className + "][-I-]: [Rx(peer)|udp|" + thisClient.ServerHostname + ":" + thisClient.ServerPort + "|" + response + "]");
       String[] respArr = thisClient.parseIncoming(response);
       if(respArr[0].equals("EXIT")){
         if(respArr[1].startsWith(thisClient.userName)){
