@@ -247,6 +247,7 @@ public class Client {
       MESG¤<screen_name>:¤<message>\n
       */
       String response = this.getUdp();
+      System.out.println( logPreAmble + "[-I-]: [Rx(peer)|udp|" + this.ServerHostname + ":" + this.ServerPort + "|" + response + "]");
       String[] respArr = this.parseIncoming(response);
       if(respArr[0].equals("MESG")){
         udpReceived = true;
@@ -256,10 +257,18 @@ public class Client {
 
   }
   public void disconnectFromServer() throws Exception{
+    disconnectFromServerInit();
+    // TODO: for now, loop until receive new message
+    boolean udpReceived = false;
+    while(! udpReceived){
+      udpReceived = disconnectFromServerVerify();
+    }
+  }
+  // initiate exit handshake
+  public void disconnectFromServerInit() throws Exception{
     String methodName = new Throwable().getStackTrace()[0].getMethodName();
     String logPreAmble = "[" + className + "][" + methodName + "]";
     String sentence;
-
     /*
     When the Chat Client wants to terminate (or exit) the chat it sends this to the Membership Server over TCP.
     The exit should take effect ONLY when the client clicks on the EXIT button provided in the GUI.
@@ -271,28 +280,34 @@ public class Client {
     System.out.println( logPreAmble + "[-I-]: [Tx(server)|" + this.ServerHostname + ":" + this.ServerPort + "|" + sentence + "]");
 
     this.outToServer.writeBytes(sentence + '\n');
+  }
+  // if exit acknowledged, close ports and return true
+  // otherwise return false
+  public boolean disconnectFromServerVerify() throws Exception{
+    String methodName = new Throwable().getStackTrace()[0].getMethodName();
+    String logPreAmble = "[" + className + "][" + methodName + "]";
+    String sentence;
 
-    // TODO: for now, loop until receive new message
+    /*
+       This is a message received on the UDP Socket.
+       It is from the Membership Server notifying the exit of a member from the chatroom.
+       Parse it and display an appropriate message in the JtextArea (Elvis has left the Building); Remove from local list.
+    // parties: [Rx|udp|server,client]
+    EXIT¤<screen_name>\n
+    */
     boolean udpReceived = false;
-    while(! udpReceived){
-      /*
-         This is a message received on the UDP Socket.
-         It is from the Membership Server notifying the exit of a member from the chatroom.
-         Parse it and display an appropriate message in the JtextArea (Elvis has left the Building); Remove from local list.
-         // parties: [Rx|udp|server,client]
-         EXIT¤<screen_name>\n
-         */
-      String response = this.getUdp();
-      String[] respArr = this.parseIncoming(response);
-      if(respArr[0].equals("EXIT")){
-        if(respArr[1].startsWith(this.userName)){
-          udpReceived = true;
-        }
+    String response = this.getUdp();
+    System.out.println( logPreAmble + "[-I-]: [Rx(server)|udp|" + this.ServerHostname + ":" + this.ServerPort + "|" + response + "]");
+    String[] respArr = this.parseIncoming(response);
+    if(respArr[0].equals("EXIT")){
+      if(respArr[1].startsWith(this.userName)){
+        udpReceived = true;
+        // done
+        this.tcpSocket.close();
+        this.udpSocket.close();
       }
     }
-    // done
-    this.tcpSocket.close();
-    this.udpSocket.close();
+    return udpReceived;
 
   }
 
