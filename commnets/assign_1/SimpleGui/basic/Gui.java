@@ -132,9 +132,16 @@ public class Gui extends JFrame{
           if( this.myClient.disconnectFromServerFinalise(response) ){
             System.exit( 0 );
           }else{
-            String msg = respArr[1] + " has left the chatroom";
-            this.WriteData(msg);
+            //TODO: remove the newline
+            String[] peerInfo = respArr[1].split("[\\s]");
+            String goneUser = peerInfo[0];
+            String msg = goneUser + " has left the chatroom";
             // TODO: remove user
+            this.myClient.removePeer(goneUser);
+            System.out.println("-D-: removed users, printing out user array");
+            this.myClient.printPeerList();
+            this.WriteData(msg);
+
           }
         }
       } catch ( Exception e1) {

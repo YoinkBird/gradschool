@@ -322,6 +322,8 @@ public class Client {
   // parse incoming messages
   public String[] parseIncoming(String response) {
     String[] replyArr = new String[2];
+    // remove newlines
+    // response = response.replace("\n", "").replace("\r", "");
     // reply format: <keyword>¤<content>
     // extract,remove keyword
     String type = response.substring(0,4);
@@ -389,6 +391,15 @@ public class Client {
         System.out.println();
       }
     }
+  }
+  public ArrayList<String[]> removePeer(String removeUserName){
+    ArrayList<String[]> updatedList = new ArrayList<String[]>();
+    for (String[] peerDataArr : this.peerList){
+      if( peerDataArr[0].equals( removeUserName ) ){
+        this.peerList.remove(peerDataArr);
+      }
+    }
+    return updatedList;
   }
 
 }
