@@ -351,14 +351,10 @@ public class Client {
     for (String iter: replyArr) {
       //System.out.println(iter);
       String[] peerInfo = iter.split("[\\s]");
-      // TODO: remove this hack.
-      // sending msg to self removes need to manually start a client and type a reply
       // skip self
-      /*
       if(peerInfo[0].equals(this.userName)){
         continue;
       }
-      */
       peerArr.add(peerInfo);
       System.out.print("[");
       for ( String val : peerInfo ){
