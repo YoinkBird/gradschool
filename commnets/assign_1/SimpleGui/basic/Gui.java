@@ -53,7 +53,7 @@ public class Gui extends JFrame{
           public void actionPerformed( ActionEvent e )
           {
             try{
-              initClient.communicateWithPeer();
+              initClient.sendToPeer();
             } catch ( Exception e1) {
             }
             WriteData( e.getActionCommand() ); // e.getActionCommand() returns the text typed in
@@ -83,8 +83,8 @@ public class Gui extends JFrame{
           {
             System.out.println("Quit Pressed");
             try{
-              initClient.disconnectFromServer();
-              System.exit( 0 );
+              // send initial request to exit
+              initClient.disconnectFromServerInit();
             } catch ( Exception e1) {
             }
             System.exit(1);
@@ -101,6 +101,13 @@ public class Gui extends JFrame{
   public void runGui() 
   {
     do {
+      try{
+        this.myClient.receiveFromPeer();
+        if( this.myClient.disconnectFromServerVerify() ){
+          System.exit( 0 );
+        }
+      } catch ( Exception e1) {
+      }
     }while (true);
   }
   /**
