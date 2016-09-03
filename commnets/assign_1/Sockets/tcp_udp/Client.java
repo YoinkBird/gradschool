@@ -19,6 +19,7 @@ import java.util.*;
  *
  */
 public class Client {
+  private String className;
   private String userName;
   private ArrayList<String[]> peerList;// = new ArrayList<String[]>();
   private String ServerHostname;
@@ -26,10 +27,10 @@ public class Client {
   private int ServerPort;
 
   public Client(String[] args){
-    String className = new Throwable().getStackTrace()[0].getClassName();
+    this.className = new Throwable().getStackTrace()[0].getClassName();
     // parse args
     if (args.length != 3) {
-      System.out.println("[" + className + "][-E-]: Usage: java Client <host name> <port number> <screen_name>");
+      System.out.println("[" + this.className + "][-E-]: Usage: java Client <host name> <port number> <screen_name>");
 
       System.exit(1);
     }
@@ -49,8 +50,6 @@ public class Client {
    *
    */
   public static void main(String[] args) throws Exception{
-    // class name for debug messages
-    String className = new Throwable().getStackTrace()[0].getClassName();
     // <init ritual>
     Client thisClient = new Client(args);
     // cannot do this in the constructor for some reason
@@ -62,7 +61,7 @@ public class Client {
   }
 
   private void connectToServer() throws Exception{
-    String className = new Throwable().getStackTrace()[0].getClassName();
+    String className = this.className;
     String sentence;
     String modifiedSentence;
     // TCP
