@@ -52,11 +52,12 @@ public class Gui extends JFrame{
         new ActionListener() {
           public void actionPerformed( ActionEvent e )
           {
+            String message = e.getActionCommand();
             try{
-              initClient.sendToPeer();
+              initClient.sendToPeer(message);
             } catch ( Exception e1) {
             }
-            WriteData( e.getActionCommand() ); // e.getActionCommand() returns the text typed in
+            WriteData( initClient.getUserName() + ": " + message ); // e.getActionCommand() returns the text typed in
           }
         }
         );
@@ -122,7 +123,7 @@ public class Gui extends JFrame{
    */
   private void WriteData( String s )
   {
-    display.append( "\nTyped>>>" + s ); // write to the TextArea
+    display.append( "\n" + s ); // write to the TextArea
     enter.setText(""); //Clear the TextField
   }
 
