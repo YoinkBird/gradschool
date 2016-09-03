@@ -208,6 +208,29 @@ public class Client {
       }
     }
   }
+  public String getUdp() throws Exception{
+    String methodName = new Throwable().getStackTrace()[0].getMethodName();
+    String logPreAmble = "[" + className + "][" + methodName + "]";
+    String sentence;
+    byte[] receiveData = new byte[1024];
+
+    DatagramPacket receivePacket =
+      new DatagramPacket(receiveData, receiveData.length);
+
+    System.out.println( logPreAmble + "[-I-]: waiting for reply on " + this.udpSocket.getLocalPort());
+    try{
+      this.udpSocket.receive(receivePacket);
+    }
+    catch (IOException localIOException) {}
+    System.out.println( logPreAmble + "[-I-]: received reply " + this.udpSocket.getLocalPort());
+
+    String response =
+      new String(receivePacket.getData());
+
+    //System.out.println( logPreAmble + "[-I-]: [Rx(peer)|udp|" + todoIP + ":" + todoPort + "|" + response + "]");
+    System.out.println( logPreAmble + "[-I-]: [Rx(peer)|udp|" + this.ServerHostname + ":" + this.ServerPort + "|" + response + "]");
+    return response;
+  }
   public void receiveFromPeer() throws Exception{
     String methodName = new Throwable().getStackTrace()[0].getMethodName();
     String logPreAmble = "[" + className + "][" + methodName + "]";
@@ -223,23 +246,7 @@ public class Client {
       // parties: [Rx|udp|client,clients]
       MESG¤<screen_name>:¤<message>\n
       */
-      byte[] receiveData = new byte[1024];
-
-      DatagramPacket receivePacket =
-        new DatagramPacket(receiveData, receiveData.length);
-
-      System.out.println( logPreAmble + "[-I-]: waiting for reply on " + this.udpSocket.getLocalPort());
-      try{
-      this.udpSocket.receive(receivePacket);
-      }
-      catch (IOException localIOException) {}
-      System.out.println( logPreAmble + "[-I-]: received reply " + this.udpSocket.getLocalPort());
-
-      String response =
-        new String(receivePacket.getData());
-
-      //System.out.println( logPreAmble + "[-I-]: [Rx(peer)|udp|" + todoIP + ":" + todoPort + "|" + response + "]");
-      System.out.println( logPreAmble + "[-I-]: [Rx(peer)|udp|" + this.ServerHostname + ":" + this.ServerPort + "|" + response + "]");
+      String response = this.getUdp();
       String[] respArr = this.parseIncoming(response);
       if(respArr[0].equals("MESG")){
         udpReceived = true;
@@ -265,10 +272,6 @@ public class Client {
 
     this.outToServer.writeBytes(sentence + '\n');
 
-//   dumb anyway, 'modifiedSentence' was stale 
-//    System.out.println("[" + className + "][-I-]: [Rx(server)|" + this.ServerHostname + ":" + this.ServerPort + "|" + modifiedSentence + "]");
-
-
     // TODO: for now, loop until receive new message
     boolean udpReceived = false;
     while(! udpReceived){
@@ -279,22 +282,7 @@ public class Client {
          // parties: [Rx|udp|server,client]
          EXIT¤<screen_name>\n
          */
-      byte[] receiveData = new byte[1024];
-      DatagramPacket receivePacket =
-        new DatagramPacket(receiveData, receiveData.length);
-
-      System.out.println( logPreAmble + "[-I-]: waiting for reply on " + this.udpSocket.getLocalPort());
-      try{
-      this.udpSocket.receive(receivePacket);
-      }
-      catch (IOException localIOException) {}
-      System.out.println( logPreAmble + "[-I-]: received reply " + this.udpSocket.getLocalPort());
-
-      String response =
-        new String(receivePacket.getData());
-
-
-      System.out.println( logPreAmble + "[-I-]: [Rx(peer)|udp|" + this.ServerHostname + ":" + this.ServerPort + "|" + response + "]");
+      String response = this.getUdp();
       String[] respArr = this.parseIncoming(response);
       if(respArr[0].equals("EXIT")){
         if(respArr[1].startsWith(this.userName)){
@@ -308,7 +296,7 @@ public class Client {
 
   }
 
-  // parse incomming messages
+  // parse incoming messages
   public String[] parseIncoming(String response) {
     String[] replyArr = new String[2];
     // reply format: <keyword>¤<content>
