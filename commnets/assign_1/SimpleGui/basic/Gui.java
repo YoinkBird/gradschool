@@ -4,6 +4,8 @@ import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+
+import tcp_udp.*;
 /**
  * 
  * @author rameshyerraballi
@@ -90,12 +92,14 @@ public class Gui extends JFrame{
   /**
    * @param args
    */
-  public static void main(String[] args) {
+  public static void main(String[] args) throws Exception{
     if (args.length != 1) {
       System.out.println("Must run with one command Line argument as: java Gui <Title>");
-      System.exit(-1);
+//      System.exit(-1);
     }
-    Gui app = new Gui(args[0]);
+    Client thisClient = new Client(args);
+    thisClient.connectToServer();
+    Gui app = new Gui(thisClient.getUserName());
     // The following listener responds to the close event on the window
     // invoked when the user presses on the X at top right of the window in Windows
     // or the red button  at the top left in MacOSX
