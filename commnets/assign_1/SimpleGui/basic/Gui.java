@@ -52,7 +52,7 @@ public class Gui extends JFrame{
           public void actionPerformed( ActionEvent e )
           {
             try{
-              initClient.communicateWithServer();
+              initClient.communicateWithPeer();
             } catch ( Exception e1) {
             }
             WriteData( e.getActionCommand() ); // e.getActionCommand() returns the text typed in

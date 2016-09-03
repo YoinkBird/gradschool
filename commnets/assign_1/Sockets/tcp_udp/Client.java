@@ -62,7 +62,7 @@ public class Client {
     // TODO Auto-generated method stub
 
     thisClient.connectToServer();
-    thisClient.communicateWithServer();
+    thisClient.communicateWithPeer();
     thisClient.disconnectFromServer();
   }
 
@@ -158,7 +158,7 @@ public class Client {
       }
     }
   }
-  public void communicateWithServer() throws Exception{
+  public void communicateWithPeer() throws Exception{
     String className = this.className;
     String sentence;
     String modifiedSentence;
