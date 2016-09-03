@@ -297,6 +297,17 @@ public class Client {
     boolean udpReceived = false;
     String response = this.getUdp();
     System.out.println( logPreAmble + "[-I-]: [Rx(server)|udp|" + this.ServerHostname + ":" + this.ServerPort + "|" + response + "]");
+    udpReceived = this.disconnectFromServerFinalise(response);
+
+    return udpReceived;
+  }
+  // if exit acknowledged, close ports and return true
+  // otherwise return false
+  public boolean disconnectFromServerFinalise(String response) throws Exception{
+    String methodName = new Throwable().getStackTrace()[0].getMethodName();
+    String logPreAmble = "[" + className + "][" + methodName + "]";
+
+    boolean udpReceived = false;
     String[] respArr = this.parseIncoming(response);
     if(respArr[0].equals("EXIT")){
       if(respArr[1].startsWith(this.userName)){
@@ -307,7 +318,6 @@ public class Client {
       }
     }
     return udpReceived;
-
   }
 
   // parse incoming messages
