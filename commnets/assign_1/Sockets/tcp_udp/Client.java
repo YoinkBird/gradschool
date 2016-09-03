@@ -25,6 +25,10 @@ public class Client {
   private String ServerHostname;
   private InetAddress ServerIPAddress;
   private int ServerPort;
+  private Hashtable<String, String> protocolStrings;
+  private Socket tcpSocket;
+  private DatagramSocket udpSocket;
+  private DataOutputStream outToServer;
 
   public Client(String[] args){
     this.className = new Throwable().getStackTrace()[0].getClassName();
@@ -58,37 +62,38 @@ public class Client {
     // TODO Auto-generated method stub
 
     thisClient.connectToServer();
+    thisClient.communicateWithServer();
   }
 
   public void connectToServer() throws Exception{
     String className = this.className;
     String sentence;
     String modifiedSentence;
-    // TCP
-    Socket tcpSocket = null;
+//    // TCP
+//    Socket tcpSocket = null;
     // user input
     BufferedReader inFromUser =
       new BufferedReader(new InputStreamReader(System.in));
 
     
     System.out.println("[" + className + "][-I-]: will transmit to " + this.ServerHostname + ":" + this.ServerPort);
+    // TCP
     try {
-      tcpSocket = new Socket(this.ServerHostname, this.ServerPort);
+      this.tcpSocket = new Socket(this.ServerHostname, this.ServerPort);
     } catch ( Exception e) {
 
     } // end of try-catch
-    int myPort = tcpSocket.getLocalPort();
+    int myPort = this.tcpSocket.getLocalPort();
     // UDP
-    DatagramSocket udpSocket = new DatagramSocket();
-    int udpPort = udpSocket.getLocalPort();
+    this.udpSocket = new DatagramSocket();
+    int udpPort = this.udpSocket.getLocalPort();
 
     //	        Socket tcpSocket = new Socket("data.uta.edu", 6789);
-
-    DataOutputStream outToServer =
-      new DataOutputStream(tcpSocket.getOutputStream());
+    this.outToServer =
+      new DataOutputStream(this.tcpSocket.getOutputStream());
 
     BufferedReader inFromServer =
-      new BufferedReader(new InputStreamReader(tcpSocket.getInputStream()));
+      new BufferedReader(new InputStreamReader(this.tcpSocket.getInputStream()));
 
     // src: http://stackoverflow.com/a/31550047
     // store the deterministic components of the protocol strings, e.g. username
@@ -104,13 +109,15 @@ public class Client {
     protocolStrings.put("ACPT", "ACPT");
     // EXIT\n
     protocolStrings.put("EXIT", "EXIT");
+    // TODO: set up a method
+    this.protocolStrings = protocolStrings;
 
     // parties: [Tx|tcp|client,server]
     // HELO¤<screen_name>¤<IP>¤<Port> \n
-    sentence = protocolStrings.get("HELO");
+    sentence = this.protocolStrings.get("HELO");
     System.out.println("[" + className + "][-I-]: [Tx(server)|" + this.ServerHostname + ":" + this.ServerPort + "|" + sentence + "]");
 
-    outToServer.writeBytes(sentence + '\n');
+    this.outToServer.writeBytes(sentence + '\n');
 
     modifiedSentence = inFromServer.readLine();
 
@@ -121,7 +128,7 @@ public class Client {
     // parties: [Rx|tcp|server,client]
     RJCT¤<screen_name>\n
     */
-    if ( modifiedSentence.equals(protocolStrings.get("RJCT")) ){
+    if ( modifiedSentence.equals(this.protocolStrings.get("RJCT")) ){
       System.out.println("bad username, exiting");
       System.exit(2);
     }
@@ -133,7 +140,7 @@ public class Client {
     // parties: [Rx|tcp|server,client]
     ACPT¤<SNn>¤<IPn>¤<PORTn>\n
     */
-    if (! modifiedSentence.startsWith(protocolStrings.get("ACPT")) ){
+    if (! modifiedSentence.startsWith(this.protocolStrings.get("ACPT")) ){
       System.out.println("bad ACPT response, exiting");
       System.exit(2);
     }
@@ -149,6 +156,11 @@ public class Client {
         System.out.println();
       }
     }
+  }
+  public void communicateWithServer() throws Exception{
+    String className = this.className;
+    String sentence;
+    String modifiedSentence;
     // UDP section
     {
       // process response
@@ -167,7 +179,7 @@ public class Client {
       //sentence = "[" + timeStamp + "]";
       sentence = "where is sauce";
 
-      sentence = protocolStrings.get("MESG") + " " + sentence;
+      sentence = this.protocolStrings.get("MESG") + " " + sentence;
       sentence += "\n";
       byte[] sendData = new byte[1024];
       sendData = sentence.getBytes();
@@ -185,7 +197,7 @@ public class Client {
             new DatagramPacket(sendData, sendData.length, todoIP, todoPort);
           //         new DatagramPacket(sendData, sendData.length, todoIP, 9876);
           System.out.println("[" + className + "][-I-]: UDP packet created");
-          udpSocket.send(sendPacket);
+          this.udpSocket.send(sendPacket);
 
           System.out.println("[" + className + "][-I-]: UDP packet sent");
         }
@@ -207,12 +219,12 @@ public class Client {
       DatagramPacket receivePacket =
         new DatagramPacket(receiveData, receiveData.length);
 
-      System.out.println("[" + className + "][-I-]: waiting for reply on " + udpSocket.getLocalPort());
+      System.out.println("[" + className + "][-I-]: waiting for reply on " + this.udpSocket.getLocalPort());
       try{
-      udpSocket.receive(receivePacket);
+      this.udpSocket.receive(receivePacket);
       }
       catch (IOException localIOException) {}
-      System.out.println("[" + className + "][-I-]: received reply " + udpSocket.getLocalPort());
+      System.out.println("[" + className + "][-I-]: received reply " + this.udpSocket.getLocalPort());
 
       String response =
         new String(receivePacket.getData());
@@ -237,9 +249,10 @@ public class Client {
     sentence = "EXIT\n";
     System.out.println("[" + className + "][-I-]: [Tx(server)|" + this.ServerHostname + ":" + this.ServerPort + "|" + sentence + "]");
 
-    outToServer.writeBytes(sentence + '\n');
+    this.outToServer.writeBytes(sentence + '\n');
 
-    System.out.println("[" + className + "][-I-]: [Rx(server)|" + this.ServerHostname + ":" + this.ServerPort + "|" + modifiedSentence + "]");
+//   dumb anyway, 'modifiedSentence' was stale 
+//    System.out.println("[" + className + "][-I-]: [Rx(server)|" + this.ServerHostname + ":" + this.ServerPort + "|" + modifiedSentence + "]");
 
 
     // TODO: for now, loop until receive new message
@@ -256,12 +269,12 @@ public class Client {
       DatagramPacket receivePacket =
         new DatagramPacket(receiveData, receiveData.length);
 
-      System.out.println("[" + className + "][-I-]: waiting for reply on " + udpSocket.getLocalPort());
+      System.out.println("[" + className + "][-I-]: waiting for reply on " + this.udpSocket.getLocalPort());
       try{
-      udpSocket.receive(receivePacket);
+      this.udpSocket.receive(receivePacket);
       }
       catch (IOException localIOException) {}
-      System.out.println("[" + className + "][-I-]: received reply " + udpSocket.getLocalPort());
+      System.out.println("[" + className + "][-I-]: received reply " + this.udpSocket.getLocalPort());
 
       String response =
         new String(receivePacket.getData());
@@ -276,8 +289,8 @@ public class Client {
       }
     }
     // done
-    tcpSocket.close();
-    udpSocket.close();
+    this.tcpSocket.close();
+    this.udpSocket.close();
 
   }
 
