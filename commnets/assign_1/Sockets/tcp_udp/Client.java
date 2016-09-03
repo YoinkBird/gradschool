@@ -62,7 +62,8 @@ public class Client {
     // TODO Auto-generated method stub
 
     thisClient.connectToServer();
-    thisClient.communicateWithPeer();
+    thisClient.sendToPeer();
+    thisClient.receiveFromPeer();
     thisClient.disconnectFromServer();
   }
 
@@ -158,7 +159,7 @@ public class Client {
       }
     }
   }
-  public void communicateWithPeer() throws Exception{
+  public void sendToPeer() throws Exception{
     String className = this.className;
     String sentence;
     String modifiedSentence;
@@ -206,6 +207,11 @@ public class Client {
         }
       }
     }
+  }
+  public void receiveFromPeer() throws Exception{
+    String methodName = new Throwable().getStackTrace()[0].getMethodName();
+    String logPreAmble = "[" + className + "][" + methodName + "]";
+    String sentence;
 
     // TODO: for now, loop until receive new message
     boolean udpReceived = false;
