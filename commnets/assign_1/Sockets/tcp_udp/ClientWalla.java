@@ -12,7 +12,9 @@ public class ClientWalla {
     Client thisClient = new Client(args);
     System.out.println("[" + className + "][-I-]: userName: " + thisClient.getUserName());
     thisClient.connectToServer();
-    thisClient.sendToPeer();
+    // TODO: testing hard-code
+    String message = "where is sauce";
+    thisClient.sendToPeer(message);
     thisClient.receiveFromPeer();
     thisClient.disconnectFromServer();
   }

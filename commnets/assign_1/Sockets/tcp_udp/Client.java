@@ -60,9 +60,10 @@ public class Client {
     thisClient.ServerIPAddress = InetAddress.getByName(args[0]);
     // </init ritual>
     // TODO Auto-generated method stub
+    String message = "where is sauce";
 
     thisClient.connectToServer();
-    thisClient.sendToPeer();
+    thisClient.sendToPeer(message);
     thisClient.receiveFromPeer();
     thisClient.disconnectFromServer();
   }
@@ -159,9 +160,8 @@ public class Client {
       }
     }
   }
-  public void sendToPeer() throws Exception{
+  public void sendToPeer(String sentence) throws Exception{
     String className = this.className;
-    String sentence;
     String modifiedSentence;
     String methodName = new Throwable().getStackTrace()[0].getMethodName();
     String logPreAmble = "[" + className + "][" + methodName + "]";
@@ -181,7 +181,6 @@ public class Client {
       // http://stackoverflow.com/a/6953926
       //String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
       //sentence = "[" + timeStamp + "]";
-      sentence = "where is sauce";
       sentence = this.protocolStrings.get("MESG") + " " + sentence;
       sentence += "\n";
       byte[] sendData = new byte[1024];
