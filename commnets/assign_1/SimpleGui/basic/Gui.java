@@ -30,9 +30,11 @@ public class Gui extends JFrame{
     super( ar );	// Call JFrame's constructor to set the title of the Window	
     Container c = getContentPane(); // To add components to a JFrame we need a handle to its Content Pane
 
-    enter = new JTextField("Enter Here:"); // Create a new TextField
-    enter.setEnabled( true );	// Set its editability to be true; One can toggle this property to temporarily disable
-    //  entering of text in it; Enabled by default though
+    // Create a new TextField
+    enter = new JTextField("Enter Here:");
+    // Set its editability to be true; One can toggle this property to temporarily disable  entering of text in it;
+    //  Enabled by default though
+    enter.setEnabled( true );
     // There are several ways to register a Callback on a Gui component, here is the simplest
     //  We are creating a new anonymous object that implements the ActionListener Interface
     //   The ActionListener interface requires that you implement the ActionPerformed method
