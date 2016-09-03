@@ -334,6 +334,9 @@ public class Client {
     return peerArr;
   }
 
+  public String getUserName(){
+    return this.userName;
+  }
   public ArrayList<String[]> getPeerList(){
     // TODO: remove self
     return this.peerList;
