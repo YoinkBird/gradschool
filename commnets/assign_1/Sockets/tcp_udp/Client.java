@@ -21,6 +21,28 @@ import java.util.*;
 public class Client {
   private String userName;
   private ArrayList<String[]> peerList;// = new ArrayList<String[]>();
+  private String ServerHostname;
+  private InetAddress ServerIPAddress;
+  private int ServerPort;
+
+  public Client(String[] args){
+    String className = new Throwable().getStackTrace()[0].getClassName();
+    // parse args
+    if (args.length != 3) {
+      System.out.println("[" + className + "][-E-]: Usage: java Client <host name> <port number> <screen_name>");
+
+      System.exit(1);
+    }
+
+    // honestly not quite sure what the difference is
+    this.ServerHostname = args[0];
+    //    only works in 'main'
+//    this.ServerIPAddress = InetAddress.getByName(args[0]);
+//    InetAddress ServerIPAddress = InetAddress.getByName(args[0]);
+    this.ServerPort = java.lang.Integer.parseInt(args[1]);
+    // screen_name
+    this.userName = args[2];
+  }
 
   /**
    * @param args args[0] is the server's host ip and args[1] is its port number
@@ -29,7 +51,16 @@ public class Client {
   public static void main(String[] args) throws Exception{
     // class name for debug messages
     String className = new Throwable().getStackTrace()[0].getClassName();
-    Client thisClient = new Client();
+    // <init ritual>
+    Client thisClient = new Client(args);
+    // cannot do this in the constructor for some reason
+    thisClient.ServerIPAddress = InetAddress.getByName(args[0]);
+    //tmp vars during transition to using class/oop/whatever
+    String ServerHostname = thisClient.ServerHostname;
+    int ServerPort = thisClient.ServerPort;
+    // screen_name
+    String userName = thisClient.userName;
+    // </init ritual>
     // TODO Auto-generated method stub
     String sentence;
     String modifiedSentence;
@@ -40,20 +71,6 @@ public class Client {
     BufferedReader inFromUser =
       new BufferedReader(new InputStreamReader(System.in));
 
-    // parse args
-    if (args.length != 3) {
-      System.out.println("[" + className + "][-E-]: Usage: java Client <host name> <port number> <screen_name>");
-
-      System.exit(1);
-    }
-
-    // honestly not quite sure what the difference is
-    String ServerHostname = args[0];
-    InetAddress ServerIPAddress = InetAddress.getByName(args[0]);
-    int ServerPort = java.lang.Integer.parseInt(args[1]);
-    // screen_name
-    String userName = args[2];
-    thisClient.userName = userName;
     
     System.out.println("[" + className + "][-I-]: will transmit to " + ServerHostname + ":" + ServerPort);
     try {
@@ -79,11 +96,11 @@ public class Client {
     // when calling, add the dynamic components
     Hashtable<String, String> protocolStrings = new Hashtable<>();
     // HELO¤<screen_name>¤<IP>¤<Port>\n
-    protocolStrings.put("HELO", "HELO " + userName + " " + ServerHostname + " " + udpPort);
+    protocolStrings.put("HELO", "HELO " + thisClient.userName + " " + ServerHostname + " " + udpPort);
     // RJCT¤<screen_name>\n
-    protocolStrings.put("RJCT", "RJCT " + userName);
+    protocolStrings.put("RJCT", "RJCT " + thisClient.userName);
     // MESG¤<screen_name>:¤<message>\n
-    protocolStrings.put("MESG", "MESG " + userName);
+    protocolStrings.put("MESG", "MESG " + thisClient.userName);
     // ACPT¤<SNn>¤<IPn>¤<PORTn>
     protocolStrings.put("ACPT", "ACPT");
     // EXIT\n
@@ -254,7 +271,7 @@ public class Client {
       System.out.println("[" + className + "][-I-]: [Rx(peer)|udp|" + ServerHostname + ":" + ServerPort + "|" + response + "]");
       String[] respArr = thisClient.parseIncoming(response);
       if(respArr[0].equals("EXIT")){
-        if(respArr[1].startsWith(userName)){
+        if(respArr[1].startsWith(thisClient.userName)){
           udpReceived = true;
         }
       }
