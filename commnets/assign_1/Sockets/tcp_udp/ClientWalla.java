@@ -13,5 +13,6 @@ public class ClientWalla {
     System.out.println("[" + className + "][-I-]: userName: " + thisClient.getUserName());
     thisClient.connectToServer();
     thisClient.communicateWithServer();
+    thisClient.disconnectFromServer();
   }
 }

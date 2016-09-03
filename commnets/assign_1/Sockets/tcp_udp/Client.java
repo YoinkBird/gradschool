@@ -63,6 +63,7 @@ public class Client {
 
     thisClient.connectToServer();
     thisClient.communicateWithServer();
+    thisClient.disconnectFromServer();
   }
 
   public void connectToServer() throws Exception{
@@ -238,6 +239,9 @@ public class Client {
     }
 
 
+  }
+  public void disconnectFromServer() throws Exception{
+    String sentence;
 
     /*
     When the Chat Client wants to terminate (or exit) the chat it sends this to the Membership Server over TCP.
@@ -256,7 +260,7 @@ public class Client {
 
 
     // TODO: for now, loop until receive new message
-    udpReceived = false;
+    boolean udpReceived = false;
     while(! udpReceived){
       /*
          This is a message received on the UDP Socket.
