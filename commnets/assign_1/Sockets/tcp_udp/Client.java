@@ -283,7 +283,7 @@ public class Client {
       DatagramPacket receivePacket =
         new DatagramPacket(receiveData, receiveData.length);
 
-      System.out.println( logPreAmble + "[" + methodName + "][-I-]: waiting for reply on " + this.udpSocket.getLocalPort());
+      System.out.println( logPreAmble + "[-I-]: waiting for reply on " + this.udpSocket.getLocalPort());
       try{
       this.udpSocket.receive(receivePacket);
       }
