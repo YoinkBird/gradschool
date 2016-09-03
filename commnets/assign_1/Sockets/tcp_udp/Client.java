@@ -182,7 +182,6 @@ public class Client {
       //String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
       //sentence = "[" + timeStamp + "]";
       sentence = "where is sauce";
-
       sentence = this.protocolStrings.get("MESG") + " " + sentence;
       sentence += "\n";
       byte[] sendData = new byte[1024];
@@ -231,30 +230,30 @@ public class Client {
     System.out.println( logPreAmble + "[-I-]: [Rx(peer)|udp|" + this.ServerHostname + ":" + this.ServerPort + "|" + response + "]");
     return response;
   }
-  public void receiveFromPeer() throws Exception{
+  public String receiveFromPeer() throws Exception{
     String methodName = new Throwable().getStackTrace()[0].getMethodName();
     String logPreAmble = "[" + className + "][" + methodName + "]";
     String sentence;
 
     // TODO: for now, loop until receive new message
     boolean udpReceived = false;
-    while(! udpReceived){
-      /*
-         This is a message received on the UDP Socket.
-         It is another Chatter’s chat message.
-         Parse it and display the message in the JtextArea as shown in the GUI
-      // parties: [Rx|udp|client,clients]
-      MESG¤<screen_name>:¤<message>\n
-      */
-      String response = this.getUdp();
-      System.out.println( logPreAmble + "[-I-]: [Rx(peer)|udp|" + this.ServerHostname + ":" + this.ServerPort + "|" + response + "]");
-      String[] respArr = this.parseIncoming(response);
-      if(respArr[0].equals("MESG")){
-        udpReceived = true;
-      }
+    /*
+       This is a message received on the UDP Socket.
+       It is another Chatter’s chat message.
+       Parse it and display the message in the JtextArea as shown in the GUI
+    // parties: [Rx|udp|client,clients]
+    MESG¤<screen_name>:¤<message>\n
+    */
+    String response = this.getUdp();
+    System.out.println( logPreAmble + "[-I-]: [Rx(peer)|udp|" + this.ServerHostname + ":" + this.ServerPort + "|" + response + "]");
+    String[] respArr = this.parseIncoming(response);
+    String message = new String();
+    if(respArr[0].equals("MESG")){
+      udpReceived = true;
+      // TODO: don't assume defined
+      message = respArr[1];
     }
-
-
+    return message;
   }
   public void disconnectFromServer() throws Exception{
     disconnectFromServerInit();

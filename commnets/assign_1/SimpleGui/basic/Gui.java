@@ -102,7 +102,12 @@ public class Gui extends JFrame{
   {
     do {
       try{
-        this.myClient.receiveFromPeer();
+        // MESG
+        String msg = this.myClient.receiveFromPeer();
+        if(msg != null){
+          this.WriteData(msg);
+        }
+        //  EXIT
         if( this.myClient.disconnectFromServerVerify() ){
           System.exit( 0 );
         }
