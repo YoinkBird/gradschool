@@ -1,6 +1,7 @@
 package basic;
 
 import java.io.*;
+import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -103,14 +104,38 @@ public class Gui extends JFrame{
   {
     do {
       try{
-        // MESG
-        String msg = this.myClient.receiveFromPeer();
-        if(msg != null){
+        // get response
+        String response = this.myClient.getUdp();
+        String[] respArr = this.myClient.parseIncoming(response);
+        // figure it out
+        if(respArr[0].equals("MESG")){
+          // TODO: don't assume defined
+          String msg = respArr[1];
           this.WriteData(msg);
         }
+        else if(respArr[0].equals("JOIN")){
+          String msg = new String();
+          // parse reply
+          // TODO: fix the condition in which own username is left out
+          ArrayList<String[]> joinArr = this.myClient.parseAccept(response);
+          for (String[] peerDataArr : joinArr){
+            msg += peerDataArr[0] + " ";
+          }
+          msg += " has joined the chatroom";
+          this.WriteData(msg);
+          System.out.println("-D-: printing out user array");
+          this.myClient.printPeerList();
+        }
         //  EXIT
-        if( this.myClient.disconnectFromServerVerify() ){
-          System.exit( 0 );
+        else if(respArr[0].equals("EXIT")){
+          // only exit if the function confirms it; still depends on username and so forth
+          if( this.myClient.disconnectFromServerFinalise(response) ){
+            System.exit( 0 );
+          }else{
+            String msg = respArr[1] + " has left the chatroom";
+            this.WriteData(msg);
+            // TODO: remove user
+          }
         }
       } catch ( Exception e1) {
       }
@@ -150,8 +175,7 @@ public class Gui extends JFrame{
           {
             System.out.println("-I-: pressed [x]");
             try{
-              app.myClient.connectToServer();
-              System.exit( 0 );
+              app.myClient.disconnectFromServerInit();
             } catch ( Exception e1) {
             }
           }
