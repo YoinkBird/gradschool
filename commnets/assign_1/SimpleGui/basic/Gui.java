@@ -4,6 +4,7 @@ import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.text.DefaultCaret;
 
 import tcp_udp.*;
 /**
@@ -62,6 +63,10 @@ public class Gui extends JFrame{
     c.add( enter, BorderLayout.NORTH ); // Place this component at the top (i.e., NORTH)
 
     display = new JTextArea();	// Create a JTextArea
+    // http://stackoverflow.com/a/2483824
+    DefaultCaret caret = (DefaultCaret)display.getCaret();
+    caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+    //
     c.add( new JScrollPane( display ), 
         BorderLayout.CENTER ); // Attach a Scrollpane to it before adding so we can scroll
     /*
