@@ -13,9 +13,38 @@ public class ClientWalla {
     System.out.println("[" + className + "][-I-]: userName: " + thisClient.getUserName());
     thisClient.connectToServer();
     // TODO: testing hard-code
-    String message = "where is sauce";
-    thisClient.sendToPeer(message);
+    thisClient.sendToPeer("where is sauce");
+    for(;;){
+      try{
+        // get response
+        String response = thisClient.getUdp();
+        String[] respArr = thisClient.parseIncoming(response);
+        // figure it out
+        if(respArr[0].equals("MESG")){
+          // TODO: don't assume defined
+          String msg = respArr[1];
+          //this.WriteData(msg);
+          System.out.println(msg);
+        }
+        else if(respArr[0].equals("JOIN")){
+          // parse reply
+          thisClient.parseAccept(response);
+          System.out.println("-D-: printing out user array");
+          thisClient.printPeerList();
+        }
+        //  EXIT
+        else if(respArr[0].equals("EXIT")){
+          // only exit if the function confirms it; still depends on username and so forth
+          if( thisClient.disconnectFromServerFinalise(response) ){
+            System.exit( 0 );
+          }
+        }
+      } catch ( Exception e1) {
+      }
+    }
+    /*
     thisClient.receiveFromPeer();
     thisClient.disconnectFromServer();
+    */
   }
 }

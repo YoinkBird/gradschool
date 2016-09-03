@@ -368,7 +368,11 @@ public class Client {
       System.out.print("]");
       System.out.println();
     }
-    this.peerList = peerArr;
+    if(this.peerList != null){
+      this.peerList.addAll(peerArr);
+    }else{
+      this.peerList = peerArr;
+    }
     return peerArr;
   }
 
@@ -378,6 +382,17 @@ public class Client {
   public ArrayList<String[]> getPeerList(){
     // TODO: remove self
     return this.peerList;
+  }
+  public void printPeerList(){
+    // print out table/retrieve element/whatever
+    {
+      for (String[] peerDataArr : this.getPeerList()){
+        for (String data : peerDataArr){
+          System.out.print(data + "|");
+        }
+        System.out.println();
+      }
+    }
   }
 
 }
