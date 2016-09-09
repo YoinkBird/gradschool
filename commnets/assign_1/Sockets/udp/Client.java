@@ -17,38 +17,61 @@ import java.net.*;
 class Client {
   public static void main(String args[]) throws Exception
   {
+    // class name for debug messages
+    String className = new Throwable().getStackTrace()[0].getClassName();
 
     BufferedReader inFromUser =
       new BufferedReader(new InputStreamReader(System.in));
 
-    DatagramSocket clientSocket = new DatagramSocket();
+    DatagramSocket udpSocket = new DatagramSocket();
 
+    // parse args
+    if (args.length != 3) {
+      System.out.println("[" + className + "][-E-]: Usage: java Client <host name> <port number> <screen_name>");
+      System.exit(1);
+    }
+    //      InetAddress ServerIPAddress = InetAddress.getByName("127.0.0.1");
     InetAddress ServerIPAddress = InetAddress.getByName(args[0]);
     int ServerPort = java.lang.Integer.parseInt(args[1]);
-    //      InetAddress ServerIPAddress = InetAddress.getByName("127.0.0.1");
+    String userName = args[2];
 
+    System.out.println("[" + className + "][-I-]: will transmit to " + ServerIPAddress + ":" + ServerPort);
     byte[] sendData = new byte[1024];
     byte[] receiveData = new byte[1024];
 
     String sentence = inFromUser.readLine();
 
+    /* TODO <newsection> */
+    // parties: [Tx|udp|client,clients]
+    // MESG¤<screen_name>:¤<message>\n
+    sentence = "MESG " + userName + " " + sentence;
+    sentence += "\n";
+
+    /* TODO </newsection> */
+
+    System.out.println("[" + className + "][-I-]: [Tx(peer)|udp|" + ServerIPAddress + ":" + ServerPort + "|" + sentence + "]");
     sendData = sentence.getBytes();
+
     DatagramPacket sendPacket =
       new DatagramPacket(sendData, sendData.length, ServerIPAddress, ServerPort);
     //         new DatagramPacket(sendData, sendData.length, ServerIPAddress, 9876);
-    clientSocket.send(sendPacket);
+    System.out.println("[" + className + "][-I-]: UDP packet created");
+    udpSocket.send(sendPacket);
+
+    System.out.println("[" + className + "][-I-]: UDP packet sent");
 
     DatagramPacket receivePacket =
       new DatagramPacket(receiveData, receiveData.length);
 
-    clientSocket.receive(receivePacket);
+    udpSocket.receive(receivePacket);
+    System.out.println("[" + className + "][-I-]: UDP waiting for reply");
 
     String modifiedSentence =
       new String(receivePacket.getData());
 
-    System.out.println("FROM SERVER:" + modifiedSentence);
+    System.out.println("[" + className + "][-I-]: [Rx(peer)|udp|" + ServerIPAddress + ":" + ServerPort + "|" + modifiedSentence + "]");
 
-    clientSocket.close();
+    udpSocket.close();
 
   }
 }

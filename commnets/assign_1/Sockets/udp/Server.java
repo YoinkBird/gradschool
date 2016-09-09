@@ -18,12 +18,20 @@ import java.net.*;
 class Server {
   public static void main(String args[]) throws Exception
   {
+    // class name for debug messages
+    String className = new Throwable().getStackTrace()[0].getClassName();
+    // parse args
+    if (args.length != 1) {
+      System.out.println("[" + className + "][-E-]: Usage: java Server <port number>");
+      System.exit(1);
+    }
     int ServerPort = java.lang.Integer.parseInt(args[0]);
     //      DatagramSocket serverSocket = new DatagramSocket(9876);
     DatagramSocket serverSocket = new DatagramSocket(ServerPort);
     byte[] receiveData = new byte[1024];
     byte[] sendData  = new byte[1024];
 
+    System.out.println("[" + className + "][-I-]: listening on " + "<whateverhost>" + ":" + ServerPort);
     while(true)
     {
 
@@ -33,7 +41,7 @@ class Server {
       serverSocket.receive(receivePacket);
 
       String sentence = new String(receivePacket.getData());
-      System.out.println("Received form UDP Client: " + sentence);
+      System.out.println("[" + className + "][-I-]: Rx from UDP Client: " + sentence);
       InetAddress ClientIPAddress = receivePacket.getAddress();
 
       int ClientPort = receivePacket.getPort();
