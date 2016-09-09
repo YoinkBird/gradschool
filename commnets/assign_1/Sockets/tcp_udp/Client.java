@@ -33,7 +33,7 @@ public class Client {
   public Client(String[] args){
     this.className = new Throwable().getStackTrace()[0].getClassName();
     // parse args
-    if (args.length != 3) {
+    if (args.length < 3) {
       System.out.println("[" + this.className + "][-E-]: Usage: java Client <host name> <port number> <screen_name>");
 
       System.exit(1);
