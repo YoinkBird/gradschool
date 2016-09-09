@@ -6,11 +6,11 @@ set -x
 
 args=$*
 if [[ -z $args ]]; then
-  args="localhost 1024 farfalle"
+  args="localhost 1024 tagliatelle"
 fi
 
 
-../../../../bin/java_build_run.sh ClientWalla.java localhost 1024 tagliatelle
+../../../../bin/java_build_run.sh ClientWalla.java $args
 exit;
 
 # clean compile with one-shot backup
