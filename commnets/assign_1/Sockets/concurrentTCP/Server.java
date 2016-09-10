@@ -275,13 +275,25 @@ class Servant extends Thread
         // parse client input
         String[] inputArr = ServerInst.protocol.parseIncoming(clientInput);
         // check for EXIT
-        if(inputArr[0].equals(ServerInst.protocolStrings.get("EXIT"))){
-          System.out.println(logPreAmble +
-              "[-I-]: [Rx(server)|" + ServerInst.ServerHostname + ":" + ServerInst.ServerPort + "|"
-              + "processing EXIT"
-              + "]");
-          // send EXIT to all clients
-          // remove from list
+        if(inputArr != null) {
+          if (inputArr[0].equals(ServerInst.protocolStrings.get("EXIT"))) {
+            System.out.println(logPreAmble +
+                    "[-I-]: [Rx(server)|" + ServerInst.ServerHostname + ":" + ServerInst.ServerPort + "|"
+                    + "processing EXIT"
+                    + "]");
+            // send EXIT to all clients
+            String msgForClient = "EXIT " + this.userName + "\n";
+            try {
+              ServerInst.sendUDPtoAllClients(msgForClient);
+            } catch (Exception e) {
+              e.printStackTrace();
+              System.out.println(e.getMessage());
+            }
+            // remove from list
+            ServerInst.protocol.userHash.remove(this.userName);
+            // print user list
+            ServerInst.protocol.printUserList();
+          }
         }
       }
     }

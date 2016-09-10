@@ -35,17 +35,22 @@ public class Protocol {
   // parse incoming messages
   public String[] parseIncoming(String response) {
     String[] replyArr = new String[2];
-    // remove newlines
-    // response = response.replace("\n", "").replace("\r", "");
-    // reply format: <keyword>¤<content>
-    // extract,remove keyword
-    String type = response.substring(0,4);
-    replyArr[0] = type;
-    if(response.length() > 4){
-      if(response.substring(4,5).equals(" ")) {
-        String content = response.substring(5, response.length());
-        if (content != null) {
-          replyArr[1] = content;
+    if(response.length() < 4){
+      replyArr = null;
+    }
+    else{
+      // remove newlines
+      // response = response.replace("\n", "").replace("\r", "");
+      // reply format: <keyword>¤<content>
+      // extract,remove keyword
+      String type = response.substring(0,4);
+      replyArr[0] = type;
+      if(response.length() > 4){
+        if(response.substring(4,5).equals(" ")) {
+          String content = response.substring(5, response.length());
+          if (content != null) {
+            replyArr[1] = content;
+          }
         }
       }
     }
@@ -148,6 +153,7 @@ public class Protocol {
     // print out table/retrieve element/whatever
     {
       Enumeration userEnum = this.userHash.keys();
+      System.out.println("-I-: user list");
       while ( userEnum.hasMoreElements() ){
         String user = (String) userEnum.nextElement();
         Hashtable userInfo = (Hashtable) this.userHash.get(user);
