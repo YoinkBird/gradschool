@@ -70,12 +70,13 @@ class Server {
       Socket connectionSocket = ServerInst.tcpSocket.accept(); 
 
       // validate client connection
-      if(ServerInst.validateClient(connectionSocket)){
+      String userName = ServerInst.validateClient(connectionSocket);
+      if(! userName.isEmpty()){
         // broadcast relevant information about client
         //if(ServerInst.broadcastClient(connectionSocket)){
 
           // accepted client connection
-          Servant newServant = new Servant(connectionSocket);
+          Servant newServant = new Servant(userName, connectionSocket, ServerInst);
           // try
           // BetterServant newServant = new BetterServant(connectionSocket);
 
@@ -102,14 +103,14 @@ class Server {
         + "]");
   }
 
-  public boolean validateClient(Socket ClientTcpSocket) throws Exception{
+  public String validateClient(Socket ClientTcpSocket) throws Exception{
     String methodName = new Throwable().getStackTrace()[0].getMethodName();
     String logPreAmble = "[" + className + "][" + methodName + "]";
     String sentence;
     String clientInput;
     String clientResponse;
 
-    boolean userIsValid = false;
+    String userName = new String();
 
     
     // send to client
@@ -161,7 +162,7 @@ class Server {
             "[-I-]: [Rx(server)|" + this.ServerHostname + ":" + this.ServerPort + "|"
             + joinMsg
             + "]");
-        userIsValid = true;
+        userName = newUserName;
       }
     }
 
@@ -170,7 +171,7 @@ class Server {
     System.out.println("-D-: list of current users:");
     this.protocol.printUserList();
 
-    return userIsValid;
+    return userName;
   }
 
   public boolean sendUDPtoAllClients(String message) throws Exception{
@@ -239,14 +240,16 @@ class Server {
 class Servant extends Thread
 {
   private String className;
+  private String userName;
   private String clientInput;
   private String capitalizedSentence; 
   private Socket SocketToClient;
   private Server ServerInst;
 
-  public Servant (Socket sock, Server server_inst)
+  public Servant (String userName, Socket sock, Server server_inst)
   {
     this.className = new Throwable().getStackTrace()[0].getClassName();
+    this.userName = userName;
     SocketToClient = sock;
     ServerInst = server_inst;
     start();
