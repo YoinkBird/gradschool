@@ -199,7 +199,7 @@ public class Client {
           this.udpSocket.send(sendPacket);
 
           System.out.println( logPreAmble + "[-I-]: UDP packet sent: "
-              + this.udpPort + "->" + todoPort);
+              + this.udpSocket.getLocalPort() + "->" + todoPort);
         }
       }
     }
