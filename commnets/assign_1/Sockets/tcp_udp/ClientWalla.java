@@ -22,6 +22,9 @@ public class ClientWalla {
     thisClient.sendToPeer(message);
     // TODO: for testing, let an exit happen by having another client issue an exit cmd
     boolean exit = false;
+    if(message.contains("EXIT:")){
+      exit = true;
+    }
     for(;;){
       try{
         String response = "EXIT " + thisClient.getUserName();
