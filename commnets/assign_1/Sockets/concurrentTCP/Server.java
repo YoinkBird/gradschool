@@ -1,6 +1,8 @@
 package concurrentTCP;
-import java.io.*; 
-import java.net.*; 
+import java.io.*;
+import java.net.*;
+import java.util.Hashtable;
+import java.util.*;
 
 /**
  * 
@@ -17,26 +19,70 @@ import java.net.*;
  * 
  */
 class Server { 
+  private String className;
+  private Hashtable peerHash;
+  private InetAddress ServerIPAddress;
+  private int ServerPort;
+  private Hashtable<String, String> protocolStrings;
+  private ServerSocket tcpSocket;
+  private DatagramSocket udpSocket;
+  private DataOutputStream outToServer;
+
+  public Server(String[] args){
+    this.className = new Throwable().getStackTrace()[0].getClassName();
+    // parse args
+    if (args.length < 1) {
+      System.out.println("[" + this.className + "][-E-]: Usage: java Server <port number>");
+
+      System.exit(1);
+    }
+
+    //    only works in 'main'
+//    this.ServerIPAddress = InetAddress.getByName(args[0]);
+//    InetAddress ServerIPAddress = InetAddress.getByName(args[0]);
+    this.ServerPort = java.lang.Integer.parseInt(args[0]);
+
+    // init
+    this.peerHash = new Hashtable();
+  }
   /**
    * @param args args[0] is the port number at which the server must be run
    */
   public static void main(String args[]) throws Exception 
   { 
+    // <init_ritual>
+    Server ServerInst = new Server(args);
+    // </init_ritual>
 
-    if (args.length != 1) {
-      System.out.println("Run Program as\n \t java ConTCPServer <server_port>");
-      System.exit(-1);
-    }
-    ServerSocket welcomeSocket =
-      new ServerSocket(java.lang.Integer.parseInt(args[0])); 
+    // set up sockets
+    ServerInst.initSockets();
 
     while(true) { 
-      Socket connectionSocket = welcomeSocket.accept(); 
+      Socket connectionSocket = ServerInst.tcpSocket.accept(); 
       Servant newServant = new Servant(connectionSocket);
       // try
       // BetterServant newServant = new BetterServant(connectionSocket);
     } 
-  } 
+  }
+
+  public void initSockets() throws Exception{
+    String methodName = new Throwable().getStackTrace()[0].getMethodName();
+    String logPreAmble = "[" + className + "][" + methodName + "]";
+    System.out.println( logPreAmble + "[-I-]: [INIT(server)|" 
+        + "]");
+    // TCP
+    try {
+      this.tcpSocket = new ServerSocket(this.ServerPort);
+    } catch ( Exception e) {
+    System.out.println( logPreAmble + "[-I-]: [INIT(server)|tcp|" + /*this.ServerHostname +*/ ":" + this.ServerPort + "]");
+    // UDP
+    this.udpSocket = new DatagramSocket();
+    int udpPort = this.udpSocket.getLocalPort();
+    System.out.println( logPreAmble + "[-I-]: [INIT(server)|udp|"
+        + udpPort
+        + "]");
+    }
+  }
 } 
 
 class Servant extends Thread
