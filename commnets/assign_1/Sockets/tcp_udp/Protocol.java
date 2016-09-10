@@ -41,9 +41,13 @@ public class Protocol {
     // extract,remove keyword
     String type = response.substring(0,4);
     replyArr[0] = type;
-    String content = response.substring(5,response.length());
-    if(content != null){
-      replyArr[1] = content;
+    if(response.length() > 4){
+      if(response.substring(4,5).equals(" ")) {
+        String content = response.substring(5, response.length());
+        if (content != null) {
+          replyArr[1] = content;
+        }
+      }
     }
     return replyArr;
   }
