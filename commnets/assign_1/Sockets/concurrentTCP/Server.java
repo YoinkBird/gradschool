@@ -26,6 +26,7 @@ class Server {
   private String ServerHostname;
   private InetAddress ServerIPAddress;
   private int ServerPort;
+  private int udpPort;
   private Hashtable<String, String> protocolStrings;
   private ServerSocket tcpSocket;
   private DatagramSocket udpSocket;
@@ -95,7 +96,7 @@ class Server {
     System.out.println( logPreAmble + "[-I-]: [INIT(server)|tcp|" + /*this.ServerHostname +*/ ":" + this.ServerPort + "]");
     // UDP
     this.udpSocket = new DatagramSocket();
-    int udpPort = this.udpSocket.getLocalPort();
+    this.udpPort = this.udpSocket.getLocalPort();
     System.out.println( logPreAmble + "[-I-]: [INIT(server)|udp|"
         + udpPort
         + "]");
@@ -148,7 +149,7 @@ class Server {
         String newUserName = (String) userParam.get("user");
         // send join string before adding user
         String joinMsg = this.protocol.createJoinMsg(userParam);
-        this.sendUDPtoAllClients(ClientTcpSocket, joinMsg);
+        this.sendUDPtoAllClients(joinMsg);
         // add user
         this.protocol.userHash.put(userParam.get("user"),userParam);
         // create acpt string
@@ -172,22 +173,11 @@ class Server {
     return userIsValid;
   }
 
-  public boolean sendUDPtoAllClients(Socket ClientTcpSocket, String message) throws Exception{
+  public boolean sendUDPtoAllClients(String message) throws Exception{
     String methodName = new Throwable().getStackTrace()[0].getMethodName();
     String logPreAmble = "[" + className + "][" + methodName + "]";
-    String sentence;
-    String clientInput;
-    String clientResponse;
 
     boolean userIsValid = false;
-
-    
-    // send to client
-    DataOutputStream  outToClient = 
-      new DataOutputStream(ClientTcpSocket.getOutputStream());
-    // read client input
-    BufferedReader inFromClient =
-      new BufferedReader(new InputStreamReader(ClientTcpSocket.getInputStream()));
 
     // send string
     byte[] sendData = new byte[1024];
@@ -197,82 +187,49 @@ class Server {
       Enumeration userEnum = this.protocol.userHash.keys();
       while ( userEnum.hasMoreElements() ){
         String user = (String) userEnum.nextElement();
-        Hashtable userInfo = (Hashtable) this.protocol.userHash.get(user);
-
-        String todoSN = (String) userInfo.get("user");
-        InetAddress todoIP = InetAddress.getByName((String) userInfo.get("host"));
-        int todoPort = java.lang.Integer.parseInt((String) userInfo.get("port"));
-
-        System.out.println( logPreAmble + "[-I-]: [Tx(peer)|udp|"
-            + todoSN + "|" + todoIP + ":" + todoPort + "|"
-            + message 
-            + "]");
-
-        DatagramPacket sendPacket =
-          new DatagramPacket(sendData, sendData.length, todoIP, todoPort);
-        //         new DatagramPacket(sendData, sendData.length, todoIP, 9876);
-        System.out.println( logPreAmble + "[-I-]: UDP packet created");
-        try{
-          this.udpSocket.send(sendPacket);
-        }catch (Exception e1){
-          continue;
-        }
-
-        System.out.println( logPreAmble + "[-I-]: UDP packet sent");
+        this.sendUDPtoClient(user, message);
       }
     }
 
     return userIsValid;
   }
-  public boolean sendUDPtoClient(Socket ClientTcpSocket, String user, String message) throws Exception{
+  public boolean sendUDPtoClient(String user, String message) throws Exception{
     String methodName = new Throwable().getStackTrace()[0].getMethodName();
     String logPreAmble = "[" + className + "][" + methodName + "]";
-    String sentence;
-    String clientInput;
-    String clientResponse;
 
     boolean userIsValid = false;
-
-    
-    // send to client
-    DataOutputStream  outToClient = 
-      new DataOutputStream(ClientTcpSocket.getOutputStream());
-    // read client input
-    BufferedReader inFromClient =
-      new BufferedReader(new InputStreamReader(ClientTcpSocket.getInputStream()));
 
     // send string
     byte[] sendData = new byte[1024];
     sendData = message.getBytes();
     // send
     {
-      //Enumeration userEnum = this.protocol.userHash.keys();
-      //while ( userEnum.hasMoreElements() ){
-        //String user = (String) userEnum.nextElement();
-        Hashtable userInfo = (Hashtable) this.protocol.userHash.get(user);
+      Hashtable userInfo = (Hashtable) this.protocol.userHash.get(user);
 
-        String todoSN = (String) userInfo.get("user");
-        InetAddress todoIP = InetAddress.getByName((String) userInfo.get("host"));
-        int todoPort = java.lang.Integer.parseInt((String) userInfo.get("port"));
+      String todoSN = (String) userInfo.get("user");
+      InetAddress todoIP = InetAddress.getByName((String) userInfo.get("host"));
+      int todoPort = java.lang.Integer.parseInt((String) userInfo.get("port"));
 
-        System.out.println( logPreAmble + "[-I-]: [Tx(peer)|udp|"
-            + todoSN + "|" + todoIP + ":" + todoPort + "|"
-            + message 
-            + "]");
+      System.out.println( logPreAmble + "[-I-]: [Tx(client)|udp:"
+          + this.udpPort + "|"
+          + todoSN + "|"
+          + todoIP + ":" + todoPort + "|"
+          + message 
+          + "]");
 
-        DatagramPacket sendPacket =
-          new DatagramPacket(sendData, sendData.length, todoIP, todoPort);
-        //         new DatagramPacket(sendData, sendData.length, todoIP, 9876);
-        System.out.println( logPreAmble + "[-I-]: UDP packet created");
-        try{
-          this.udpSocket.send(sendPacket);
-        }catch (Exception e1){
-          System.out.println(e1.toString());
-          //continue;
-        }
+      DatagramPacket sendPacket =
+        new DatagramPacket(sendData, sendData.length, todoIP, todoPort);
+      //         new DatagramPacket(sendData, sendData.length, todoIP, 9876);
+      System.out.println( logPreAmble + "[-I-]: UDP packet created");
+      try{
+        this.udpSocket.send(sendPacket);
+      }catch (Exception e1){
+        System.out.println(e1.toString());
+        //continue;
+      }
 
-        System.out.println( logPreAmble + "[-I-]: UDP packet sent");
-      //}
+      System.out.println( logPreAmble + "[-I-]: UDP packet sent: "
+          + this.udpPort + "->" + todoPort);
     }
 
     return userIsValid;
