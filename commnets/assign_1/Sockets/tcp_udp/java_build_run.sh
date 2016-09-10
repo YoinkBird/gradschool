@@ -1,4 +1,5 @@
 #!/bin/bash -xu
+cd `dirname $0`;
 set +x
 echo "# for diff : create reference as output.txt.`git log -n 1 --oneline HEAD | awk '{printf "%s",$1}'`"
 echo "# for diff : redirect output to output.txt.`date --iso-8601=seconds`"
