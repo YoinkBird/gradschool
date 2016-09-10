@@ -10,6 +10,9 @@ if [[ -z $args ]]; then
 fi
 
 
+rm -rf class.bak
+mv class class.bak
+mkdir -p class
 ../../../../bin/java_build_run.sh ClientWalla.java $args
 exit;
 
