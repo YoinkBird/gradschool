@@ -18,32 +18,32 @@ import java.net.*;
 
 class Client { 
 
-	public static void main(String args[]) throws Exception 
-	{ 
-		String sentence; 
-		String modifiedSentence; 
-		if (args.length != 2) {
-			System.out.println("Run Program as\n \t java  concurrentTCP.Client <Server_hostIP> <Server_Port>");
-			System.exit(-1);
-		}
-		BufferedReader inFromUser = 
-			new BufferedReader(new InputStreamReader(System.in)); 
+  public static void main(String args[]) throws Exception 
+  { 
+    String sentence; 
+    String modifiedSentence; 
+    if (args.length != 2) {
+      System.out.println("Run Program as\n \t java  concurrentTCP.Client <Server_hostIP> <Server_Port>");
+      System.exit(-1);
+    }
+    BufferedReader inFromUser = 
+      new BufferedReader(new InputStreamReader(System.in)); 
 
-		Socket clientSocket = new Socket(args[0], java.lang.Integer.parseInt(args[1])); 
+    Socket clientSocket = new Socket(args[0], java.lang.Integer.parseInt(args[1])); 
 
-		DataOutputStream outToServer = 
-			new DataOutputStream(clientSocket.getOutputStream()); 
+    DataOutputStream outToServer = 
+      new DataOutputStream(clientSocket.getOutputStream()); 
 
-		BufferedReader inFromServer = 
-			new BufferedReader(new InputStreamReader(clientSocket.getInputStream())); 
+    BufferedReader inFromServer = 
+      new BufferedReader(new InputStreamReader(clientSocket.getInputStream())); 
 
-		while ((sentence = inFromUser.readLine()) != null) { 
-			outToServer.writeBytes(sentence + '\n'); 
-   
-			modifiedSentence = inFromServer.readLine(); 
-			
-			System.out.println("FROM SERVER: " + modifiedSentence); 
-		}
-		
-	} 
+    while ((sentence = inFromUser.readLine()) != null) { 
+      outToServer.writeBytes(sentence + '\n'); 
+
+      modifiedSentence = inFromServer.readLine(); 
+
+      System.out.println("FROM SERVER: " + modifiedSentence); 
+    }
+
+  } 
 }
