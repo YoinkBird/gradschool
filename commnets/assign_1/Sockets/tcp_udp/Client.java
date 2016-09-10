@@ -123,13 +123,13 @@ public class Client {
     // parties: [Tx|tcp|client,server]
     // HELO¤<screen_name>¤<IP>¤<Port> \n
     sentence = this.protocolStrings.get("HELO");
-    System.out.println(logPreAmble + "[-I-]: [Tx(server)|" + this.ServerHostname + ":" + this.ServerPort + "|" + sentence + "]");
+    System.out.println(logPreAmble + "[-I-]: [Tx(server)|tcp|" + this.ServerHostname + ":" + this.ServerPort + "|" + sentence + "]");
 
     this.outToServer.writeBytes(sentence + '\n');
 
     modifiedSentence = inFromServer.readLine();
 
-    System.out.println(logPreAmble + "[-I-]: [Rx(server)|" + this.ServerHostname + ":" + this.ServerPort + "|" + modifiedSentence + "]");
+    System.out.println(logPreAmble + "[-I-]: [Rx(server)|tcp|" + this.ServerHostname + ":" + this.ServerPort + "|" + modifiedSentence + "]");
 
     /*
     The server sends this message in response to the Greeting, to let the Chat Client know that the screen name is already in use.
@@ -198,7 +198,8 @@ public class Client {
           System.out.println( logPreAmble + "[-I-]: UDP packet created");
           this.udpSocket.send(sendPacket);
 
-          System.out.println( logPreAmble + "[-I-]: UDP packet sent");
+          System.out.println( logPreAmble + "[-I-]: UDP packet sent: "
+              + this.udpPort + "->" + todoPort);
         }
       }
     }
