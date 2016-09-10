@@ -21,7 +21,7 @@ import java.util.*;
 public class Client {
   private String className;
   private String userName;
-  private ArrayList<String[]> peerList;// = new ArrayList<String[]>();
+  private Hashtable peerHash;
   private String ServerHostname;
   private InetAddress ServerIPAddress;
   private int ServerPort;
@@ -47,6 +47,9 @@ public class Client {
     this.ServerPort = java.lang.Integer.parseInt(args[1]);
     // screen_name
     this.userName = args[2];
+
+    // init
+    this.peerHash = new Hashtable();
   }
 
   /**
@@ -150,15 +153,7 @@ public class Client {
     // parse reply
     this.parseAccept(modifiedSentence);
     System.out.println("-D-: printing out user array");
-    // print out table/retrieve element/whatever
-    {
-      for (String[] peerDataArr : this.getPeerList()){
-        for (String data : peerDataArr){
-          System.out.print(data + "|");
-        }
-        System.out.println();
-      }
-    }
+    this.printPeerList();
   }
   public void sendToPeer(String sentence) throws Exception{
     String className = this.className;
@@ -337,6 +332,8 @@ public class Client {
   // parse ACPT reply
   public ArrayList<String[]> parseAccept(String response) {
     ArrayList<String[]> peerArr = new ArrayList<String[]>();
+    // reference
+    Hashtable peerHashTmp = new Hashtable();
     //System.out.println("-D-: parsing ACPT reply");
     // reply format: ACPT¤<SNn>¤<IPn>¤<PORTn>:<SNn+1>¤<IPn+1>¤<PORTn+1>:
     // extract,remove keyword
@@ -358,6 +355,7 @@ public class Client {
         continue;
       }
       peerArr.add(peerInfo);
+      peerHashTmp.put(peerInfo[0],peerInfo);
       System.out.print("[");
       for ( String val : peerInfo ){
         System.out.print(val);
@@ -366,11 +364,7 @@ public class Client {
       System.out.print("]");
       System.out.println();
     }
-    if(this.peerList != null){
-      this.peerList.addAll(peerArr);
-    }else{
-      this.peerList = peerArr;
-    }
+    this.peerHash.putAll(peerHashTmp);
     return peerArr;
   }
 
@@ -379,7 +373,8 @@ public class Client {
   }
   public ArrayList<String[]> getPeerList(){
     // TODO: remove self
-    return this.peerList;
+    ArrayList<String[]> values = new ArrayList<String[]>(this.peerHash.values());
+    return values;
   }
   public void printPeerList(){
     // print out table/retrieve element/whatever
@@ -392,14 +387,8 @@ public class Client {
       }
     }
   }
-  public ArrayList<String[]> removePeer(String removeUserName){
-    ArrayList<String[]> updatedList = new ArrayList<String[]>();
-    for (String[] peerDataArr : this.peerList){
-      if( peerDataArr[0].equals( removeUserName ) ){
-        this.peerList.remove(peerDataArr);
-      }
-    }
-    return updatedList;
+  public void removePeer(String removeUserName){
+    this.peerHash.remove(removeUserName);
   }
 
 }
