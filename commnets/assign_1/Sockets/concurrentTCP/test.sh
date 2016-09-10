@@ -25,12 +25,13 @@ sleep 2;
 
 #echo "################################################################################"
 #echo "starting client2"
-../tcp_udp/java_build_run.sh localhost $port fettucini 'EXIT:tagliatelle' > /dev/null 2>&1
+../tcp_udp/java_build_run.sh localhost $port fettucini 'hello1' > /dev/null 2>&1 &
 #rc=$?
 #echo "client2 rc: $rc"
 #echo "################################################################################"
 #echo "back to client1"
 
+sleep 2
 fg $java_cmd_pid
 #kill -9 $java_cmd_pid
 kill_port_procs $port

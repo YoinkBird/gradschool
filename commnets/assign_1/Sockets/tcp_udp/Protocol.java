@@ -94,11 +94,52 @@ public class Protocol {
     return userArr;
   }
 
+  // reply format: ACPT¤<SNn>¤<IPn>¤<PORTn>:<SNn+1>¤<IPn+1>¤<PORTn+1>:
   public ArrayList<String[]> getUserList(){
     // TODO: remove self
     ArrayList<String[]> values = new ArrayList<String[]>(this.userHash.values());
     return values;
   }
+
+  // create 'JOIN' string to message other clients about new user
+  public String createJoinMsg(Hashtable userInfo){
+    String separator = " ";
+    String joinMsg = "JOIN" + separator
+      + userInfo.get("user") + separator
+      + userInfo.get("host") + separator
+      + userInfo.get("port") + separator;
+    return joinMsg;
+  }
+  public String createJoinMsg(String userName){
+    Hashtable userInfo = (Hashtable) this.userHash.get(userName);
+    String separator = " ";
+    String joinMsg = "JOIN" + separator
+      + userInfo.get("user") + separator
+      + userInfo.get("host") + separator
+      + userInfo.get("port") + separator;
+    return joinMsg;
+  }
+
+  public String createAcptMsg(){
+    // print out table/retrieve element/whatever
+    {
+      Enumeration userEnum = this.userHash.keys();
+      String separator = " ";
+      String acptTxt = "ACPT" + separator;
+      while ( userEnum.hasMoreElements() ){
+        String user = (String) userEnum.nextElement();
+        Hashtable userInfo = (Hashtable) this.userHash.get(user);
+
+        acptTxt += 
+            userInfo.get("user") + separator +
+            userInfo.get("host") + separator +
+            userInfo.get("port") + ":";
+
+      }
+      return acptTxt;
+    }
+  }
+
   public void printUserList(){
     // print out table/retrieve element/whatever
     {
@@ -110,7 +151,7 @@ public class Protocol {
         System.out.print(
             userInfo.get("user") + "|" +
             userInfo.get("host") + "|" +
-            userInfo.get("port") + "|"
+            userInfo.get("port") + "\n"
             );
       }
       System.out.println();

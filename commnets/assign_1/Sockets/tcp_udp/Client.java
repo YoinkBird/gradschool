@@ -73,6 +73,8 @@ public class Client {
 
   public void connectToServer() throws Exception{
     String className = this.className;
+    String methodName = new Throwable().getStackTrace()[0].getMethodName();
+    String logPreAmble = "[" + className + "][" + methodName + "]";
     String sentence;
     String modifiedSentence;
 //    // TCP
@@ -121,13 +123,13 @@ public class Client {
     // parties: [Tx|tcp|client,server]
     // HELO¤<screen_name>¤<IP>¤<Port> \n
     sentence = this.protocolStrings.get("HELO");
-    System.out.println("[" + className + "][-I-]: [Tx(server)|" + this.ServerHostname + ":" + this.ServerPort + "|" + sentence + "]");
+    System.out.println(logPreAmble + "[-I-]: [Tx(server)|" + this.ServerHostname + ":" + this.ServerPort + "|" + sentence + "]");
 
     this.outToServer.writeBytes(sentence + '\n');
 
     modifiedSentence = inFromServer.readLine();
 
-    System.out.println("[" + className + "][-I-]: [Rx(server)|" + this.ServerHostname + ":" + this.ServerPort + "|" + modifiedSentence + "]");
+    System.out.println(logPreAmble + "[-I-]: [Rx(server)|" + this.ServerHostname + ":" + this.ServerPort + "|" + modifiedSentence + "]");
 
     /*
     The server sends this message in response to the Greeting, to let the Chat Client know that the screen name is already in use.
