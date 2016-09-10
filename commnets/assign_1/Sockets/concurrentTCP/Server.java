@@ -21,17 +21,17 @@ import tcp_udp.*;
  * 
  */
 class Server { 
-  private String className;
-  private Hashtable peerHash;
-  private String ServerHostname;
-  private InetAddress ServerIPAddress;
-  private int ServerPort;
-  private int udpPort;
-  private Hashtable<String, String> protocolStrings;
-  private ServerSocket tcpSocket;
-  private DatagramSocket udpSocket;
-  private DataOutputStream outToClient;
-  private Protocol protocol;
+  public String className;
+  public Hashtable peerHash;
+  public String ServerHostname;
+  public InetAddress ServerIPAddress;
+  public int ServerPort;
+  public int udpPort;
+  public Hashtable<String, String> protocolStrings;
+  public ServerSocket tcpSocket;
+  public DatagramSocket udpSocket;
+  public DataOutputStream outToClient;
+  public Protocol protocol;
 
   public Server(String[] args){
     this.className = new Throwable().getStackTrace()[0].getClassName();
@@ -238,18 +238,25 @@ class Server {
 
 class Servant extends Thread
 {
+  private String className;
   private String clientInput;
   private String capitalizedSentence; 
   private Socket SocketToClient;
+  private Server ServerInst;
 
-  public Servant (Socket sock)
+  public Servant (Socket sock, Server server_inst)
   {
+    this.className = new Throwable().getStackTrace()[0].getClassName();
     SocketToClient = sock;
+    ServerInst = server_inst;
     start();
   }
 
   public void run()
   {
+    String className = this.className;
+    String methodName = new Throwable().getStackTrace()[0].getMethodName();
+    String logPreAmble = "[" + className + "][" + methodName + "]";
     try {
       BufferedReader inFromClient = 
         new BufferedReader(new  
@@ -258,11 +265,21 @@ class Servant extends Thread
       DataOutputStream  outToClient = 
         new DataOutputStream(SocketToClient.getOutputStream());
 
+      Server ServerInst = this.ServerInst;
       while ((clientInput = inFromClient.readLine()) != null) {
         System.out.println("From Client on IP: " + SocketToClient.getInetAddress() 
             + " @port: " + SocketToClient.getPort() + " :\n\t" + clientInput);
-        //capitalizedSentence = clientInput.toUpperCase() + '\n';
-        //outToClient.writeBytes(capitalizedSentence);
+        // parse client input
+        String[] inputArr = ServerInst.protocol.parseIncoming(clientInput);
+        // check for EXIT
+        if(inputArr[0].equals(ServerInst.protocolStrings.get("EXIT"))){
+          System.out.println(logPreAmble +
+              "[-I-]: [Rx(server)|" + ServerInst.ServerHostname + ":" + ServerInst.ServerPort + "|"
+              + "processing EXIT"
+              + "]");
+          // send EXIT to all clients
+          // remove from list
+        }
       }
     }
     catch (IOException e) {
