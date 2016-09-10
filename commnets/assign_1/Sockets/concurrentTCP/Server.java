@@ -238,7 +238,7 @@ class Server {
 
 class Servant extends Thread
 {
-  private String clientSentence; 
+  private String clientInput;
   private String capitalizedSentence; 
   private Socket SocketToClient;
 
@@ -258,12 +258,11 @@ class Servant extends Thread
       DataOutputStream  outToClient = 
         new DataOutputStream(SocketToClient.getOutputStream());
 
-      while ((clientSentence = inFromClient.readLine()) != null) {
+      while ((clientInput = inFromClient.readLine()) != null) {
         System.out.println("From Client on IP: " + SocketToClient.getInetAddress() 
-            + " @port: " + SocketToClient.getPort() + " :\n\t" + clientSentence);
-        capitalizedSentence = clientSentence.toUpperCase() + '\n'; 
-
-        outToClient.writeBytes(capitalizedSentence); 
+            + " @port: " + SocketToClient.getPort() + " :\n\t" + clientInput);
+        //capitalizedSentence = clientInput.toUpperCase() + '\n';
+        //outToClient.writeBytes(capitalizedSentence);
       }
     }
     catch (IOException e) {
@@ -274,7 +273,7 @@ class Servant extends Thread
 
 class BetterServant implements Runnable 
 {
-  private String clientSentence; 
+  private String clientInput;
   private String capitalizedSentence; 
   private Socket SocketToClient;
   Thread myThread;
@@ -293,8 +292,8 @@ class BetterServant implements Runnable
 
       DataOutputStream  outToClient = 
         new DataOutputStream(SocketToClient.getOutputStream());
-      while ((clientSentence = inFromClient.readLine()) != null) {
-        capitalizedSentence = clientSentence.toUpperCase() + '\n'; 	    
+      while ((clientInput = inFromClient.readLine()) != null) {
+        capitalizedSentence = clientInput.toUpperCase() + '\n';
         outToClient.writeBytes(capitalizedSentence); 
       }
     }
