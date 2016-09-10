@@ -1,5 +1,6 @@
 package tcp_udp;
 
+import java.util.*;
 import tcp_udp.Client.*;
 /**
  * Created by weelee on 9/2/16.
@@ -37,7 +38,6 @@ public class ClientWalla {
         if(respArr[0].equals("MESG")){
           // TODO: don't assume defined
           String msg = respArr[1];
-          //this.WriteData(msg);
           System.out.println(msg);
           // force quit for testing purposes
           if(respArr[1].contains("EXIT:" + thisClient.getUserName())){
@@ -47,8 +47,15 @@ public class ClientWalla {
 
         }
         else if(respArr[0].equals("JOIN")){
+          String msg = new String();
           // parse reply
-          thisClient.parseAccept(response);
+          // TODO: fix the condition in which own username is left out
+          ArrayList<String[]> joinArr = thisClient.parseAccept(response);
+          for (String[] peerDataArr : joinArr){
+            msg += peerDataArr[0] + " ";
+          }
+          msg += " has joined the chatroom";
+          System.out.println("-I-: " + msg);
           System.out.println("-D-: printing out user array");
           thisClient.printPeerList();
         }
@@ -57,9 +64,21 @@ public class ClientWalla {
           // only exit if the function confirms it; still depends on username and so forth
           if( thisClient.disconnectFromServerFinalise(response) ){
             System.exit( 0 );
+          }else{
+            //TODO: remove the newline
+            String[] peerInfo = respArr[1].split("[\\s]");
+            String goneUser = peerInfo[0];
+            String msg = goneUser + " has left the chatroom";
+            // TODO: remove user
+            thisClient.removePeer(goneUser);
+            System.out.println("-D-: removed users, printing out user array");
+            thisClient.printPeerList();
+            System.out.println("-I-: " + msg);
+
           }
         }
       } catch ( Exception e1) {
+          System.out.println(e1.getMessage());
       }
     }
     /*
