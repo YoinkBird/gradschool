@@ -108,7 +108,7 @@ public class Client {
     // when calling, add the dynamic components
     Hashtable<String, String> protocolStrings = new Hashtable<>();
     // HELO¤<screen_name>¤<IP>¤<Port>\n
-    protocolStrings.put("HELO", "HELO " + this.userName + " " + this.ServerHostname + " " + udpPort);
+    protocolStrings.put("HELO", "HELO " + this.userName + " " + tcpSocket.getLocalAddress().toString().replace("/","") + " " + udpPort);
     // RJCT¤<screen_name>\n
     protocolStrings.put("RJCT", "RJCT " + this.userName);
     // MESG¤<screen_name>:¤<message>\n
