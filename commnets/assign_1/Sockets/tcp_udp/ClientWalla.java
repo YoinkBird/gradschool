@@ -2,6 +2,7 @@ package tcp_udp;
 
 import java.util.*;
 import tcp_udp.Client.*;
+import sun.misc.*;
 /**
  * Created by weelee on 9/2/16.
  */
@@ -13,6 +14,28 @@ public class ClientWalla {
     if(args.length > 3){
       message = args[3];
     }
+    Runtime.getRuntime().addShutdownHook(
+        new Thread()
+        {
+          @Override
+          public void run()
+          {
+            System.out.println("-I-: BEGIN shutdown hook");
+            Client exitClient = new Client(args);
+            String response = "EXIT " + exitClient.getUserName();
+            System.out.println("-I-: attempt Tx of: " + response);
+            try {
+              if( exitClient.disconnectFromServerFinalise(response) ){
+                System.out.println("-I-: successful Tx of :" + response);
+                System.exit( 0 );
+              }
+            } catch ( Exception e1) {
+            }
+            System.out.println("-I-: END shutdown hook");
+          }
+        }
+        );
+
 
     // copy-paste starting here:
     //import tcp_udp.Client.*;
@@ -27,6 +50,19 @@ public class ClientWalla {
       exit = true;
     }
     for(;;){
+      // send static message on signal 'HUP'
+      Signal.handle(new Signal("HUP"), new SignalHandler() {
+        public void handle(Signal signal)
+        {
+          String message = "still can't find sauce";
+          System.out.println("HUP: " + thisClient.getUserName() + " sending " + message);
+          try{
+            thisClient.sendToPeer(message);
+          } catch ( Exception e1) {
+              e1.printStackTrace();
+          }
+        }
+      });
       try{
         String response = "EXIT " + thisClient.getUserName();
         if(! exit){
