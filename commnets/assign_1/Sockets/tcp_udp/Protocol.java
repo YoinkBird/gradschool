@@ -160,7 +160,7 @@ public class Protocol {
         String user = (String) userEnum.nextElement();
         Hashtable userInfo = (Hashtable) this.userHash.get(user);
 
-        userList += 
+        userList +=
             userInfo.get("user") + separator +
             userInfo.get("host") + separator +
             userInfo.get("port") + recordSeparator;

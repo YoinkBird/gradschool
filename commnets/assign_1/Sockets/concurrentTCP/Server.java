@@ -162,6 +162,17 @@ class Server {
             "[-I-]: [Rx(server)|" + this.ServerHostname + ":" + this.ServerPort + "|"
             + joinMsg
             + "]");
+        String msgForClient = "MESG " 
+          + "current users:\n"
+          + this.protocol.createUserList()
+          + "--------------"
+          + "\n";
+        try {
+          this.sendUDPtoClient(newUserName, msgForClient);
+        } catch (Exception e) {
+          e.printStackTrace();
+          System.out.println(e.getMessage());
+        }
         userName = newUserName;
       }
     }
@@ -294,6 +305,8 @@ class Servant extends Thread
             // print user list
             ServerInst.protocol.printUserList();
           }
+          // maybe: add secret menu, e.g. pseudocmds like %USERS to list all available users
+          // else if (inputArr[0].equals(ServerInst.protocolStrings.get("MESG")))
         }
       }
     }
