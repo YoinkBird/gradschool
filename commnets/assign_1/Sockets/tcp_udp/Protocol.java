@@ -149,22 +149,31 @@ public class Protocol {
     }
   }
 
+  public String createUserList(){
+    String userList = "";
+    // print out table/retrieve element/whatever
+    {
+      Enumeration userEnum = this.userHash.keys();
+      String separator = " ";
+      String recordSeparator = "\n";
+      while ( userEnum.hasMoreElements() ){
+        String user = (String) userEnum.nextElement();
+        Hashtable userInfo = (Hashtable) this.userHash.get(user);
+
+        userList += 
+            userInfo.get("user") + separator +
+            userInfo.get("host") + separator +
+            userInfo.get("port") + recordSeparator;
+      }
+    }
+    return userList;
+  }
   public void printUserList(){
     // print out table/retrieve element/whatever
     {
       Enumeration userEnum = this.userHash.keys();
       System.out.println("-I-: user list");
-      while ( userEnum.hasMoreElements() ){
-        String user = (String) userEnum.nextElement();
-        Hashtable userInfo = (Hashtable) this.userHash.get(user);
-
-        System.out.print(
-            userInfo.get("user") + "|" +
-            userInfo.get("host") + "|" +
-            userInfo.get("port") + "\n"
-            );
-      }
-      System.out.println();
+      System.out.println( this.createUserList() );
     }
   }
   public void removeUser(String removeUserName){
