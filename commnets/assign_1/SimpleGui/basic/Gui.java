@@ -116,12 +116,19 @@ public class Gui extends JFrame{
         else if(respArr[0].equals("JOIN")){
           String msg = new String();
           // parse reply
-          // TODO: fix the condition in which own username is left out
+          // hack: still call this.myClient.parseAccept to actually update the list
+          // but update screen using the protocol.parseAccept because it doesn't omit the current user
           ArrayList<String[]> joinArr = this.myClient.parseAccept(response);
-          for (String[] peerDataArr : joinArr){
-            msg += peerDataArr[0] + " ";
+          Protocol protocol = new Protocol();
+          protocol.parseAccept(response);
+          {
+            Enumeration userEnum = protocol.userHash.keys();
+            while ( userEnum.hasMoreElements() ){
+              String user = (String) userEnum.nextElement();
+              msg += user;
+              msg += " has joined the chatroom";
+            }
           }
-          msg += " has joined the chatroom";
           this.WriteData(msg);
           System.out.println("-D-: printing out user array");
           this.myClient.printPeerList();

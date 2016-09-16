@@ -10,7 +10,7 @@ fi
 rm -rf cls.bak
 mv cls cls.bak
 mkdir -p cls
-javac -d cls -cp . Gui.java tcp_udp/Client.java 
+javac -d cls -cp . Gui.java tcp_udp/*
 if [[ $? -ne 0 ]]; then
   exit $?
 fi
