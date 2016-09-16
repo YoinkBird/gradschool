@@ -128,7 +128,7 @@ public class Gui extends JFrame{
           }
           this.WriteData(msg);
           System.out.println("-D-: printing out user array");
-          this.myClient.printPeerList();
+          this.myClient.protocol.printUserList();
         }
         //  EXIT
         else if(respArr[0].equals("EXIT")){
@@ -141,9 +141,9 @@ public class Gui extends JFrame{
             String goneUser = peerInfo[0];
             String msg = goneUser + " has left the chatroom";
             // TODO: remove user
-            this.myClient.removePeer(goneUser);
+            this.myClient.protocol.removeUser(goneUser);
             System.out.println("-D-: removed users, printing out user array");
-            this.myClient.printPeerList();
+            this.myClient.protocol.printUserList();
             this.WriteData(msg);
 
           }

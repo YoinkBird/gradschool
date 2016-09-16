@@ -155,7 +155,6 @@ public class Client {
       System.exit(2);
     }
     // parse reply
-    this.parseAccept(modifiedSentence);
     this.protocol.parseAccept(modifiedSentence);
     System.out.println("-D-: printing out user array");
     this.protocol.printUserList();
@@ -377,25 +376,6 @@ public class Client {
 
   public String getUserName(){
     return this.userName;
-  }
-  public ArrayList<String[]> getPeerList(){
-    // TODO: remove self
-    ArrayList<String[]> values = new ArrayList<String[]>(this.peerHash.values());
-    return values;
-  }
-  public void printPeerList(){
-    // print out table/retrieve element/whatever
-    {
-      for (String[] peerDataArr : this.getPeerList()){
-        for (String data : peerDataArr){
-          System.out.print(data + "|");
-        }
-        System.out.println();
-      }
-    }
-  }
-  public void removePeer(String removeUserName){
-    this.peerHash.remove(removeUserName);
   }
 
 }
