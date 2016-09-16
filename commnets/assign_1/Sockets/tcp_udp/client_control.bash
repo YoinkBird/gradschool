@@ -11,13 +11,18 @@ if [[ ! -z $* ]]; then
   fi
 fi
 
+hupClient="ClientWalla"
+#TODO:
+# lsof -i :1028 | awk '{printf "%s\n",$2}' | grep -v 'PID' | xargs ps -f | cat | grep -v 'Server' | awk '{printf "%s\n",$2}' | grep -v 'PID'
 if [[ $action == "list" ]]; then
   lsof -i :${port}
   lsof -i :${port} | awk '{printf "%s\n",$2}' | grep -v 'PID' | xargs -r ps -f | cat | grep --colour '\bjava\b'
 elif [[ $action == "hup" ]]; then
-  lsof -i :${port} | awk '{printf "%s\n",$2}' | grep -v 'PID' | xargs -r kill -s HUP
+  #lsof -i :${port} | awk '{printf "%s\n",$2}' | grep -v 'PID' | xargs -r kill -s HUP
+  lsof -i :1028 | awk '{printf "%s\n",$2}' | grep -v 'PID' | xargs ps -f | cat | grep $hupClient | awk '{printf "%s\n",$2}' | grep -v 'PID' | xargs -r kill -s HUP
 elif [[ $action == "kill" ]]; then
-  lsof -i :${port} | awk '{printf "%s\n",$2}' | grep -v 'PID' | xargs -r kill
+  #lsof -i :${port} | awk '{printf "%s\n",$2}' | grep -v 'PID' | xargs -r kill
+  lsof -i :1028 | awk '{printf "%s\n",$2}' | grep -v 'PID' | xargs ps -f | cat | grep $hupClient | awk '{printf "%s\n",$2}' | grep -v 'PID' | xargs -r kill
 elif [[ $action == "start" ]]; then
   #env USERPREFIX=`date +%A%H_%M_%S` env HOST_SERVER=192.168.10.225 HOST_PORT=1030 bash -c './java_build_run.sh $HOST_SERVER $HOST_PORT user${USERPREFIX}${i} & sleep 5; lsof -i :${HOST_PORT}'
   ./java_build_run.sh $host $port user${user} & sleep 5; lsof -i :${port}
