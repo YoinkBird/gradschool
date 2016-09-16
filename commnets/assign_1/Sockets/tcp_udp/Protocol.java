@@ -90,7 +90,11 @@ public class Protocol {
       //System.out.println(iter);
       String[] userInfo = iter.split("[\\s]");
       userArr.add(userInfo);
-      userHashTmp.put(userInfo[0],userInfo);
+      //  userHashTmp.put(userInfo[0],userInfo);
+      // String[] userInfo = sequence.split("[\\s]");
+      userHashTmp.put("user",userInfo[0]);
+      userHashTmp.put("host",userInfo[1]);
+      userHashTmp.put("port",userInfo[2]);
       System.out.print("[");
       for ( String val : userInfo ){
         System.out.print(val);
@@ -99,7 +103,7 @@ public class Protocol {
       System.out.print("]");
       System.out.println();
     }
-    this.userHash.putAll(userHashTmp);
+    this.userHash.put(userHashTmp.get("user"),userHashTmp);
     return userArr;
   }
 

@@ -29,6 +29,7 @@ public class Client {
   private Socket tcpSocket;
   private DatagramSocket udpSocket;
   private DataOutputStream outToServer;
+  public Protocol protocol;
 
   public Client(String[] args){
     this.className = new Throwable().getStackTrace()[0].getClassName();
@@ -50,6 +51,7 @@ public class Client {
 
     // init
     this.peerHash = new Hashtable();
+    this.protocol = new Protocol();
   }
 
   /**
@@ -154,8 +156,9 @@ public class Client {
     }
     // parse reply
     this.parseAccept(modifiedSentence);
+    this.protocol.parseAccept(modifiedSentence);
     System.out.println("-D-: printing out user array");
-    this.printPeerList();
+    this.protocol.printUserList();
   }
   public void sendToPeer(String sentence) throws Exception{
     String className = this.className;
@@ -185,7 +188,7 @@ public class Client {
 
       // print out table/retrieve element/whatever
       {
-        for (String[] peerDataArr : this.getPeerList()){
+        for (String[] peerDataArr : this.protocol.getUserList()){
           String todoSN = peerDataArr[0];
           InetAddress todoIP = InetAddress.getByName(peerDataArr[1]);
           int todoPort = java.lang.Integer.parseInt(peerDataArr[2]);
@@ -305,7 +308,8 @@ public class Client {
     String logPreAmble = "[" + className + "][" + methodName + "]";
 
     boolean udpReceived = false;
-    String[] respArr = this.parseIncoming(response);
+    //String[] respArr = this.parseIncoming(response);
+    String[] respArr = this.protocol.parseIncoming(response);
     if(respArr[0].equals("EXIT")){
       if(respArr[1].startsWith(this.userName)){
         udpReceived = true;
