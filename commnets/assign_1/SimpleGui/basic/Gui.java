@@ -106,7 +106,7 @@ public class Gui extends JFrame{
       try{
         // get response
         String response = this.myClient.getUdp();
-        String[] respArr = this.myClient.parseIncoming(response);
+        String[] respArr = this.myClient.protocol.parseIncoming(response);
         // figure it out
         if(respArr[0].equals("MESG")){
           // TODO: don't assume defined

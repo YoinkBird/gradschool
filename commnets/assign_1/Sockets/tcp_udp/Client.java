@@ -245,7 +245,7 @@ public class Client {
     */
     String response = this.getUdp();
     System.out.println( logPreAmble + "[-I-]: [Rx(peer)|udp|" + this.ServerHostname + ":" + this.ServerPort + "|" + response + "]");
-    String[] respArr = this.parseIncoming(response);
+    String[] respArr = this.protocol.parseIncoming(response);
     String message = new String();
     if(respArr[0].equals("MESG")){
       udpReceived = true;
@@ -307,7 +307,6 @@ public class Client {
     String logPreAmble = "[" + className + "][" + methodName + "]";
 
     boolean udpReceived = false;
-    //String[] respArr = this.parseIncoming(response);
     String[] respArr = this.protocol.parseIncoming(response);
     if(respArr[0].equals("EXIT")){
       if(respArr[1].startsWith(this.userName)){
@@ -320,59 +319,6 @@ public class Client {
     return udpReceived;
   }
 
-  // parse incoming messages
-  public String[] parseIncoming(String response) {
-    String[] replyArr = new String[2];
-    // remove newlines
-    // response = response.replace("\n", "").replace("\r", "");
-    // reply format: <keyword>¤<content>
-    // extract,remove keyword
-    String type = response.substring(0,4);
-    replyArr[0] = type;
-    String content = response.substring(5,response.length());
-    if(content != null){
-      replyArr[1] = content;
-    }
-    return replyArr;
-  }
-  // parse ACPT reply
-  public ArrayList<String[]> parseAccept(String response) {
-    ArrayList<String[]> peerArr = new ArrayList<String[]>();
-    // reference
-    Hashtable peerHashTmp = new Hashtable();
-    //System.out.println("-D-: parsing ACPT reply");
-    // reply format: ACPT¤<SNn>¤<IPn>¤<PORTn>:<SNn+1>¤<IPn+1>¤<PORTn+1>:
-    // extract,remove keyword
-    // then split on ':'
-    // then split on ' '
-    String type = response.substring(0,4);
-    String sequence = response.substring(5,response.length());
-    String[] replyArr1 = this.parseIncoming(response);
-    type = replyArr1[0];
-    sequence = replyArr1[1];
-    //System.out.println("-D-:" + type + "|" + sequence);
-    //System.out.println("-D-: ACPT List");
-    String[] replyArr = sequence.split("[:]");
-    for (String iter: replyArr) {
-      //System.out.println(iter);
-      String[] peerInfo = iter.split("[\\s]");
-      // skip self
-      if(peerInfo[0].equals(this.userName)){
-        continue;
-      }
-      peerArr.add(peerInfo);
-      peerHashTmp.put(peerInfo[0],peerInfo);
-      System.out.print("[");
-      for ( String val : peerInfo ){
-        System.out.print(val);
-        System.out.print("|");
-      }
-      System.out.print("]");
-      System.out.println();
-    }
-    this.peerHash.putAll(peerHashTmp);
-    return peerArr;
-  }
 
   public String getUserName(){
     return this.userName;
