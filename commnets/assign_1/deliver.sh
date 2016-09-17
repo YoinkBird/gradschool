@@ -28,6 +28,9 @@ cp Sockets/concurrentTCP/Server.java deliver/MemD
 cp Sockets/tcp_udp/{Client.java,Protocol.java} deliver/Chatter/tcp_udp/
 cp Sockets/tcp_udp/{Client.java,Protocol.java} deliver/MemD/tcp_udp/
 
+# put me in there too
+cp $0 deliver
+
 # prepare files
 cd deliver/Chatter
 sed -i 's|package.*||g' Gui.java 
@@ -50,10 +53,17 @@ echo "Main-Class: Server" > manifest.txt
 jar cfvm MemD.jar manifest.txt *
 cd -
 
-mv deliver/Chatter/Chatter.jar deliver
-mv deliver/MemD/MemD.jar deliver
+# prepare for hand-off
+cd deliver
+mv Chatter/Chatter.jar .
+mv MemD/MemD.jar .
 
+zip -r eid_PA1.zip *
+
+# visual verify
+cd -
 tree deliver
+
 
 # run
 cd deliver
@@ -72,3 +82,6 @@ lsof -i :${PORT} | awk '{printf "%s\n",$2}' | grep -v 'PID' | xargs ps -f | cat 
 kill $pid
 
 exit;
+
+# miini cmd
+java -jar MemD.jar 1028 &  sleep 2; java -jar Chatter.jar localhost 1028 orzo &  java -jar Chatter.jar localhost 1028 zoro &
