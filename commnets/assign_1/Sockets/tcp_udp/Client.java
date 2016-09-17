@@ -40,13 +40,13 @@ public class Client {
     }
 
     // honestly not quite sure what the difference is
-    this.ServerHostname = args[0];
+    this.ServerHostname = args[1];
     //    only works in 'main'
 //    this.ServerIPAddress = InetAddress.getByName(args[0]);
 //    InetAddress ServerIPAddress = InetAddress.getByName(args[0]);
-    this.ServerPort = java.lang.Integer.parseInt(args[1]);
+    this.ServerPort = java.lang.Integer.parseInt(args[2]);
     // screen_name
-    this.userName = args[2];
+    this.userName = args[0];
 
     // init
     this.peerHash = new Hashtable();

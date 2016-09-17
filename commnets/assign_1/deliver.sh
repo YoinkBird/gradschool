@@ -71,8 +71,8 @@ java -jar MemD.jar 1028 &
 pid=$!
 sleep 2
 
-java -jar Chatter.jar localhost 1028 orzo &
-java -jar Chatter.jar localhost 1028 zoro
+java -jar Chatter.jar orzo localhost 1028 &
+java -jar Chatter.jar zoro localhost 1028
 cd -
 
 # end
@@ -84,4 +84,4 @@ kill $pid
 exit;
 
 # miini cmd
-java -jar MemD.jar 1028 &  sleep 2; java -jar Chatter.jar localhost 1028 orzo &  java -jar Chatter.jar localhost 1028 zoro &
+java -jar MemD.jar 1028 &  sleep 2; java -jar Chatter.jar orzo localhost 1028 &  java -jar Chatter.jar zoro localhost 1028 &
