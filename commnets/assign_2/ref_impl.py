@@ -29,7 +29,9 @@ def read_iperf3(location):
     counter = 0
     df = pd.DataFrame(columns=['Retr','Cwnd'])
 
+    print(location)
     # json
+    # open
     if ftype == '.json':
         with open(location) as data_file:
             iperf3_data = json.load(data_file)
@@ -40,14 +42,29 @@ def read_iperf3(location):
         for line in f:
             counter = counter + 1
             if counter > 9 and counter < 170:
+                retData = parse_line(line)
+                print("Retr: " + str(retData[0]) + " Cwnd " + str(retData[1]))
                 df.loc[int(counter) - 9] = parse_line(line)
 
         f.close()
+
+    # get data
+    if ftype == '.json':
+#        import pdb; pdb.set_trace()
+        print()
+        for inter in iperf3_data["intervals"]:
+            retx = inter["sum"]["retransmits"]
+            for strm in inter["streams"]:
+                cwnd = int(strm["snd_cwnd"] / 1024)
+                print("Retr: " + str(retx) + " Cwnd " + str(cwnd))
+                df.loc[int(counter)] = [float(retx), float(cwnd)]
+                counter += 1
+
     return(df)
 
 # filetype
-ftype = '.json'
 ftype = '.txt'
+ftype = '.json'
 # number of tests
 num_tests = 61
 num_tests = 2
@@ -71,6 +88,8 @@ for i in range(1,num_tests):
     plt.xlabel('Time (seconds)')
     plt.savefig(title)
     plt.close()
+import sys
+sys.exit(0)
     
 for i in range(1,num_tests):
     df = read_iperf3('test_reno_loss_'+str(i) + ftype)
