@@ -4,8 +4,8 @@
 
 base_args_iperf3_client="-V -c $(cat client_a/ip.txt) -J --get-server-output"
 
-transmit_time=100
-trials=10
+transmit_time=180
+trials=1
 
 #debug
 #transmit_time=1
@@ -62,20 +62,25 @@ fi
 
 if [[ $runmode == "server" ]]; then
   # set up perturbation conditions
+  # https://wiki.linuxfoundation.org/networking/netem
   case "$perturbation" in
     none)
       rc=0
       ;;
     delay)
-      sudo tc qdisc add dev eth1 root netem delay 100ms 20ms
+      # reorder
+      sudo tc qdisc add dev eth1 root netem delay 75ms 10ms
       rc=$?
       ;;
     loss)
-      sudo tc qdisc add dev eth1 root netem loss 5% 25%
+      # n are lost, successive prob dep by j on prev
+      # Probn = .25 * Probn-1 + .75 * Random
+      # e.g. lose 10% 
+      sudo tc qdisc add dev eth1 root netem loss 10% 25%
       rc=$?
       ;;
     corruption)
-      sudo tc qdisc add dev eth1 root netem corrupt 2.5% delay 50ms
+      sudo tc qdisc add dev eth1 root netem corrupt 80% delay 75ms
       rc=$?
       ;;
     *)
