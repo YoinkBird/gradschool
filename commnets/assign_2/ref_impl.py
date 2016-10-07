@@ -76,7 +76,7 @@ num_tests = 2
 # types of test
 algorithms = ["cubic" , "reno"]
 # types of perturbation
-perturbations = ['control' , 'delay' , 'loss' , 'corruption']
+perturbations = ['none' , 'delay' , 'loss' , 'corruption']
 
 # now work:
 for algorithm in algorithms:

@@ -1,1 +1,1 @@
-test_cubic_control_1.txt
+test_cubic_none_1.txt

@@ -1,1 +1,1 @@
-test_reno_control_1.txt
+test_reno_none_1.txt
