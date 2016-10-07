@@ -70,13 +70,18 @@ num_tests = 61
 num_tests = 2
 # range needs to be from 1 to 61
 for i in range(1,num_tests):
-    df = read_iperf3('test_reno_control_'+str(i) + ftype)
-    ax = df['Cwnd'].plot(title='Test_Reno_Control_'+str(i),kind='line',legend=True)
+    algorithm    = "reno"
+    perturbation = "control"
+    file_name    = "test_" + algorithm + "_" + perturbation + "_" + str(i) + ftype
+    img_name     = "test_" + algorithm + "_" + perturbation + "_" + str(i) + '.png'
+    plot_title   = "Test " + algorithm + " " + perturbation + " " + str(i)
+
+    df = read_iperf3(file_name)
+    ax = df['Cwnd'].plot(title=plot_title.title(),kind='line',legend=True)
     df['Retr'].plot(ax=ax,legend=True)
-    title = 'test_reno_control_'+str(i)+'.png'
     plt.ylabel('Cwnd (KBytes)')
     plt.xlabel('Time (seconds)')
-    plt.savefig(title)
+    plt.savefig(img_name)
     plt.close()
 
 for i in range(1,num_tests):
