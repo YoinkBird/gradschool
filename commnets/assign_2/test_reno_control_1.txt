@@ -1,0 +1,19 @@
+iperf 3.0.11
+Linux weelee-ubuntu 4.4.0-36-generic #55-Ubuntu SMP Thu Aug 11 18:01:55 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+Time: Fri, 07 Oct 2016 02:12:34 GMT
+Connecting to host localhost, port 5201
+      Cookie: weelee-ubuntu.1475806354.869234.65f3
+      TCP MSS: 21888 (default)
+[  4] local 127.0.0.1 port 60526 connected to 127.0.0.1 port 5201
+Starting Test: protocol: TCP, 1 streams, 131072 byte blocks, omitting 0 seconds, 10 second test
+[ ID] Interval           Transfer     Bandwidth       Retr  Cwnd
+[  4]   0.00-1.00   sec   574 MBytes  4.81 Gbits/sec    0   3.12 MBytes       
+[  4]   1.00-2.00   sec   525 MBytes  4.40 Gbits/sec    0   3.12 MBytes       
+[  4]   2.00-3.00   sec   569 MBytes  4.78 Gbits/sec    0   3.12 MBytes       
+[  4]   3.00-4.00   sec   571 MBytes  4.79 Gbits/sec    0   3.12 MBytes       
+[  4]   4.00-5.00   sec   571 MBytes  4.79 Gbits/sec    0   3.12 MBytes       
+[  4]   5.00-6.00   sec   569 MBytes  4.77 Gbits/sec    0   3.12 MBytes       
+[  4]   6.00-7.00   sec   575 MBytes  4.82 Gbits/sec    0   3.12 MBytes       
+[  4]   7.00-8.00   sec   578 MBytes  4.85 Gbits/sec    0   3.12 MBytes       
+[  4]   8.00-9.00   sec   580 MBytes  4.84 Gbits/sec    0   3.12 MBytes       
+[  4]   9.00-10.00  sec   696 MBytes  5.85 Gbits/sec    0   3.12 MBytes       
