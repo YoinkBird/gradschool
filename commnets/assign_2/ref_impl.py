@@ -81,7 +81,7 @@ for algorithm in algorithms:
     for perturbation in perturbations:
         # range needs to be from 1 to 61
         for i in range(1,num_tests):
-            file_name    = "test_" + algorithm + "_" + perturbation + "_" + str(i) + ftype
+            file_name    = "test_data/test_" + algorithm + "_" + perturbation + "_" + str(i) + ftype
             img_name     = "test_" + algorithm + "_" + perturbation + "_" + str(i) + '.png'
             plot_title   = "Test " + algorithm + " " + perturbation + " " + str(i)
 
