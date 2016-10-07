@@ -71,21 +71,25 @@ num_tests = 2
 
 # types of test
 algorithms = ["cubic" , "reno"]
-for algorithm in algorithms:
-    # range needs to be from 1 to 61
-    for i in range(1,num_tests):
-        perturbation = "control"
-        file_name    = "test_" + algorithm + "_" + perturbation + "_" + str(i) + ftype
-        img_name     = "test_" + algorithm + "_" + perturbation + "_" + str(i) + '.png'
-        plot_title   = "Test " + algorithm + " " + perturbation + " " + str(i)
+# types of perturbation
+perturbations = ['control' , 'delay' , 'loss' , 'corruption']
 
-        df = read_iperf3(file_name)
-        ax = df['Cwnd'].plot(title=plot_title.title(),kind='line',legend=True)
-        df['Retr'].plot(ax=ax,legend=True)
-        plt.ylabel('Cwnd (KBytes)')
-        plt.xlabel('Time (seconds)')
-        plt.savefig(img_name)
-        plt.close()
+# now work:
+for algorithm in algorithms:
+    for perturbation in perturbations:
+        # range needs to be from 1 to 61
+        for i in range(1,num_tests):
+            file_name    = "test_" + algorithm + "_" + perturbation + "_" + str(i) + ftype
+            img_name     = "test_" + algorithm + "_" + perturbation + "_" + str(i) + '.png'
+            plot_title   = "Test " + algorithm + " " + perturbation + " " + str(i)
+
+            df = read_iperf3(file_name)
+            ax = df['Cwnd'].plot(title=plot_title.title(),kind='line',legend=True)
+            df['Retr'].plot(ax=ax,legend=True)
+            plt.ylabel('Cwnd (KBytes)')
+            plt.xlabel('Time (seconds)')
+            plt.savefig(img_name)
+            plt.close()
 import sys
 sys.exit(0)
 
