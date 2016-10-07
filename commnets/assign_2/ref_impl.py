@@ -27,7 +27,7 @@ def parse_line(line):
 
 def read_iperf3(location):
     counter = 0
-    df = pd.DataFrame(columns=['Retr','Cwnd'])
+    df = pd.DataFrame(columns=['Retr','Cwnd','Bits'])
 
     debug = 0
     if debug == 1:
@@ -57,9 +57,10 @@ def read_iperf3(location):
             retx = inter["sum"]["retransmits"]
             for strm in inter["streams"]:
                 cwnd = int(strm["snd_cwnd"] / 1024)
+                bits = int(strm["bits_per_second"])
                 if debug == 1:
                     print("Retr: " + str(retx) + " Cwnd " + str(cwnd))
-                df.loc[int(counter)] = [float(retx), float(cwnd)]
+                df.loc[int(counter)] = [float(retx), float(cwnd), float(bits)]
                 counter += 1
 
     return(df)
