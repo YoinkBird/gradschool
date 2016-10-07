@@ -67,11 +67,11 @@ def read_iperf3(location):
 # filetype
 ftype = '.txt'
 ftype = '.json'
-file_dir = "test_data"
-file_prefix = "test"
+file_dir = "data"
+file_prefix = "results"
 # number of tests
 num_tests = 61
-num_tests = 2
+num_tests = 10
 
 # types of test
 algorithms = ["cubic" , "reno"]
@@ -83,12 +83,16 @@ for algorithm in algorithms:
     for perturbation in perturbations:
         # range needs to be from 1 to 61
         for i in range(1,num_tests):
-            file_root_name = file_prefix + "_" + algorithm + "_" + perturbation + "_" + str(i)
+            file_num       = "%03d" % i
+            file_root_name = file_prefix + "_" + algorithm + "_" + perturbation + "_" + file_num
             file_name      = file_dir + "/" + file_root_name + ftype
             img_name       = file_root_name + '.png'
             plot_title     = "Test " + algorithm + " " + perturbation + " " + str(i)
 
             df = read_iperf3(file_name)
+            if df.empty:
+                print("BAD DATA: " + file_name)
+                continue
             ax = df['Cwnd'].plot(title=plot_title.title(),kind='line',legend=True)
             df['Retr'].plot(ax=ax,legend=True)
             plt.ylabel('Cwnd (KBytes)')
