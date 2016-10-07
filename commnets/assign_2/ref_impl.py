@@ -68,33 +68,27 @@ ftype = '.json'
 # number of tests
 num_tests = 61
 num_tests = 2
-# range needs to be from 1 to 61
-for i in range(1,num_tests):
-    algorithm    = "reno"
-    perturbation = "control"
-    file_name    = "test_" + algorithm + "_" + perturbation + "_" + str(i) + ftype
-    img_name     = "test_" + algorithm + "_" + perturbation + "_" + str(i) + '.png'
-    plot_title   = "Test " + algorithm + " " + perturbation + " " + str(i)
 
-    df = read_iperf3(file_name)
-    ax = df['Cwnd'].plot(title=plot_title.title(),kind='line',legend=True)
-    df['Retr'].plot(ax=ax,legend=True)
-    plt.ylabel('Cwnd (KBytes)')
-    plt.xlabel('Time (seconds)')
-    plt.savefig(img_name)
-    plt.close()
+# types of test
+algorithms = ["cubic" , "reno"]
+for algorithm in algorithms:
+    # range needs to be from 1 to 61
+    for i in range(1,num_tests):
+        perturbation = "control"
+        file_name    = "test_" + algorithm + "_" + perturbation + "_" + str(i) + ftype
+        img_name     = "test_" + algorithm + "_" + perturbation + "_" + str(i) + '.png'
+        plot_title   = "Test " + algorithm + " " + perturbation + " " + str(i)
 
-for i in range(1,num_tests):
-    df = read_iperf3('test_cubic_control_'+str(i) + ftype)
-    ax = df['Cwnd'].plot(title='Test_Cubic_Control_'+str(i),kind='line',legend=True)
-    df['Retr'].plot(ax=ax,legend=True)
-    title = 'test_cubic_control_'+str(i)+'.png'
-    plt.ylabel('Cwnd (KBytes)')
-    plt.xlabel('Time (seconds)')
-    plt.savefig(title)
-    plt.close()
+        df = read_iperf3(file_name)
+        ax = df['Cwnd'].plot(title=plot_title.title(),kind='line',legend=True)
+        df['Retr'].plot(ax=ax,legend=True)
+        plt.ylabel('Cwnd (KBytes)')
+        plt.xlabel('Time (seconds)')
+        plt.savefig(img_name)
+        plt.close()
 import sys
 sys.exit(0)
+
     
 for i in range(1,num_tests):
     df = read_iperf3('test_reno_loss_'+str(i) + ftype)
