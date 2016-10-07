@@ -67,6 +67,8 @@ def read_iperf3(location):
 # filetype
 ftype = '.txt'
 ftype = '.json'
+file_dir = "test_data"
+file_prefix = "test"
 # number of tests
 num_tests = 61
 num_tests = 2
@@ -81,9 +83,10 @@ for algorithm in algorithms:
     for perturbation in perturbations:
         # range needs to be from 1 to 61
         for i in range(1,num_tests):
-            file_name    = "test_data/test_" + algorithm + "_" + perturbation + "_" + str(i) + ftype
-            img_name     = "test_" + algorithm + "_" + perturbation + "_" + str(i) + '.png'
-            plot_title   = "Test " + algorithm + " " + perturbation + " " + str(i)
+            file_root_name = file_prefix + "_" + algorithm + "_" + perturbation + "_" + str(i)
+            file_name      = file_dir + "/" + file_root_name + ftype
+            img_name       = file_root_name + '.png'
+            plot_title     = "Test " + algorithm + " " + perturbation + " " + str(i)
 
             df = read_iperf3(file_name)
             ax = df['Cwnd'].plot(title=plot_title.title(),kind='line',legend=True)
