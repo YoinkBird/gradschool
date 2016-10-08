@@ -81,7 +81,7 @@ if [[ $runmode == "server" ]]; then
       rc=$?
       ;;
     corruption)
-      sudo tc qdisc add dev $device root netem corrupt 80% delay 75ms
+      sudo tc qdisc add dev $device root netem corrupt 20% delay 75ms
       rc=$?
       ;;
     *)
