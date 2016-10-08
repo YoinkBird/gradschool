@@ -109,11 +109,14 @@ for algorithm in algorithms:
                 print("BAD DATA: " + file_name)
                 continue
             ax = df['Retr'].plot(title=plot_title.title(),kind='line',legend=True)
-            df['Bits'].plot(ax=ax,legend=True)
+            ax2 = ax.twinx()
+            ax3 = ax.twinx()
+            df['Bits'].plot(ax=ax2,legend=True)
             df['Cwnd'].plot(ax=ax,legend=True)
             # TODO: fix axis and timescale; timescale is TODO_201607102325
             plt.ylabel('Cwnd (KBytes) | KB/10s')
             plt.xlabel('Time (seconds)')
             plt.savefig(img_name)
+            plt.show()
             plt.close()
 
