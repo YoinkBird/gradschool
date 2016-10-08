@@ -108,11 +108,13 @@ for algorithm in algorithms:
             if df.empty:
                 print("BAD DATA: " + file_name)
                 continue
-            ax = df['Retr'].plot(title=plot_title.title(),kind='line',legend=True)
+            # on the internet, no can tell you're a dog - http://stackoverflow.com/a/38076485
+            ax = df.plot(title=plot_title.title(),kind='line',legend=True)
+            df['Retr'].plot(ax=ax)
+            df['Cwnd'].plot(ax=ax)
             ax2 = ax.twinx()
             ax3 = ax.twinx()
             df['Bits'].plot(ax=ax2,legend=True)
-            df['Cwnd'].plot(ax=ax,legend=True)
             # TODO: fix axis and timescale; timescale is TODO_201607102325
             plt.ylabel('Cwnd (KBytes) | KB/10s')
             plt.xlabel('Time (seconds)')
