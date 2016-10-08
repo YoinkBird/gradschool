@@ -61,12 +61,11 @@ def read_iperf3(location):
                 cwnd = int(strm["snd_cwnd"] / 1024)
                 # convert to Gbits/sec
                 #bits = int(strm["bits_per_second"] / (10^9) )
-                #bits = int(strm["bits_per_second"] / (1000000) )
                 # convert to KBytes/sec
                 bits = int(strm["bits_per_second"] / (8000) )
-                # TODO: TODO_201607102325 remove this once timescale in graph is fixed
-                # downsample for graph
-                bits /= 10
+                ## convert KBytes/sec to GBytes/sec
+                bits /= (8000)
+                # bytes.. to... MB?
                 bytes = int(strm["bytes"] / 1024)
                 if debug == 1:
                     print("Retr: " + str(retx) + " Cwnd " + str(cwnd))
@@ -109,17 +108,20 @@ for algorithm in algorithms:
                 print("BAD DATA: " + file_name)
                 continue
             # http://pandas.pydata.org/pandas-docs/stable/visualization.html
+            # http://stackoverflow.com/q/5484922
             ## plot retries, initial axis
             ax = df['Retr'].plot(title=plot_title.title(),kind='line',style="+",legend=True)
             ## plot congestion window
             df['Cwnd'].plot(ax=ax, style="g-")
             # plot bits, duplicate axis
             ax2 = ax.twinx()
-            df['Bits'].plot(ax=ax2, style="r-",)
-            # TODO: fix axis and timescale; timescale is TODO_201607102325
+            df['Bits'].plot(ax=ax2, style="r-",legend=True)
+            # set labels
             ax.set_ylabel('Cwnd (KBytes)')
-            ax2.set_ylabel('Bandwidth (KB/10s)')
+            ax2.set_ylabel('Bandwidth (GB/s)')
             plt.xlabel('Time (seconds)')
+            ax.legend(loc=0)
+            ax2.legend(loc=2)
             plt.savefig(img_name)
             plt.close()
 
