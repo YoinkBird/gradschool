@@ -115,7 +115,8 @@ for algorithm in algorithms:
             df['Cwnd'].plot(ax=ax, style="g-")
             # plot bits, duplicate axis
             ax2 = ax.twinx()
-            df['Bits'].plot(ax=ax2, style="r-",legend=True)
+            # dashes http://stackoverflow.com/a/14710446
+            df['Bits'].plot(ax=ax2, style="y-",dashes=[5,3],legend=True)
             # set labels
             ax.set_ylabel('Cwnd (KBytes)')
             ax2.set_ylabel('Bandwidth (GB/s)')
