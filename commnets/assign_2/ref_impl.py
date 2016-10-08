@@ -108,11 +108,17 @@ for algorithm in algorithms:
             if df.empty:
                 print("BAD DATA: " + file_name)
                 continue
-            ax = df['Retr'].plot(title=plot_title.title(),kind='line',legend=True)
-            df['Bits'].plot(ax=ax,legend=True)
-            df['Cwnd'].plot(ax=ax,legend=True)
+            # http://pandas.pydata.org/pandas-docs/stable/visualization.html
+            ## plot retries, initial axis
+            ax = df['Retr'].plot(title=plot_title.title(),kind='line',style="+",legend=True)
+            ## plot congestion window
+            df['Cwnd'].plot(ax=ax, style="g-")
+            # plot bits, duplicate axis
+            ax2 = ax.twinx()
+            df['Bits'].plot(ax=ax2, style="r-",)
             # TODO: fix axis and timescale; timescale is TODO_201607102325
-            plt.ylabel('Cwnd (KBytes) | KB/10s')
+            ax.set_ylabel('Cwnd (KBytes)')
+            ax2.set_ylabel('Bandwidth (KB/10s)')
             plt.xlabel('Time (seconds)')
             plt.savefig(img_name)
             plt.close()
