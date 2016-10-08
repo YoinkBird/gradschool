@@ -63,24 +63,25 @@ fi
 if [[ $runmode == "server" ]]; then
   # set up perturbation conditions
   # https://wiki.linuxfoundation.org/networking/netem
+  device="eth0"
   case "$perturbation" in
     none)
       rc=0
       ;;
     delay)
       # reorder
-      sudo tc qdisc add dev eth1 root netem delay 75ms 10ms
+      sudo tc qdisc add dev $device root netem delay 75ms 10ms
       rc=$?
       ;;
     loss)
       # n are lost, successive prob dep by j on prev
       # Probn = .25 * Probn-1 + .75 * Random
       # e.g. lose 10% 
-      sudo tc qdisc add dev eth1 root netem loss 10% 25%
+      sudo tc qdisc add dev $device root netem loss 10% 25%
       rc=$?
       ;;
     corruption)
-      sudo tc qdisc add dev eth1 root netem corrupt 80% delay 75ms
+      sudo tc qdisc add dev $device root netem corrupt 80% delay 75ms
       rc=$?
       ;;
     *)
@@ -93,7 +94,7 @@ if [[ $runmode == "server" ]]; then
   fi
   # start server
   setup_iperf3_server
-  sudo tc qdisc del dev eth1 root
+  sudo tc qdisc del dev $device root
   tc qdisc list
 elif [[ $runmode == "client" ]]; then
   # keep track of algorithm used (reno|cubic), the perturbation, and the current time
