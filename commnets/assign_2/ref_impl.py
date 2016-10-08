@@ -119,4 +119,7 @@ for algorithm in algorithms:
             plt.savefig(img_name)
             plt.show()
             plt.close()
+            # tmphack
+            import sys
+            sys.exit(0)
 
