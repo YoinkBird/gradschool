@@ -29,7 +29,7 @@ def parse_line(line):
 
 def read_iperf3(location):
     counter = 0
-    df = pd.DataFrame(columns=['Retr','Cwnd','Bits'])
+    df = pd.DataFrame(columns=['Retr','Cwnd','Bits','Bytes'])
 
     debug = 0
     if debug == 1:
@@ -59,10 +59,18 @@ def read_iperf3(location):
             retx = inter["sum"]["retransmits"]
             for strm in inter["streams"]:
                 cwnd = int(strm["snd_cwnd"] / 1024)
-                bits = int(strm["bits_per_second"])
+                # convert to Gbits/sec
+                #bits = int(strm["bits_per_second"] / (10^9) )
+                #bits = int(strm["bits_per_second"] / (1000000) )
+                # convert to KBytes/sec
+                bits = int(strm["bits_per_second"] / (8000) )
+                # TODO: TODO_201607102325 remove this once timescale in graph is fixed
+                # downsample for graph
+                bits /= 10
+                bytes = int(strm["bytes"] / 1024)
                 if debug == 1:
                     print("Retr: " + str(retx) + " Cwnd " + str(cwnd))
-                df.loc[int(counter)] = [float(retx), float(cwnd), float(bits)]
+                df.loc[int(counter)] = [float(retx), float(cwnd), float(bits), float(bytes)]
                 counter += 1
 
     return(df)
@@ -90,7 +98,7 @@ for algorithm in algorithms:
             file_root_name = file_prefix + "_" + algorithm + "_" + perturbation + "_" + file_num
             file_name      = file_dir + "/" + file_root_name + ftype
             img_name       = file_root_name + '.png'
-            plot_title     = "Test " + algorithm + " " + perturbation + " " + str(i)
+            plot_title     = "Results " + algorithm + " " + perturbation + " " + str(i)
 
             #if not Path(file_name).is_file():
             if not os.path.exists(file_name):
@@ -100,9 +108,11 @@ for algorithm in algorithms:
             if df.empty:
                 print("BAD DATA: " + file_name)
                 continue
-            ax = df['Cwnd'].plot(title=plot_title.title(),kind='line',legend=True)
-            df['Retr'].plot(ax=ax,legend=True)
-            plt.ylabel('Cwnd (KBytes)')
+            ax = df['Retr'].plot(title=plot_title.title(),kind='line',legend=True)
+            df['Bits'].plot(ax=ax,legend=True)
+            df['Cwnd'].plot(ax=ax,legend=True)
+            # TODO: fix axis and timescale; timescale is TODO_201607102325
+            plt.ylabel('Cwnd (KBytes) | KB/10s')
             plt.xlabel('Time (seconds)')
             plt.savefig(img_name)
             plt.close()
