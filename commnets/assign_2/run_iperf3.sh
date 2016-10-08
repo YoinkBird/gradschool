@@ -98,11 +98,13 @@ if [[ $runmode == "server" ]]; then
   tc qdisc list
 elif [[ $runmode == "client" ]]; then
   # keep track of algorithm used (reno|cubic), the perturbation, and the current time
-  out_file=results_${algorithm}_${perturbation}_${curtime}.json
+  out_dir=data_${curtime}
+  mkdir ${out_dir}/
+  out_file=${out_dir}/results_${algorithm}_${perturbation}_${curtime}.json
   # run with chosen algorithm
   for i in $(seq 1 1 $trials); do
     filenum=$(printf "%03d" $i)
-    out_file=results_${algorithm}_${perturbation}_${curtime}_${filenum}.json
+    out_file=results_${algorithm}_${perturbation}_${filenum}.json
     #echo "iperf3 $base_args_iperf3_client -t transmit_time -C $algorithm"
     iperf3 $base_args_iperf3_client -t $transmit_time -C $algorithm >> ${out_file}
     rc=$1
