@@ -5,6 +5,8 @@ import numpy as np
 
 import json
 
+import os.path
+
 '''
 purpose: return number of retries and the window size
 # sample input
@@ -90,6 +92,10 @@ for algorithm in algorithms:
             img_name       = file_root_name + '.png'
             plot_title     = "Test " + algorithm + " " + perturbation + " " + str(i)
 
+            #if not Path(file_name).is_file():
+            if not os.path.exists(file_name):
+                print("BAD DATA: " + file_name)
+                continue
             df = read_iperf3(file_name)
             if df.empty:
                 print("BAD DATA: " + file_name)
