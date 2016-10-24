@@ -81,7 +81,12 @@ def doOnePing(destAddr, timeout):
   # SOCK_RAW is a powerful socket type. For more details:   
 #    http://sock-raw.org/papers/sock_raw
 
-  mySocket = socket(AF_INET, SOCK_RAW, icmp)
+  try:
+    mySocket = socket(AF_INET, SOCK_RAW, icmp)
+  #except socket.error as e_socket:
+  except OSError as e_socket:
+    print("-E-: no socket established, try running with sudo")
+    raise
   
   myID = os.getpid() & 0xFFFF  # Return the current process i
   sendOnePing(mySocket, destAddr, myID)
