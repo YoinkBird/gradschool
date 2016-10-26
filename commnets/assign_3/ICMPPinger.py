@@ -65,19 +65,45 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
     whatReady = select.select([mySocket], [], [], timeLeft)
     howLongInSelect = (time.time() - startedSelect)
     if whatReady[0] == []: # Timeout
-      return "Request timed out."
+      return "Request timed out. right away"
   
     timeReceived = time.time() 
     recPacket, addr = mySocket.recvfrom(1024)
-         
-         #Fill in start
         
-          #Fetch the ICMP header from the IP packet
-        
-         #Fill in end
+    # first, get the IP header
+    ip_header = struct.unpack('!BBHHHBBH4s4s' , recPacket[0:20])
+    # get the IHL, length in bits; last 4 bits of first byte
+    ip_ihl = ip_header[0] & 0xF
+    # ip header total length - IHL * 32bit = IHL * 4byte
+    ip_h_len = ip_ihl * 4
+    # verify ICMP protocol
+    if(ip_header[6] != getprotobyname("icmp")):
+      # src: http://stackoverflow.com/a/37005235
+      table = {num:name[8:] for name,num in vars(socket).items() if name.startswith("IPPROTO")}
+      return("non icmp packet received: " + table[ip_h_len[6]])
+
+
+
+    #Fetch the ICMP header from the IP packet
+    # https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol
+    # All ICMP packets have an 8-byte header: 'type code checksum packetID sequence'
+    icmp_h_end=ip_h_len+8
+    icmpHeaderPacket = recPacket[ip_h_len:icmp_h_end]
+    icmp_header = ICMP_H._make( struct.unpack(ICMP_STRUCT_FORMAT, icmpHeaderPacket) )
+
+    # TODO handle different messages and whatever 
+    #  https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol#Control_messages
+
+    print("-I- Rx packet: header %s " % (str(icmp_header), ) )
+    # for pinging localhost, ignore echo request
+    if icmp_header.type != ICMP_ECHO_REQUEST and icmp_header.packetID == ID:
+        bytesInDouble = struct.calcsize("d")
+        icmp_data_end = icmp_h_end + bytesInDouble
+        timeSent = struct.unpack("d", recPacket[icmp_h_end:icmp_data_end])[0]
+        return timeReceived - timeSent
     timeLeft = timeLeft - howLongInSelect
     if timeLeft <= 0:
-      return "Request timed out."
+      return "Request timed out. later"
   
 def sendOnePing(mySocket, destAddr, ID):
   # Header is type (8), code (8), checksum (16), id (16), sequence (16)
@@ -152,3 +178,22 @@ def ping(host, timeout=1):
 #TODO: ping("foobar.com.none")
 ping("google.com")
 ping("localhost")
+
+
+
+print(
+'''
+        TODO:
+            ping -c 5 google.com
+            PING google.com (24.155.92.84) 56(84) bytes of data.
+            64 bytes from google-24-155-92-84.grandecom.net (24.155.92.84): icmp_seq=1 ttl=60 time=10.3 ms
+            64 bytes from google-24-155-92-84.grandecom.net (24.155.92.84): icmp_seq=2 ttl=60 time=10.1 ms
+            64 bytes from google-24-155-92-84.grandecom.net (24.155.92.84): icmp_seq=3 ttl=60 time=10.5 ms
+            64 bytes from google-24-155-92-84.grandecom.net (24.155.92.84): icmp_seq=4 ttl=60 time=10.3 ms
+            64 bytes from google-24-155-92-84.grandecom.net (24.155.92.84): icmp_seq=5 ttl=60 time=11.1 ms
+
+            --- google.com ping statistics ---
+            5 packets transmitted, 5 received, 0% packet loss, time 4006ms
+            rtt min/avg/max/mdev = 10.171/10.528/11.132/0.341 ms
+'''
+)
