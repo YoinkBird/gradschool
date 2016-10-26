@@ -6,7 +6,31 @@ import time
 import select
 import binascii  
 
+from collections import namedtuple
+
 ICMP_ECHO_REQUEST = 8
+ICMP_H = namedtuple( 'ICMP_Header', 'type code checksum packetID sequence')
+ICMP_STRUCT_FORMAT = "bbHHh"
+# # https://docs.python.org/2/library/struct.html#format-characters
+# Format	C Type	 	Python type 		Standard size 	Notes
+# x	pad byte 		no value
+# c	char 			string of length	1 	1
+# b	signed char 		integer 		1 	(3)
+# B	unsigned char 		integer 		1 	(3)
+# ?	_Bool 			bool 			1 	(1)
+# h	short 			integer 		2 	(3)
+# H	unsigned short 		integer 		2 	(3)
+# i	int 			integer 		4 	(3)
+# I	unsigned int 		integer 		4 	(3)
+# l	long 			integer 		4 	(3)
+# L	unsigned long 		integer 		4 	(3)
+# q	long long 		integer 		8 	(2), (3)
+# Q	unsigned long long 	integer 		8 	(2), (3)
+# f	float 			float 			4 	(4)
+# d	double 			float 			8 	(4)
+# s	char[] 			string
+# p	char[] 			string
+# P	void * 			integer 		  	(5), (3)
 
 def checksum(string): 
   csum = 0
@@ -61,8 +85,9 @@ def sendOnePing(mySocket, destAddr, ID):
   myChecksum = 0
   # Make a dummy header with a 0 checksum
   # struct -- Interpret strings as packed binary data
-  header = struct.pack("bbHHh", ICMP_ECHO_REQUEST, 0, myChecksum, ID, 1)
-  data = struct.pack("d", time.time())
+  header = struct.pack(ICMP_STRUCT_FORMAT, ICMP_ECHO_REQUEST, 0, myChecksum, ID, 1)
+  curtime = time.time()
+  data = struct.pack("d", curtime)
   # Calculate the checksum on the data and the dummy header.
   myChecksum = checksum(header + data)
   
@@ -73,9 +98,11 @@ def sendOnePing(mySocket, destAddr, ID):
   else:
     myChecksum = htons(myChecksum)
     
-  header = struct.pack("bbHHh", ICMP_ECHO_REQUEST, 0, myChecksum, ID, 1)
+  icmp_header = ICMP_H(ICMP_ECHO_REQUEST, 0, myChecksum, ID, 1)
+  header = struct.pack(ICMP_STRUCT_FORMAT, *icmp_header)
   packet = header + data
   
+  print("-I- Tx packet: header %s | data %d " % (str(icmp_header), curtime) )
   mySocket.sendto(packet, (destAddr, 1)) # AF_INET address must be tuple, not str
   # Both LISTS and TUPLES consist of a number of objects
   # which can be referenced by their position number within the object.
@@ -103,13 +130,25 @@ def ping(host, timeout=1):
   # timeout=1 means: If one second goes by without a reply from the server,
   # the client assumes that either the client's ping or the server's pong is lost
   dest = gethostbyname(host)
-  print("Pinging " + dest + " using Python:")
+  print("Pinging " + host + " == " + dest + " using Python:")
   print("")
   # Send ping requests to a server separated by approximately one second
-  while 1 :
+  #while 1 :
+  print("""
+  TODO print like this:
+  PING localhost (127.0.0.1) 56(84) bytes of data.
+  64 bytes from localhost (127.0.0.1): icmp_seq=1 ttl=64 time=0.063 ms
+  """)
+
+  for i in range(4):
     delay = doOnePing(dest, timeout)
-    print(delay)
+    # ICMP is in ms
+    # src: https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol#Timestamp
+    print("reply in %0.3f ms" % (delay * 1000) )
+    #print(delay * 1000)
     time.sleep(1)# one second
   return delay
   
+#TODO: ping("foobar.com.none")
 ping("google.com")
+ping("localhost")
