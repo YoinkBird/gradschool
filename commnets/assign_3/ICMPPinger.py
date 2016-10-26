@@ -13,7 +13,11 @@ def checksum(string):
   countTo = (len(string) // 2) * 2
   count = 0
   while count < countTo:
-    thisVal = ord(string[count+1]) * 256 + ord(string[count]) 
+    # python 2/3 compat - 3 doesn't need 'ord'
+    try:
+      thisVal = ord(string[count + 1])*256 + ord(string[count])
+    except TypeError:
+      thisVal = string[count + 1] * 256 + string[count]
     csum = csum + thisVal 
     csum = csum & 0xffffffff  
     count = count + 2
@@ -60,7 +64,7 @@ def sendOnePing(mySocket, destAddr, ID):
   header = struct.pack("bbHHh", ICMP_ECHO_REQUEST, 0, myChecksum, ID, 1)
   data = struct.pack("d", time.time())
   # Calculate the checksum on the data and the dummy header.
-  myChecksum = checksum(str(header + data))
+  myChecksum = checksum(header + data)
   
   # Get the right checksum, and put in the header
   if sys.platform == 'darwin':
