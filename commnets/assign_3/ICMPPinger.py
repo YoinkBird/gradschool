@@ -77,6 +77,34 @@ def get_icmp_errcode(type):
     )
   return errorTypes[type]
 
+# src: http://codeselfstudy.com/blogs/how-to-calculate-standard-deviation-in-python
+# src: http://serverfault.com/questions/333116/what-does-mdev-mean-in-ping8
+def stddev(values):
+  from math import sqrt
+  # src: http://codeselfstudy.com/blogs/how-to-calculate-standard-deviation-in-python
+  # src: http://serverfault.com/questions/333116/what-does-mdev-mean-in-ping8
+  mean = ( sum(values) / len(values) ) # avg(values)
+  deviations = [ x - mean for x in values ]
+  deviations_sq = [ d ** 2 for d in deviations ]
+  sum_dev_sq = sum(deviations_sq)
+  variance = sum_dev_sq / len(values)
+  std_dev = sqrt(variance)
+  return std_dev
+
+# test for stats calc - simply call this from anywhere in the code
+def test_stddev():
+  time_list = [ 9.70 , 10.1 , 10.2 , 17.9 ]
+  time_list_ns = [ x / 1000 for x in time_list ]
+  reference = \
+    '''
+    # --- 24.155.92.81 ping statistics ---
+    # 4 packets transmitted, 4 received, 0% packet loss, time 3003ms
+    # rtt min/avg/max/mdev = 9.700/12.009/17.952/3.437 ms
+    '''
+  print("reference:\n" + reference)
+  std_dev = stddev(time_list)
+  print("mdev: %0.3f" % std_dev)
+
 def checksum(string): 
   csum = 0
   countTo = (len(string) // 2) * 2
@@ -233,7 +261,8 @@ def ping(host, timeout=1):
   t_avg_ns = ( sum(time_list) / len(time_list) ) # avg(time_list)
   t_avg = 1000 * t_avg_ns
   t_max = 1000 * max(time_list)
-  t_mdev = -1 # todo # mdev(time_list)
+  std_dev = stddev(time_list)
+  t_mdev = 1000 * std_dev #-1 # todo # mdev(time_list)
   print("rtt min/avg/max/mdev = %0.3f/%0.3f/%0.3f/%0.3f ms" % (t_min , t_avg , t_max , t_mdev ,) )
 
   return delay
