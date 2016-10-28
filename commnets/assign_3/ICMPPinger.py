@@ -32,6 +32,51 @@ ICMP_STRUCT_FORMAT = "bbHHh"
 # p	char[] 			string
 # P	void * 			integer 		  	(5), (3)
 
+# http://www.nthelp.com/icmp.html
+def get_icmp_errcode(type):
+  # Type	Name					Reference
+  # ----	-------------------------		---------
+  errorTypes = dict(
+    [
+      (0,'Echo Reply'),					# [RFC792]
+      (1,'Unassigned'),					# [JBP]
+      (2,'Unassigned'),					# [JBP]
+      (3,'Destination Unreachable'),			# [RFC792]
+      (4,'Source Quench'),				  	# [RFC792]
+      (5,'Redirect'),					# [RFC792]
+      (6,'Alternate Host Address'),				# [JBP]
+      (7,'Unassigned'),					# [JBP]
+      (8,'Echo'),					  	# [RFC792]
+      (9,'Router Advertisement'),			  	# [RFC1256]
+      (10,'Router Selection'),				# [RFC1256]
+      (11,'Time Exceeded'),				 	# [RFC792]
+      (12,'Parameter Problem'),				# [RFC792]
+      (13,'Timestamp'),					# [RFC792]
+      (14,'Timestamp Reply'),				# [RFC792]
+      (15,'Information Request'),			   	# [RFC792]
+      (16,'Information Reply'),				# [RFC792]
+      (17,'Address Mask Request'),                           # [RFC950]
+      (18,'Address Mask Reply'),				# [RFC950]
+      (19,'Reserved (for Security)'),			# [Solo]
+      (20,'Reserved (for Robustness Experiment)'),           # [ZSu]
+      (29,'Reserved (for Robustness Experiment)'),           # [ZSu]
+      (30,'Traceroute'),					# [RFC1393]
+      (31,'Datagram Conversion Error'),			# [RFC1475]
+      (32,'Mobile Host Redirect'),       	                # [David Johnson]
+      (33,'IPv6 Where-Are-You'),         	                # [Bill Simpson]
+      (34,'IPv6 I-Am-Here'),             	                # [Bill Simpson]
+      (35,'Mobile Registration Request'),	                # [Bill Simpson]
+      (36,'Mobile Registration Reply'),  	                # [Bill Simpson]
+      (37,'Domain Name Request'),        	                # [Simpson]
+      (38,'Domain Name Reply'),          	                # [Simpson]
+      (39,'SKIP'),                       	                # [Markson]
+      (40,'Photuris'),                   	                # [Simpson]
+      #(41-'255 Reserved'),				  	# [JBP]
+      (41,'Reserved'),				  	# [JBP]
+      ]
+    )
+  return errorTypes[type]
+
 def checksum(string): 
   csum = 0
   countTo = (len(string) // 2) * 2
@@ -95,6 +140,7 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
     #  https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol#Control_messages
 
     print("-I- Rx packet: header %s " % (str(icmp_header), ) )
+    print("-I- Rx packet: code:message %d:%s " % (icmp_header.code,get_icmp_errcode(icmp_header.code), ) )
     # for pinging localhost, ignore echo request
     if icmp_header.type != ICMP_ECHO_REQUEST and icmp_header.packetID == ID:
         bytesInDouble = struct.calcsize("d")
@@ -178,6 +224,7 @@ def ping(host, timeout=1):
 #TODO: ping("foobar.com.none")
 ping("google.com")
 ping("localhost")
+ping("bbc.co.uk")
 
 
 
