@@ -202,9 +202,6 @@ def ping(host, timeout=1):
   # timeout=1 means: If one second goes by without a reply from the server,
   # the client assumes that either the client's ping or the server's pong is lost
   dest = gethostbyname(host)
-  print("Pinging " + host + " == " + dest + " using Python:")
-  print("")
-  # Send ping requests to a server separated by approximately one second
   #while 1 :
   print("""
   TODO print like this:
@@ -212,13 +209,33 @@ def ping(host, timeout=1):
   64 bytes from localhost (127.0.0.1): icmp_seq=1 ttl=64 time=0.063 ms
   """)
 
+  print("Pinging " + host + " == " + dest + " using Python:")
+  # Send ping requests to a server separated by approximately one second
+  time_list = []
+  start_time = time.time()
   for i in range(4):
     delay = doOnePing(dest, timeout)
     # ICMP is in ms
     # src: https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol#Timestamp
     print("reply in %0.3f ms" % (delay * 1000) )
+    time_list.append(delay)
     #print(delay * 1000)
     time.sleep(1)# one second
+  total_time = time.time() - start_time
+  total_time *= 1000 # convert to ms
+
+  # calculate stats
+  packets_tx = len(time_list)
+  packets_rx = -1 # TODO
+  packet_loss = -1 # TODO
+  print("%d packets transmitted, %d received, %d packet loss, time %0.0fms" % (packets_tx, packets_rx, packet_loss, total_time) )
+  t_min = 1000 * min(time_list)
+  t_avg_ns = ( sum(time_list) / len(time_list) ) # avg(time_list)
+  t_avg = 1000 * t_avg_ns
+  t_max = 1000 * max(time_list)
+  t_mdev = -1 # todo # mdev(time_list)
+  print("rtt min/avg/max/mdev = %0.3f/%0.3f/%0.3f/%0.3f ms" % (t_min , t_avg , t_max , t_mdev ,) )
+
   return delay
   
 #TODO: ping("foobar.com.none")
