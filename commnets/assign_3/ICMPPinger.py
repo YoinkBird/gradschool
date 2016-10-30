@@ -276,24 +276,19 @@ def ping(host, timeout=1):
   # the client assumes that either the client's ping or the server's pong is lost
   dest = gethostbyname(host)
   #while 1 :
-  print("""
-  TODO print like this:
-  PING localhost (127.0.0.1) 56(84) bytes of data.
-  64 bytes from localhost (127.0.0.1): icmp_seq=1 ttl=64 time=0.063 ms
-  """)
 
-  print("PING %s (%s)" % (host, dest))
   # Send ping requests to a server separated by approximately one second
   time_list = []
   start_time = time.time()
   #TODO: determine this from arg
   count = 4
+  print("====")
+  print("PING %s (%s) %s times at %ds interval" % (host, dest, count, timeout))
   for i in range(count):
     pong = doOnePing(dest, timeout, i+1) # want sequence to start at 1
     # ICMP is in ms
     # src: https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol#Timestamp
-    print("reply in %0.3f ms" % (pong.delay * 1000) )
-    print("ttl=%d" % (pong.ip.ttl) )
+    print("reply from %s (%s): icmp_seq=%d ttl=%d time=%0.3f ms" % (host, dest, pong.icmp.sequence, pong.ip.ttl, pong.delay * 1000) )
     time_list.append(pong.delay)
     #print(delay * 1000)
     time.sleep(1)# one second
@@ -311,6 +306,8 @@ def ping(host, timeout=1):
   t_max = 1000 * max(time_list)
   std_dev = stddev(time_list)
   t_mdev = 1000 * std_dev #-1 # todo # mdev(time_list)
+  print("--- %s ping statistics ---" % host)
+  print("%d packets transmitted, %d packets received, %d packet loss, time %d" % (packets_tx, packets_rx, -1, total_time) )
   print("rtt min/avg/max/mdev = %0.3f/%0.3f/%0.3f/%0.3f ms" % (t_min , t_avg , t_max , t_mdev ,) )
 
   return pong.delay
