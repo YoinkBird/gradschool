@@ -190,7 +190,7 @@ def sendOnePing(mySocket, destAddr, ID, sequence_num=1):
   myChecksum = 0
   # Make a dummy header with a 0 checksum
   # struct -- Interpret strings as packed binary data
-  header = struct.pack(ICMP_STRUCT_FORMAT, ICMP_ECHO_REQUEST, 0, myChecksum, ID, 1)
+  header = struct.pack(ICMP_STRUCT_FORMAT, ICMP_ECHO_REQUEST, 0, myChecksum, ID, sequence_num)
   curtime = time.time()
   data = struct.pack("d", curtime)
   # Calculate the checksum on the data and the dummy header.
@@ -242,12 +242,14 @@ def ping(host, timeout=1):
   64 bytes from localhost (127.0.0.1): icmp_seq=1 ttl=64 time=0.063 ms
   """)
 
-  print("Pinging " + host + " == " + dest + " using Python:")
+  print("PING %s (%s)" % (host, dest))
   # Send ping requests to a server separated by approximately one second
   time_list = []
   start_time = time.time()
-  for i in range(1,4):
-    delay = doOnePing(dest, timeout, 1)
+  #TODO: determine this from arg
+  count = 4
+  for i in range(count):
+    delay = doOnePing(dest, timeout, i+1) # want sequence to start at 1
     # ICMP is in ms
     # src: https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol#Timestamp
     print("reply in %0.3f ms" % (delay * 1000) )
