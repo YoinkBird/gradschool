@@ -279,6 +279,8 @@ def ping(host, timeout=1):
 
   # Send ping requests to a server separated by approximately one second
   time_list = []
+  packets_tx = 0
+  packet_loss = 0
   start_time = time.time()
   #TODO: determine this from arg
   count = 4
@@ -286,33 +288,41 @@ def ping(host, timeout=1):
   print("PING %s (%s) %s times at %ds interval" % (host, dest, count, timeout))
   for i in range(count):
     pong = doOnePing(dest, timeout, i+1) # want sequence to start at 1
-    # ICMP is in ms
-    # src: https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol#Timestamp
-    print("reply from %s (%s): icmp_seq=%d ttl=%d time=%0.3f ms" % (host, dest, pong.icmp.sequence, pong.ip.ttl, pong.delay * 1000) )
-    time_list.append(pong.delay)
+    packets_tx +=1
+    if(pong != None):
+      # ICMP is in ms
+      # src: https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol#Timestamp
+      print("reply from %s (%s): icmp_seq=%d ttl=%d time=%0.3f ms" % (host, dest, pong.icmp.sequence, pong.ip.ttl, pong.delay * 1000) )
+      time_list.append(pong.delay)
+    else:
+      packet_loss += 1
     #print(delay * 1000)
     time.sleep(1)# one second
   total_time = time.time() - start_time
   total_time *= 1000 # convert to ms
 
   # calculate stats
-  packets_tx = len(time_list)
-  packets_rx = -1 # TODO
-  packet_loss = -1 # TODO
-  print("%d packets transmitted, %d received, %d packet loss, time %0.0fms" % (packets_tx, packets_rx, packet_loss, total_time) )
-  t_min = 1000 * min(time_list)
-  t_avg_ns = ( sum(time_list) / len(time_list) ) # avg(time_list)
-  t_avg = 1000 * t_avg_ns
-  t_max = 1000 * max(time_list)
-  std_dev = stddev(time_list)
-  t_mdev = 1000 * std_dev #-1 # todo # mdev(time_list)
+  packets_rx = len(time_list)
+  packet_loss = 1 - (packets_rx / packets_tx)
   print("--- %s ping statistics ---" % host)
-  print("%d packets transmitted, %d packets received, %d packet loss, time %d" % (packets_tx, packets_rx, -1, total_time) )
-  print("rtt min/avg/max/mdev = %0.3f/%0.3f/%0.3f/%0.3f ms" % (t_min , t_avg , t_max , t_mdev ,) )
+  print("%d packets transmitted, %d received, %d %% packet loss, time %0.0fms" % (packets_tx, packets_rx, 100 * packet_loss, total_time) )
+  if(time_list):
+    t_min = 1000 * min(time_list)
+    t_avg_ns = ( sum(time_list) / len(time_list) ) # avg(time_list)
+    t_avg = 1000 * t_avg_ns
+    t_max = 1000 * max(time_list)
+    std_dev = stddev(time_list)
+    t_mdev = 1000 * std_dev #-1 # todo # mdev(time_list)
+    print("rtt min/avg/max/mdev = %0.3f/%0.3f/%0.3f/%0.3f ms" % (t_min , t_avg , t_max , t_mdev ,) )
+    return pong.delay
+  else:
+    return -1
 
-  return pong.delay
   
 #TODO: ping("foobar.com.none")
+# degenerate case:
+ping("192.168.14.129")
+# successful case:
 ping("google.com")
 ping("localhost")
 ping("bbc.co.uk")
@@ -333,5 +343,13 @@ print(
             --- google.com ping statistics ---
             5 packets transmitted, 5 received, 0% packet loss, time 4006ms
             rtt min/avg/max/mdev = 10.171/10.528/11.132/0.341 ms
-'''
-)
+
+Packet Loss: - differences: 
+            ping -c 2 192.168.14.129
+            PING 192.168.14.129 (192.168.14.129) 56(84) bytes of data.
+
+            --- 192.168.14.129 ping statistics ---
+            2 packets transmitted, 0 received, 100% packet loss, time 1006ms
+
+            '''
+            )
