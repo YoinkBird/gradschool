@@ -184,7 +184,7 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
     if timeLeft <= 0:
       return "Request timed out. later"
   
-def sendOnePing(mySocket, destAddr, ID):
+def sendOnePing(mySocket, destAddr, ID, sequence_num=1):
   # Header is type (8), code (8), checksum (16), id (16), sequence (16)
   
   myChecksum = 0
@@ -203,7 +203,7 @@ def sendOnePing(mySocket, destAddr, ID):
   else:
     myChecksum = htons(myChecksum)
     
-  icmp_header = ICMP_H(ICMP_ECHO_REQUEST, 0, myChecksum, ID, 1)
+  icmp_header = ICMP_H(ICMP_ECHO_REQUEST, 0, myChecksum, ID, sequence_num)
   header = struct.pack(ICMP_STRUCT_FORMAT, *icmp_header)
   packet = header + data
   
@@ -212,7 +212,7 @@ def sendOnePing(mySocket, destAddr, ID):
   # Both LISTS and TUPLES consist of a number of objects
   # which can be referenced by their position number within the object.
   
-def doOnePing(destAddr, timeout): 
+def doOnePing(destAddr, timeout, sequence_num=1):
   icmp = getprotobyname("icmp")
   # SOCK_RAW is a powerful socket type. For more details:   
 #    http://sock-raw.org/papers/sock_raw
@@ -225,7 +225,7 @@ def doOnePing(destAddr, timeout):
     raise
   
   myID = os.getpid() & 0xFFFF  # Return the current process i
-  sendOnePing(mySocket, destAddr, myID)
+  sendOnePing(mySocket, destAddr, myID, sequence_num)
   delay = receiveOnePing(mySocket, myID, timeout, destAddr)
   
   mySocket.close()
@@ -246,8 +246,8 @@ def ping(host, timeout=1):
   # Send ping requests to a server separated by approximately one second
   time_list = []
   start_time = time.time()
-  for i in range(4):
-    delay = doOnePing(dest, timeout)
+  for i in range(1,4):
+    delay = doOnePing(dest, timeout, 1)
     # ICMP is in ms
     # src: https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol#Timestamp
     print("reply in %0.3f ms" % (delay * 1000) )
