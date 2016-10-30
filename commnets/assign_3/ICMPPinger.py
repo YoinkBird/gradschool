@@ -10,7 +10,14 @@ from collections import namedtuple
 
 ICMP_ECHO_REQUEST = 8
 ICMP_H = namedtuple( 'ICMP_Header', 'type code checksum packetID sequence')
-ICMP_STRUCT_FORMAT = "bbHHh"
+ICMP_STRUCT_FORMAT = "bbHHh" # 1,1,2,2,2 -> 8 bytes -> 64 bits
+ICMP_DATA_BYTES = 64
+# IP Header (from recPacket[0:20])
+#         !B    B                   H         H                 H
+# version ihl type_of_service total_length identification flags fragment_offset
+#          B      B           H             4s            4s                NA      NA
+# time_to_live protocol header_checksum source_address destination_address options padding
+IP_H = namedtuple( 'IP_Header', 'version ihl type_of_service total_length identification flags_and_fragment_offset ttl protocol header_checksum source_address destination_address options padding' )
 PING_RESPONSE = namedtuple('pong', 'delay icmp ip')
 # # https://docs.python.org/2/library/struct.html#format-characters
 # Format	C Type	 	Python type 		Standard size 	Notes
@@ -150,15 +157,41 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
   
     timeReceived = time.time() 
     recPacket, addr = mySocket.recvfrom(1024)
-        
+    #Fill in start
+#
+
+# 0                   1                   2                   3
+# 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+# +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+# |Version|  IHL  |Type of Service|          Total Length         |
+# +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+# |         Identification        |Flags|      Fragment Offset    |
+# +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+# |  Time to Live |    Protocol   |         Header Checksum       |
+# +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+# |                       Source Address                          |
+# +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+# |                    Destination Address                        |
+# +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+# |                    Options                    |    Padding    |
+# +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
     # first, get the IP header
-    ip_header = struct.unpack('!BBHHHBBH4s4s' , recPacket[0:20])
+    ip_header = list(struct.unpack('!BBHHHBBH4s4s' , recPacket[0:20]))
     # get the IHL, length in bits; last 4 bits of first byte
     ip_ihl = ip_header[0] & 0xF
     # ip header total length - IHL * 32bit = IHL * 4byte
     ip_h_len = ip_ihl * 4
+    # ip version is left-most nibble
+    ip_ver = ip_header[0] >> 4
+    # ip TTL
+    ip_ttl = ip_header[5]
+    # split up byte with version+IHL
+    ip_header[0] = ip_ihl
+    ip_header.insert(0,ip_ver)
+    ip_header_pack = IP_H( *ip_header , -1, -1)
+    printdb("-I-: " + str(ip_header_pack))
     # verify ICMP protocol
-    if(ip_header[6] != getprotobyname("icmp")):
+    if(ip_header_pack.protocol != getprotobyname("icmp")):
       # src: http://stackoverflow.com/a/37005235
       table = {num:name[8:] for name,num in vars(socket).items() if name.startswith("IPPROTO")}
       return("non icmp packet received: " + table[ip_h_len[6]])
@@ -182,7 +215,7 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
         bytesInDouble = struct.calcsize("d")
         icmp_data_end = icmp_h_end + bytesInDouble
         timeSent = struct.unpack("d", recPacket[icmp_h_end:icmp_data_end])[0]
-        retval = PING_RESPONSE(timeReceived - timeSent, icmp_header, ip_header)
+        retval = PING_RESPONSE(timeReceived - timeSent, icmp_header, ip_header_pack)
         return retval
         return timeReceived - timeSent
     timeLeft = timeLeft - howLongInSelect
@@ -260,6 +293,7 @@ def ping(host, timeout=1):
     # ICMP is in ms
     # src: https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol#Timestamp
     print("reply in %0.3f ms" % (pong.delay * 1000) )
+    print("ttl=%d" % (pong.ip.ttl) )
     time_list.append(pong.delay)
     #print(delay * 1000)
     time.sleep(1)# one second
