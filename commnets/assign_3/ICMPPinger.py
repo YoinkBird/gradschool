@@ -11,6 +11,7 @@ from collections import namedtuple
 ICMP_ECHO_REQUEST = 8
 ICMP_H = namedtuple( 'ICMP_Header', 'type code checksum packetID sequence')
 ICMP_STRUCT_FORMAT = "bbHHh"
+PING_RESPONSE = namedtuple('pong', 'delay icmp ip')
 # # https://docs.python.org/2/library/struct.html#format-characters
 # Format	C Type	 	Python type 		Standard size 	Notes
 # x	pad byte 		no value
@@ -143,6 +144,8 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
     whatReady = select.select([mySocket], [], [], timeLeft)
     howLongInSelect = (time.time() - startedSelect)
     if whatReady[0] == []: # Timeout
+      # TODO: fix this
+      return
       return "Request timed out. right away"
   
     timeReceived = time.time() 
@@ -179,9 +182,13 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
         bytesInDouble = struct.calcsize("d")
         icmp_data_end = icmp_h_end + bytesInDouble
         timeSent = struct.unpack("d", recPacket[icmp_h_end:icmp_data_end])[0]
+        retval = PING_RESPONSE(timeReceived - timeSent, icmp_header, ip_header)
+        return retval
         return timeReceived - timeSent
     timeLeft = timeLeft - howLongInSelect
     if timeLeft <= 0:
+      # TODO: fix this
+      return
       return "Request timed out. later"
   
 def sendOnePing(mySocket, destAddr, ID, sequence_num=1):
@@ -226,10 +233,10 @@ def doOnePing(destAddr, timeout, sequence_num=1):
   
   myID = os.getpid() & 0xFFFF  # Return the current process i
   sendOnePing(mySocket, destAddr, myID, sequence_num)
-  delay = receiveOnePing(mySocket, myID, timeout, destAddr)
+  pong = receiveOnePing(mySocket, myID, timeout, destAddr)
   
   mySocket.close()
-  return delay
+  return pong
   
 def ping(host, timeout=1):
   # timeout=1 means: If one second goes by without a reply from the server,
@@ -249,11 +256,11 @@ def ping(host, timeout=1):
   #TODO: determine this from arg
   count = 4
   for i in range(count):
-    delay = doOnePing(dest, timeout, i+1) # want sequence to start at 1
+    pong = doOnePing(dest, timeout, i+1) # want sequence to start at 1
     # ICMP is in ms
     # src: https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol#Timestamp
-    print("reply in %0.3f ms" % (delay * 1000) )
-    time_list.append(delay)
+    print("reply in %0.3f ms" % (pong.delay * 1000) )
+    time_list.append(pong.delay)
     #print(delay * 1000)
     time.sleep(1)# one second
   total_time = time.time() - start_time
@@ -272,7 +279,7 @@ def ping(host, timeout=1):
   t_mdev = 1000 * std_dev #-1 # todo # mdev(time_list)
   print("rtt min/avg/max/mdev = %0.3f/%0.3f/%0.3f/%0.3f ms" % (t_min , t_avg , t_max , t_mdev ,) )
 
-  return delay
+  return pong.delay
   
 #TODO: ping("foobar.com.none")
 ping("google.com")
