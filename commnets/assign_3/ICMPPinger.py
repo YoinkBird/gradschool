@@ -105,6 +105,11 @@ def test_stddev():
   std_dev = stddev(time_list)
   print("mdev: %0.3f" % std_dev)
 
+def printdb(*kargs):
+  debug=0
+  if(debug==1):
+    print(*kargs)
+
 def checksum(string): 
   csum = 0
   countTo = (len(string) // 2) * 2
@@ -167,8 +172,8 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
     # TODO handle different messages and whatever 
     #  https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol#Control_messages
 
-    print("-I- Rx packet: header %s " % (str(icmp_header), ) )
-    print("-I- Rx packet: code:message %d:%s " % (icmp_header.code,get_icmp_errcode(icmp_header.code), ) )
+    printdb("-I- Rx packet: header %s " % (str(icmp_header), ) )
+    printdb("-I- Rx packet: code:message %d:%s " % (icmp_header.code,get_icmp_errcode(icmp_header.code), ) )
     # for pinging localhost, ignore echo request
     if icmp_header.type != ICMP_ECHO_REQUEST and icmp_header.packetID == ID:
         bytesInDouble = struct.calcsize("d")
@@ -202,7 +207,7 @@ def sendOnePing(mySocket, destAddr, ID):
   header = struct.pack(ICMP_STRUCT_FORMAT, *icmp_header)
   packet = header + data
   
-  print("-I- Tx packet: header %s | data %d " % (str(icmp_header), curtime) )
+  printdb("-I- Tx packet: header %s | data %d " % (str(icmp_header), curtime) )
   mySocket.sendto(packet, (destAddr, 1)) # AF_INET address must be tuple, not str
   # Both LISTS and TUPLES consist of a number of objects
   # which can be referenced by their position number within the object.
