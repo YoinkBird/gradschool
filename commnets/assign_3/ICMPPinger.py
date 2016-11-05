@@ -334,27 +334,25 @@ ping("62.138.116.25")   # europe spiegel.de
 
 
 
-print(
 '''
-        TODO:
-            ping -c 5 google.com
-            PING google.com (24.155.92.84) 56(84) bytes of data.
-            64 bytes from google-24-155-92-84.grandecom.net (24.155.92.84): icmp_seq=1 ttl=60 time=10.3 ms
-            64 bytes from google-24-155-92-84.grandecom.net (24.155.92.84): icmp_seq=2 ttl=60 time=10.1 ms
-            64 bytes from google-24-155-92-84.grandecom.net (24.155.92.84): icmp_seq=3 ttl=60 time=10.5 ms
-            64 bytes from google-24-155-92-84.grandecom.net (24.155.92.84): icmp_seq=4 ttl=60 time=10.3 ms
-            64 bytes from google-24-155-92-84.grandecom.net (24.155.92.84): icmp_seq=5 ttl=60 time=11.1 ms
+sample output from ubuntu ping
+ping -c 5 google.com
+PING google.com (24.155.92.84) 56(84) bytes of data.
+64 bytes from google-24-155-92-84.grandecom.net (24.155.92.84): icmp_seq=1 ttl=60 time=10.3 ms
+64 bytes from google-24-155-92-84.grandecom.net (24.155.92.84): icmp_seq=2 ttl=60 time=10.1 ms
+64 bytes from google-24-155-92-84.grandecom.net (24.155.92.84): icmp_seq=3 ttl=60 time=10.5 ms
+64 bytes from google-24-155-92-84.grandecom.net (24.155.92.84): icmp_seq=4 ttl=60 time=10.3 ms
+64 bytes from google-24-155-92-84.grandecom.net (24.155.92.84): icmp_seq=5 ttl=60 time=11.1 ms
 
-            --- google.com ping statistics ---
-            5 packets transmitted, 5 received, 0% packet loss, time 4006ms
-            rtt min/avg/max/mdev = 10.171/10.528/11.132/0.341 ms
+--- google.com ping statistics ---
+5 packets transmitted, 5 received, 0% packet loss, time 4006ms
+rtt min/avg/max/mdev = 10.171/10.528/11.132/0.341 ms
 
 Packet Loss: - differences: 
-            ping -c 2 192.168.14.129
-            PING 192.168.14.129 (192.168.14.129) 56(84) bytes of data.
+ping -c 2 192.168.14.129
+PING 192.168.14.129 (192.168.14.129) 56(84) bytes of data.
 
-            --- 192.168.14.129 ping statistics ---
-            2 packets transmitted, 0 received, 100% packet loss, time 1006ms
+--- 192.168.14.129 ping statistics ---
+2 packets transmitted, 0 received, 100% packet loss, time 1006ms
 
-            '''
-            )
+'''
