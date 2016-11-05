@@ -319,13 +319,18 @@ def ping(host, timeout=1):
     return -1
 
   
+# lookup IPs with https://www.iplocation.net/ 
 #TODO: ping("foobar.com.none")
 # degenerate case:
 ping("192.168.14.129")
 # successful case:
 ping("google.com")
 ping("localhost")
-ping("bbc.co.uk")
+ping("216.58.194.174")  # usa    google.com
+ping("212.58.244.22")   # europe bbc.co.uk
+ping("163.53.78.58")    # india  flipkart.com
+ping("111.13.101.208")  # china  baidu.cn
+ping("62.138.116.25")   # europe spiegel.de
 
 
 
