@@ -1,0 +1,67 @@
+====
+PING 192.168.14.129 (192.168.14.129) 4 times at 1s interval
+--- 192.168.14.129 ping statistics ---
+4 packets transmitted, 0 received, 100 % packet loss, time 8013ms
+====
+PING google.com (24.155.92.80) 4 times at 1s interval
+reply from google.com (24.155.92.80): icmp_seq=1 ttl=60 time=10.769 ms
+reply from google.com (24.155.92.80): icmp_seq=2 ttl=60 time=10.783 ms
+reply from google.com (24.155.92.80): icmp_seq=3 ttl=60 time=11.878 ms
+reply from google.com (24.155.92.80): icmp_seq=4 ttl=60 time=11.797 ms
+--- google.com ping statistics ---
+4 packets transmitted, 4 received, 0 % packet loss, time 4050ms
+rtt min/avg/max/mdev = 10.769/11.307/11.878/0.532 ms
+====
+PING localhost (127.0.0.1) 4 times at 1s interval
+reply from localhost (127.0.0.1): icmp_seq=1 ttl=64 time=0.302 ms
+reply from localhost (127.0.0.1): icmp_seq=2 ttl=64 time=0.293 ms
+reply from localhost (127.0.0.1): icmp_seq=3 ttl=64 time=0.551 ms
+reply from localhost (127.0.0.1): icmp_seq=4 ttl=64 time=0.403 ms
+--- localhost ping statistics ---
+4 packets transmitted, 4 received, 0 % packet loss, time 4007ms
+rtt min/avg/max/mdev = 0.293/0.387/0.551/0.104 ms
+====
+PING 216.58.194.174 (216.58.194.174) 4 times at 1s interval
+reply from 216.58.194.174 (216.58.194.174): icmp_seq=1 ttl=51 time=70.987 ms
+reply from 216.58.194.174 (216.58.194.174): icmp_seq=2 ttl=51 time=70.887 ms
+reply from 216.58.194.174 (216.58.194.174): icmp_seq=3 ttl=51 time=70.363 ms
+reply from 216.58.194.174 (216.58.194.174): icmp_seq=4 ttl=51 time=70.443 ms
+--- 216.58.194.174 ping statistics ---
+4 packets transmitted, 4 received, 0 % packet loss, time 4289ms
+rtt min/avg/max/mdev = 70.363/70.670/70.987/0.271 ms
+====
+PING 212.58.244.22 (212.58.244.22) 4 times at 1s interval
+reply from 212.58.244.22 (212.58.244.22): icmp_seq=1 ttl=45 time=116.275 ms
+reply from 212.58.244.22 (212.58.244.22): icmp_seq=2 ttl=45 time=116.345 ms
+reply from 212.58.244.22 (212.58.244.22): icmp_seq=3 ttl=45 time=116.072 ms
+reply from 212.58.244.22 (212.58.244.22): icmp_seq=4 ttl=45 time=116.974 ms
+--- 212.58.244.22 ping statistics ---
+4 packets transmitted, 4 received, 0 % packet loss, time 4471ms
+rtt min/avg/max/mdev = 116.072/116.417/116.974/0.337 ms
+====
+PING 163.53.78.58 (163.53.78.58) 4 times at 1s interval
+reply from 163.53.78.58 (163.53.78.58): icmp_seq=1 ttl=45 time=256.347 ms
+reply from 163.53.78.58 (163.53.78.58): icmp_seq=2 ttl=45 time=255.324 ms
+reply from 163.53.78.58 (163.53.78.58): icmp_seq=3 ttl=45 time=255.995 ms
+reply from 163.53.78.58 (163.53.78.58): icmp_seq=4 ttl=45 time=256.006 ms
+--- 163.53.78.58 ping statistics ---
+4 packets transmitted, 4 received, 0 % packet loss, time 5029ms
+rtt min/avg/max/mdev = 255.324/255.918/256.347/0.371 ms
+====
+PING 111.13.101.208 (111.13.101.208) 4 times at 1s interval
+reply from 111.13.101.208 (111.13.101.208): icmp_seq=1 ttl=38 time=535.705 ms
+reply from 111.13.101.208 (111.13.101.208): icmp_seq=2 ttl=38 time=533.515 ms
+reply from 111.13.101.208 (111.13.101.208): icmp_seq=3 ttl=38 time=517.117 ms
+reply from 111.13.101.208 (111.13.101.208): icmp_seq=4 ttl=38 time=525.682 ms
+--- 111.13.101.208 ping statistics ---
+4 packets transmitted, 4 received, 0 % packet loss, time 6118ms
+rtt min/avg/max/mdev = 517.117/528.005/535.705/7.307 ms
+====
+PING 62.138.116.25 (62.138.116.25) 4 times at 1s interval
+reply from 62.138.116.25 (62.138.116.25): icmp_seq=1 ttl=238 time=130.088 ms
+reply from 62.138.116.25 (62.138.116.25): icmp_seq=2 ttl=238 time=130.492 ms
+reply from 62.138.116.25 (62.138.116.25): icmp_seq=3 ttl=238 time=130.133 ms
+reply from 62.138.116.25 (62.138.116.25): icmp_seq=4 ttl=238 time=130.766 ms
+--- 62.138.116.25 ping statistics ---
+4 packets transmitted, 4 received, 0 % packet loss, time 4528ms
+rtt min/avg/max/mdev = 130.088/130.370/130.766/0.277 ms
