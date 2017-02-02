@@ -31,7 +31,7 @@ def bernoulli(**kwargs):
   #import ipdb;ipdb.set_trace()
 
   # plot
-  count, bins, ignored = plt.hist(rv_z_list, bins=30, normed=True)
+  count, bins, ignored = plt.hist(rv_z_list)
   plt.show()
 # end bernoulli
 
