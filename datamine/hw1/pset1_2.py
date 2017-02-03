@@ -40,16 +40,11 @@ seed=23
 np.random.seed(seed)
 
 # Check that for small n (say, 5-10) Zn does not look that much like a Gaussian,
-size = 10
-bernoulli(samplesize=size)
 #  but when n is bigger (already by the time n = 30 or 50) it looks much more like a Gaussian.
-size = 30
-bernoulli(samplesize=size)
 #  Check also for much bigger n: n = 250, to see that at this point, one can really see the bell curve.
-size = 250
-bernoulli(samplesize=size)
-size = 1000
-bernoulli(samplesize=size)
+trials = [5,7,10,30,50,100,250]
+for i in range(0,len(trials)):
+    bernoulli(samplesize=trials)
 
 # rejects
 
