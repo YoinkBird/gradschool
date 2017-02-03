@@ -89,21 +89,6 @@ def char_matrix_1():
 char_matrix_df = char_matrix_1()
 print(char_matrix_df)
 
-# b: 
-def permutation_thing(df):
-  for index, row in df.iterrows():
-    #print(index + "," + row)
-    print(list(row))
-    # permute row
-
-  # not sure how to permute the first col, so doing it wrong
-  set_keywords = set.union(S1,S2,S3)
-  for alphabet in np.random.permutation(list(set_keywords)):
-    print(alphabet)
-  return
-import ipdb;ipdb.set_trace();
-#permutation_thing(char_matrix_df)
-
 # create permutation
 # src: http://stackoverflow.com/a/13401681
 def permutate_rand(df):
@@ -112,6 +97,12 @@ def permutate_rand(df):
   permute = np.random.permutation(df.shape[0])
   df2 = df.take(permute)
   return df2
+
+# hash function
+# hash function of the form h(x) = a * x + b (mod 7)
+def hash_fn(x,a,b,modulo):
+  value = (a * x + b) % modulo
+  return value
 
 # permuate with hash
 # use the hash function: h(x) = 3x + 2 (mod 7).
@@ -123,7 +114,22 @@ def permutate_hash1(df):
   for i in range(0,df.shape[0]):
     value = (3 * i + 2) % df.shape[0]
     permute.append(value)
-  import ipdb;ipdb.set_trace();
+  df2 = df.take(permute)
+  return df2
+
+# permuate with hash
+# use the hash function: h(x) = ax + b (mod 7).
+# (d) Generate your own hash functions of the form h(x) = a * x + b (mod 7) by choosing a
+# and b at random from {0,1,...,6}. Doing this 20 times, estimate the Jaccard Similarity
+# of the three sets. How closely do you approximate the true values, computed in the previous exercise?
+def permutate_hash2_rand(df):
+  permute = []
+  for i in range(0,df.shape[0]):
+    rnd_a = np.random.randint(0,6)
+    rnd_b = np.random.randint(1,6)
+    value = hash_fn(i,rnd_a,rnd_b,df.shape[0])
+    permute.append(value)
+  #DEBUG print("# rand 0,6: " + str(permute))
   df2 = df.take(permute)
   return df2
 
@@ -135,8 +141,8 @@ def first_nonzero(needle,haystack):
 
 # compute the first non-zero element of each column (i.e., of each set), under the permutation.
 # i.e. return the row-index of the first non-zero element
+# src: pandas indexing - http://pandas.pydata.org/pandas-docs/stable/indexing.html
 def df_first_nonzero(df):
-  import ipdb;ipdb.set_trace();
   non_zero_mat={}
   # iterate over column series TODO: iterate directly using series 
   for ser_col in df.columns:
@@ -146,25 +152,48 @@ def df_first_nonzero(df):
     index = first_nonzero(1.0,vals)
     #non_zero_mat[ser.name] = df.index[index]
     # store name of col (the set) and look up the row name (df index)
+    # src: http://stackoverflow.com/questions/18327624/find-elements-index-in-pandas-series
     # TODO: use iterator, e.g. ser_col.name
     non_zero_mat[df[ser_col].name] = df[ser_col].index[index]
 
-  import ipdb;ipdb.set_trace();
   return non_zero_mat
 
 
 # print first occurence
+print("""
+# (b) For a random permutation of the seven alphabet elements, find a way to compute the
+first non-zero element of each column (i.e., of each set), under the permutation.
+""")
 df_rand = permutate_rand(char_matrix_df)
-print(df_first_nonzero(df_rand))
+first_nonzero_rand = df_first_nonzero(df_rand)
+print(df_rand)
+print(first_nonzero_rand)
 
 # first_nonzero_matrix={}
 # first_nonzero_matrix['rand'] = df_first_nonzero(df_rand)
 
+print("""
 # (c) Now do the same where instead of choosing a random permutation, you use the hash function: h(x) = 3x + 2 (mod 7).
+""")
 df_hash1 = permutate_hash1(char_matrix_df)
-print(df_first_nonzero(df_hash1))
+first_nonzero_hash1 = df_first_nonzero(df_hash1)
+print(df_hash1)
+print(first_nonzero_hash1)
   
     
+print("""
+# (d) Generate your own hash functions of the form h(x) = a * x + b (mod 7) by choosing a
+# and b at random from {0,1,...,6}. Doing this 20 times, estimate the Jaccard Similarity
+# of the three sets. How closely do you approximate the true values, computed in the previous exercise?
+""")
+for i in range(20):
+  df_hash2_rand = permutate_hash2_rand(char_matrix_df)
+  first_nonzero_hash2_rand = df_first_nonzero(df_hash2_rand)
+  jaccard_hash2rand_rand = jaccard(set(first_nonzero_rand.values()),set(first_nonzero_hash2_rand.values()))
+  jaccard_hash2rand_hash1 = jaccard(set(first_nonzero_hash1.values()),set(first_nonzero_hash2_rand.values()))
+  print("jaccard similarity for permutation hash_random+random:   " + str(jaccard_hash2rand_rand))
+  print("jaccard similarity for permutation hash_random+hash_det: " + str(jaccard_hash2rand_hash1))
+
 
 
 
