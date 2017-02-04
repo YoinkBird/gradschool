@@ -186,13 +186,15 @@ print("""
 # and b at random from {0,1,...,6}. Doing this 20 times, estimate the Jaccard Similarity
 # of the three sets. How closely do you approximate the true values, computed in the previous exercise?
 """)
-for i in range(20):
-  df_hash2_rand = permutate_hash2_rand(char_matrix_df)
-  first_nonzero_hash2_rand = df_first_nonzero(df_hash2_rand)
-  jaccard_hash2rand_rand = jaccard(set(first_nonzero_rand.values()),set(first_nonzero_hash2_rand.values()))
-  jaccard_hash2rand_hash1 = jaccard(set(first_nonzero_hash1.values()),set(first_nonzero_hash2_rand.values()))
-  print("jaccard similarity for permutation hash_random+random:   " + str(jaccard_hash2rand_rand))
-  print("jaccard similarity for permutation hash_random+hash_det: " + str(jaccard_hash2rand_hash1))
+def problem2():
+  for i in range(20):
+    df_hash2_rand = permutate_hash2_rand(char_matrix_df)
+    first_nonzero_hash2_rand = df_first_nonzero(df_hash2_rand)
+    jaccard_hash2rand_rand = jaccard(set(first_nonzero_rand.values()),set(first_nonzero_hash2_rand.values()))
+    jaccard_hash2rand_hash1 = jaccard(set(first_nonzero_hash1.values()),set(first_nonzero_hash2_rand.values()))
+    print("jaccard similarity for permutation hash_random+random:   " + str(jaccard_hash2rand_rand))
+    print("jaccard similarity for permutation hash_random+hash_det: " + str(jaccard_hash2rand_hash1))
+problem2()
 
 
 
@@ -206,13 +208,77 @@ implement the algorithm described in Chapter 3 of MMDS, for implementing Minhash
 """
 4. More MinHash: Shingling
 (a) Figure out how to load the 5 article excerpts in HW3articles-5.txt.
-1(b) Use stopwords from the natural language processing module nltk.corpus to strip the
-stopwords from the five articles.
+(b) Use stopwords from the natural language processing module nltk.corpus to strip the stopwords from the five articles.
 (c) Compute the k-shingles of the documents, for k = 2, where you shingle on words, not
 letters.
 (d) Compute the k-shingles of the documents, for k = 3, where you shingle on characters,
 not words.
 """
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
+
+
+import nltk
+# nltk.download('english')
+# nltk.download(\"stopwords\")
+stop = set(nltk.corpus.stopwords.words('english'))
+# (a) Figure out how to load the 5 article excerpts in HW3articles-5.txt.
+# TODO: super wrong, whatever who gives a crap
+data = pd.read_csv("files_pset3/HW3articles-5.txt",delimiter="\t")
+
+# verify
+
+
+# Use stopwords from the natural language processing module nltk.corpus to strip the
+# stopwords from the five articles.
+def strip_stopwords_nope(df):
+    df.apply(lambda x: [item for item in x if item not in stop], axis=0)
+    
+    return df
+
+word_list = []
+import ipdb;ipdb.set_trace();
+# stupid line is adding '...Name:4,dtype:object'
+for line in data.iterrows():
+  # print(line);
+  # src: http://stackoverflow.com/a/15057966
+  word_list += nltk.word_tokenize(str(line[1]))
+  # return(word_list)
+
+# strip stopwords
+def strip_stopwords(word_list):
+  small_list = []
+  for item in word_list:
+    if item not in stop:
+      small_list.append(item)
+  return(small_list)
+
+# shingling
+def shingle_words(tkn_list,k_len):
+  shingles = []
+  # range is exclusive limit
+  lim = (len(tkn_list) - k_len) + 1
+  for i in range( lim ):
+    shingles.append( tkn_list[i:i+k_len] )
+  return shingles
+
+import ipdb;ipdb.set_trace();
+# (b) Use stopwords from the natural language processing module nltk.corpus to strip the stopwords from the five articles.
+tkns = strip_stopwords(word_list)
+tkns_char_str = ''.join(tkns)
+# (c) Compute the k-shingles of the documents, for k = 2, where you shingle on words, not letters.
+word_shingles = shingle_words(tkns,2)
+# (d) Compute the k-shingles of the documents, for k = 3, where you shingle on characters, not words.
+char_shingles = shingle_words(tkns_char_str,3)
+
+# print("# data before")
+# print(data)
+# data2 = strip_stopwords_nope(data)
+# print("# data after")
+# print(data2)
+
 """
 5. Even More MinHash: Document Similarity
 (a) For each of the documents above, and for the shingles generated in both ways (words,
