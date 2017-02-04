@@ -190,8 +190,23 @@ def problem2():
   for i in range(20):
     df_hash2_rand = permutate_hash2_rand(char_matrix_df)
     first_nonzero_hash2_rand = df_first_nonzero(df_hash2_rand)
-    jaccard_hash2rand_rand = jaccard(set(first_nonzero_rand.values()),set(first_nonzero_hash2_rand.values()))
-    jaccard_hash2rand_hash1 = jaccard(set(first_nonzero_hash1.values()),set(first_nonzero_hash2_rand.values()))
+    # print("-I-: type for first_nonzero_hash2_rand: %s" % type(first_nonzero_hash2_rand))
+    tmpset_rand  = set(first_nonzero_rand.values())
+    tmpset_hash1 = set(first_nonzero_hash1.values())
+    ########################
+    # sometimes this fails
+    #*************************************
+    # Traceback (most recent call last):
+    # TypeError: unhashable type: 'numpy.ndarray'
+    #*************************************
+    try:
+      tmpset_hash2 = set(first_nonzero_hash2_rand.values())
+    except Exception:
+      print("-I-: something wrong")
+      return -1
+    # calculate jaccard of hash2 and rand, and hash2 and hash1
+    jaccard_hash2rand_rand = jaccard(tmpset_rand,tmpset_hash2)
+    jaccard_hash2rand_hash1 = jaccard(tmpset_hash1,tmpset_hash2)
     print("jaccard similarity for permutation hash_random+random:   " + str(jaccard_hash2rand_rand))
     print("jaccard similarity for permutation hash_random+hash_det: " + str(jaccard_hash2rand_hash1))
 problem2()
