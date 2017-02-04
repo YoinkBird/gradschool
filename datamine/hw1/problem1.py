@@ -122,11 +122,11 @@ def permutate_hash1(df):
 # (d) Generate your own hash functions of the form h(x) = a * x + b (mod 7) by choosing a
 # and b at random from {0,1,...,6}. Doing this 20 times, estimate the Jaccard Similarity
 # of the three sets. How closely do you approximate the true values, computed in the previous exercise?
-def permutate_hash2_rand(df):
+def permutate_hash2_rand(df,randint_range):
   permute = []
   for i in range(0,df.shape[0]):
-    rnd_a = np.random.randint(0,6)
-    rnd_b = np.random.randint(1,6)
+    rnd_a = np.random.randint(0,randint_range)
+    rnd_b = np.random.randint(1,randint_range)
     value = hash_fn(i,rnd_a,rnd_b,df.shape[0])
     permute.append(value)
   #DEBUG print("# rand 0,6: " + str(permute))
@@ -188,7 +188,7 @@ print("""
 """)
 def problem2():
   for i in range(20):
-    df_hash2_rand = permutate_hash2_rand(char_matrix_df)
+    df_hash2_rand = permutate_hash2_rand(char_matrix_df, 6)
     first_nonzero_hash2_rand = df_first_nonzero(df_hash2_rand)
     # print("-I-: type for first_nonzero_hash2_rand: %s" % type(first_nonzero_hash2_rand))
     tmpset_rand  = set(first_nonzero_rand.values())
