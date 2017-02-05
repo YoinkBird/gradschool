@@ -145,9 +145,41 @@ def permutate_hash2_rand(df,randint_range,**kwargs):
     value = hash_fn(i,rnd_a,rnd_b,modulo)
     permute.append(value)
   #DEBUG print("# rand 0,6: " + str(permute))
+  # TODO: set 'df2' on permute
+  # df2.index=permute
   df2 = df.take(permute)
   return df2
 
+# inputs: char_matrix_df: characteristic matrix, hash range for random values: randint_range,
+def calculate_minhash_sig_matrix__df(char_matrix__df, num_hash_fn, randint_range,**kwargs):
+  # for problem 5
+  modulo = char_matrix__df.shape[0]
+  if("modulo" in kwargs):
+    modulo = kwargs["modulo"]
+  minhash_sig_matrix__df = DataFrame(columns=char_matrix_df.columns)
+  for i in range(num_hash_fn):
+    # get signature matrix
+    df_hash2_rand = permutate_hash2_rand(char_matrix_df, 6)
+    # calculate hash signatures
+    first_nonzero_hash2_rand = first_nonzero_df_dict(df_hash2_rand)
+    #  PANDAS
+    #  src: http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.append.html
+    #  parent 'df' stays empty no matter what
+    # convert dict to pd Series to add to the dataframe
+    hash_i_pdseries = Series(first_nonzero_hash2_rand, name=i)
+    ### could also create dataframe
+    ### hash_i_df = DataFrame(first_nonzero_hash2_rand, index=[i])
+    # add Series to dataframe
+    minhash_sig_matrix__df = minhash_sig_matrix__df.append(hash_i_pdseries)
+    ### could also add DataFrame to DataFrame
+    ### minhash_sig_matrix__df = minhash_sig_matrix__df.append(hash_i_df)
+  return minhash_sig_matrix__df
+
+# MMDS CH3 page 84
+# However, if c has 1 in row r, then for each i = 1, 2, . . . , n
+#   set SIG(i, c) to the smaller of the current value of SIG(i, c) and h_i(r).
+# i.e. if at r,c there is a 1, compute h_i(r)
+# if h_i(r) < SIG(i,c): SIG(i,c) = h_i(r)
 def first_nonzero(needle,haystack):
   # get first occurence
   for index in range(0,len(haystack)):
@@ -328,17 +360,20 @@ char_shingles = shingle_words(tkns_char_str,3)
 """
 5. Even More MinHash: Document Similarity
 (a) For each of the documents above, and for the shingles generated in both ways (words,
-characters), generate MinHash signatures using 30 hash functions. As above, each hash
-function takes the form h(x) = ax+b(mod p). As explained in the book, it is important
-to choose p to be a prime number. Thus, set p = 4;294;967;311, which is a prime number
-larger than 232-1 (and thus sufficiently large for our purposes). Uniformly sample n = 30
-values of (a; b) 2 f0;1;2; : : : ; p-1g and compute the corresponding MinHash signatures.
-Note that to do this, multiplication has to be defined. You will therefore need to map
-each of the k-shingles to integers. One way to do this is, for example, using the CRC32
-hash.
-(b) Which of the five documents is most similar to the first (t121)? And which worked
-better: shingling words or characters?
+characters), generate MinHash signatures using 30 hash functions.
+As above, each hash function takes the form h(x) = ax+b(mod p).
+As explained in the book, it is important to choose p to be a prime number.
+Thus, set p = 4;294;967;311, which is a prime number larger than 232-1 (and thus sufficiently large for our purposes).
+Uniformly sample n = 30 values of (a, b) element {0;1;2;...; p-1} and compute the corresponding MinHash signatures.
+Note that to do this, multiplication has to be defined.
+You will therefore need to map each of the k-shingles to integers.
+One way to do this is, for example, using the CRC32 hash.
+(b) Which of the five documents is most similar to the first (t121)?
+And which worked better: shingling words or characters?
 """
+# about "Note that to do this, multiplication has to be defined."
+# previous examples used the size as the modulo, so the 'x' was simply the loop index
+# in this example, it could be any value from the large primes
 """
 6. (Bonus) LSH. So far, we have only been exploring comparisons between very few documents.
 What if we wish to compare a very large number of documents? In particular, suppose we
