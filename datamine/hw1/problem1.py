@@ -415,8 +415,28 @@ import nltk
 stop = set(nltk.corpus.stopwords.words('english'))
 # (a) Figure out how to load the 5 article excerpts in HW3articles-5.txt.
 # TODO: super wrong, whatever who gives a crap
-data = pd.read_csv("files_pset3/HW3articles-5.txt",delimiter="\t")
+file_path_rel = "files_pset3/HW3articles-5.txt"
+data = pd.read_csv(file_path_rel,delimiter="\t")
 
+# Create dict with the docs in it
+import re
+docs_dict = {}
+readme = open(file_path_rel, "r")
+# split into 't\d+' and sentence
+for myrow in readme:
+  # returns list of three with first item uninit, see:
+  # https://docs.python.org/2/library/re.html#re.split
+  # solution: http://stackoverflow.com/a/25714061 : list.pop(0)
+  rex = re.split('(^t\d+)\s+',myrow)
+  indx=1
+  # TODO: error handling
+  if(rex[indx] not in docs_dict):
+    docs_dict[rex[indx]] = rex[indx+1]
+  else:
+    print("-E-: %s already in docs_dict!" % rex[indx])
+    continue
+  print(myrow)
+readme.close()
 # verify
 
 
@@ -427,14 +447,20 @@ def strip_stopwords_nope(df):
     
     return df
 
+# TOKENIZE - generate one giant list
 word_list = []
 #import ipdb;ipdb.set_trace();
-# stupid line is adding '...Name:4,dtype:object'
 for line in data.iterrows():
   # print(line);
   # src: http://stackoverflow.com/a/15057966
-  word_list += nltk.word_tokenize(str(line[1]))
+  # Note: 'line' is tuple of (<index>,<series object>), need to get the 0'th value
+  word_list += nltk.word_tokenize(str(line[1].values[0]))
   # return(word_list)
+
+# TOKENIZE - in-place, per document
+for doc in docs_dict:
+  stripped_doc = nltk.word_tokenize(docs_dict[doc])
+  docs_dict[doc] = stripped_doc
 
 # strip stopwords
 def strip_stopwords(word_list):
@@ -479,8 +505,8 @@ if(probprint_dict[4]):
 
 """
 5. Even More MinHash: Document Similarity
-(a) For each of the documents above, and for the shingles generated in both ways (words,
-characters), generate MinHash signatures using 30 hash functions.
+(a) For each of the documents above, and for the shingles generated in both ways (words, characters),
+generate MinHash signatures using 30 hash functions.
 As above, each hash function takes the form h(x) = ax+b(mod p).
 As explained in the book, it is important to choose p to be a prime number.
 Thus, set p = 4;294;967;311, which is a prime number larger than 232-1 (and thus sufficiently large for our purposes).
