@@ -107,13 +107,20 @@ def hash_fn(x,a,b,modulo):
 # permuate with hash
 # use the hash function: h(x) = 3x + 2 (mod 7).
 # src: http://stackoverflow.com/a/13401681
-def permutate_hash1(df):
+def permutate_hash1_fixed(df):
   # (b) For a random permutation of the seven alphabet elements, find a way to compute the
   # number of rows = df.shape[0]
+  # (c) Now do the same where instead of choosing a random permutation, you use the hash function: h(x) = 3x + 2 (mod 7).
   permute = []
+  rnd_a = 3
+  rnd_b = 2
   for i in range(0,df.shape[0]):
-    value = (3 * i + 2) % df.shape[0]
+    # value = (3 * i + 2) % df.shape[0]
+    value = hash_fn(i,rnd_a,rnd_b,df.shape[0])
     permute.append(value)
+  # src http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.take.html
+  #     https://docs.scipy.org/doc/numpy/reference/generated/numpy.take.html
+  # Take elements from an array along an axis.
   df2 = df.take(permute)
   return df2
 
@@ -142,7 +149,7 @@ def first_nonzero(needle,haystack):
 # compute the first non-zero element of each column (i.e., of each set), under the permutation.
 # i.e. return the row-index of the first non-zero element
 # src: pandas indexing - http://pandas.pydata.org/pandas-docs/stable/indexing.html
-def df_first_nonzero(df):
+def first_nonzero_df_dict(df):
   non_zero_mat={}
   # iterate over column series TODO: iterate directly using series 
   for ser_col in df.columns:
@@ -165,18 +172,18 @@ print("""
 first non-zero element of each column (i.e., of each set), under the permutation.
 """)
 df_rand = permutate_rand(char_matrix_df)
-first_nonzero_rand = df_first_nonzero(df_rand)
+first_nonzero_rand = first_nonzero_df_dict(df_rand)
 print(df_rand)
 print(first_nonzero_rand)
 
 # first_nonzero_matrix={}
-# first_nonzero_matrix['rand'] = df_first_nonzero(df_rand)
+# first_nonzero_matrix['rand'] = first_nonzero_df_dict(df_rand)
 
 print("""
 # (c) Now do the same where instead of choosing a random permutation, you use the hash function: h(x) = 3x + 2 (mod 7).
 """)
-df_hash1 = permutate_hash1(char_matrix_df)
-first_nonzero_hash1 = df_first_nonzero(df_hash1)
+df_hash1 = permutate_hash1_fixed(char_matrix_df)
+first_nonzero_hash1 = first_nonzero_df_dict(df_hash1)
 print(df_hash1)
 print(first_nonzero_hash1)
   
@@ -189,7 +196,7 @@ print("""
 def problem2():
   for i in range(20):
     df_hash2_rand = permutate_hash2_rand(char_matrix_df, 6)
-    first_nonzero_hash2_rand = df_first_nonzero(df_hash2_rand)
+    first_nonzero_hash2_rand = first_nonzero_df_dict(df_hash2_rand)
     # print("-I-: type for first_nonzero_hash2_rand: %s" % type(first_nonzero_hash2_rand))
     tmpset_rand  = set(first_nonzero_rand.values())
     tmpset_hash1 = set(first_nonzero_hash1.values())
@@ -254,7 +261,7 @@ def strip_stopwords_nope(df):
     return df
 
 word_list = []
-import ipdb;ipdb.set_trace();
+#import ipdb;ipdb.set_trace();
 # stupid line is adding '...Name:4,dtype:object'
 for line in data.iterrows():
   # print(line);
@@ -279,7 +286,7 @@ def shingle_words(tkn_list,k_len):
     shingles.append( tkn_list[i:i+k_len] )
   return shingles
 
-import ipdb;ipdb.set_trace();
+#import ipdb;ipdb.set_trace();
 # (b) Use stopwords from the natural language processing module nltk.corpus to strip the stopwords from the five articles.
 tkns = strip_stopwords(word_list)
 tkns_char_str = ''.join(tkns)
