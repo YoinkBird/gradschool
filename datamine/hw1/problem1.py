@@ -269,7 +269,7 @@ def problem2():
     S2_S3_err = 100 * (jaccard_dict['S2_S3'] / prob1_jaccard_dict['S2_S3'])
 
     # print results
-    print("#%02s\t%02.2f (%d%%)\t%02.2f (%d%%)\t%02.2f (%d%%)" % (i, jaccard_dict['S1_S2'], S1_S2_err, jaccard_dict['S1_S3'], S1_S3_err, jaccard_dict['S2_S3'], S2_S3_err))
+    print("#%02s\t%02.2f [%3d%%]\t%02.2f [%3d%%]\t%02.2f [%3d%%]" % (i, jaccard_dict['S1_S2'], S1_S2_err, jaccard_dict['S1_S3'], S1_S3_err, jaccard_dict['S2_S3'], S2_S3_err))
 
 
   return
