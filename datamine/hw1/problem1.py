@@ -36,13 +36,16 @@ def jaccard_calibrate():
   print(jaccard(S1a,S1b) == float(3/8))
 
 def problem1():
-  print(jaccard(S1,S2))
-  print(jaccard(S1,S3))
-  print(jaccard(S2,S3))
+  prob1_jaccard_dict = {}
+  prob1_jaccard_dict['S1_S2'] = jaccard(S1,S2)
+  prob1_jaccard_dict['S1_S3'] = jaccard(S1,S3)
+  prob1_jaccard_dict['S2_S3'] = jaccard(S2,S3)
+  print(prob1_jaccard_dict)
+  return prob1_jaccard_dict
 
 
 jaccard_calibrate()
-problem1()
+prob1_jaccard_dict = problem1()
 
 """
 2. Minhash
@@ -130,6 +133,7 @@ def permutate_hash1_fixed(df):
 # and b at random from {0,1,...,6}. Doing this 20 times, estimate the Jaccard Similarity
 # of the three sets. How closely do you approximate the true values, computed in the previous exercise?
 # params: df: dataframe, randint_range: range for generating integers, modulo: moduloe for hash function
+# PURPOSE: permutate hash as input for computation of minhash signature
 def permutate_hash2_rand(df,randint_range,**kwargs):
   permute = []
   modulo = df.shape[0]
@@ -198,30 +202,46 @@ print("""
 # of the three sets. How closely do you approximate the true values, computed in the previous exercise?
 """)
 def problem2():
+  print("jaccard similarity for 20 random hash functions")
+  print("hash fn\tS1,S2\tS1,S3\tS2,S3")
+  print("#true\t%02.2f (fit)\t%02.2f (fit)\t%02.2f (fit)" % (prob1_jaccard_dict['S1_S2'], prob1_jaccard_dict['S1_S3'],prob1_jaccard_dict['S2_S3']))
+  print("---------------------------")
   for i in range(20):
+    # get minhashed values
     df_hash2_rand = permutate_hash2_rand(char_matrix_df, 6)
-    first_nonzero_hash2_rand = first_nonzero_df_dict(df_hash2_rand)
-    # print("-I-: type for first_nonzero_hash2_rand: %s" % type(first_nonzero_hash2_rand))
-    tmpset_rand  = set(first_nonzero_rand.values())
-    tmpset_hash1 = set(first_nonzero_hash1.values())
-    ########################
-    # sometimes this fails
-    #*************************************
-    # Traceback (most recent call last):
-    # TypeError: unhashable type: 'numpy.ndarray'
-    #*************************************
-    try:
-      tmpset_hash2 = set(first_nonzero_hash2_rand.values())
-    except Exception:
-      print("-I-: something wrong")
-      return -1
-    # calculate jaccard of hash2 and rand, and hash2 and hash1
-    jaccard_hash2rand_rand = jaccard(tmpset_rand,tmpset_hash2)
-    jaccard_hash2rand_hash1 = jaccard(tmpset_hash1,tmpset_hash2)
-    print("jaccard similarity for permutation hash_random+random:   " + str(jaccard_hash2rand_rand))
-    print("jaccard similarity for permutation hash_random+hash_det: " + str(jaccard_hash2rand_hash1))
-problem2()
+    # TODO: convert to function
+    # convert to sets
+    set_mat = {}
+    for set_name in df_hash2_rand.columns:
+      # get key-value
+      hash2_rand_dict = df_hash2_rand[set_name].to_dict()
+      # correlate key with entry, i.e. convert series to set
+      tmpset = set()
+      for key in hash2_rand_dict:
+        if hash2_rand_dict[key] >= 1.0:
+          tmpset.add(key)
+      set_mat[set_name] = tmpset
 
+    # calculate jaccard
+    jaccard_dict = {}
+    jaccard_dict['S1_S2'] = jaccard( set_mat['S1'],set_mat['S2'])
+    jaccard_dict['S1_S3'] = jaccard( set_mat['S1'],set_mat['S3'])
+    jaccard_dict['S2_S3'] = jaccard( set_mat['S2'],set_mat['S3'])
+    # weird - calculate percent difference to true values
+    # S1_S2_err = 100 * (abs(prob1_jaccard_dict['S1_S2'] - jaccard_dict['S1_S2']) / prob1_jaccard_dict['S1_S2'])
+    # S1_S3_err = 100 * (abs(prob1_jaccard_dict['S1_S3'] - jaccard_dict['S1_S3']) / prob1_jaccard_dict['S1_S3'])
+    # S2_S3_err = 100 * (abs(prob1_jaccard_dict['S2_S3'] - jaccard_dict['S2_S3']) / prob1_jaccard_dict['S2_S3'])
+    # simple percentage
+    S1_S2_err = 100 * (jaccard_dict['S1_S2'] / prob1_jaccard_dict['S1_S2'])
+    S1_S3_err = 100 * (jaccard_dict['S1_S3'] / prob1_jaccard_dict['S1_S3'])
+    S2_S3_err = 100 * (jaccard_dict['S2_S3'] / prob1_jaccard_dict['S2_S3'])
+
+    # print results
+    print("#%02s\t%02.2f (%d%%)\t%02.2f (%d%%)\t%02.2f (%d%%)" % (i, jaccard_dict['S1_S2'], S1_S2_err, jaccard_dict['S1_S3'], S1_S3_err, jaccard_dict['S2_S3'], S2_S3_err))
+
+
+  return
+problem2()
 
 
 
