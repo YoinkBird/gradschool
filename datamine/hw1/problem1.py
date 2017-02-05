@@ -3,11 +3,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pandas import *
 
+probprint_dict = {}
+probprint_dict[1] = 0
+probprint_dict[2] = 0
+probprint_dict[3] = 0
+probprint_dict[4] = 1
+probprint_dict[5] = 0
+
 """
 1. Jaccard Similarity. Compute the Jaccard Similarity of the three sets S1 = {'nike',
 'running', 'shoe'}, S2 = {'nike', 'black', 'running', 'shoe'}, and S3 = {'nike',
 'blue', 'jacket', 'adidas'}, using the intersection and union of lists in Python.
 """
+print(" 1. Jaccard Similarity. Compute the Jaccard Similarity of the three sets S1,S2,S3")
 # list
 S1 = {'nike', 'running', 'shoe'}
 S2 = {'nike', 'black', 'running', 'shoe'}
@@ -40,12 +48,13 @@ def problem1():
   prob1_jaccard_dict['S1_S2'] = jaccard(S1,S2)
   prob1_jaccard_dict['S1_S3'] = jaccard(S1,S3)
   prob1_jaccard_dict['S2_S3'] = jaccard(S2,S3)
-  print(prob1_jaccard_dict)
   return prob1_jaccard_dict
 
 
-jaccard_calibrate()
 prob1_jaccard_dict = problem1()
+if(probprint_dict[1]):
+  jaccard_calibrate()
+  print(prob1_jaccard_dict)
 
 """
 2. Minhash
@@ -58,6 +67,7 @@ first non-zero element of each column (i.e., of each set), under the permutation
 and b at random from {0,1,...,6}. Doing this 20 times, estimate the Jaccard Similarity
 of the three sets. How closely do you approximate the true values, computed in the previous exercise?
 """
+print("2. Minhash")
 
 ## convert sets to dict and add missing values
 # dict : https://docs.python.org/2/library/stdtypes.html#dict
@@ -90,7 +100,8 @@ def char_matrix_1():
 
 # a: characteristic matrix
 char_matrix_df = char_matrix_1()
-print(char_matrix_df)
+if(probprint_dict[2]):
+  print(char_matrix_df)
 
 # create permutation
 # src: http://stackoverflow.com/a/13401681
@@ -220,28 +231,33 @@ def first_nonzero_df_dict(df):
 
 
 # print first occurence
-print("""
+if(probprint_dict[2]):
+  print("""
 # (b) For a random permutation of the seven alphabet elements, find a way to compute the
 first non-zero element of each column (i.e., of each set), under the permutation.
 """)
 df_rand = permutate_rand(char_matrix_df)
 first_nonzero_rand = first_nonzero_df_dict(df_rand)
-print(df_rand)
-print(first_nonzero_rand)
+if(probprint_dict[2]):
+  print(df_rand)
+  print(first_nonzero_rand)
 
 # first_nonzero_matrix={}
 # first_nonzero_matrix['rand'] = first_nonzero_df_dict(df_rand)
 
-print("""
+if(probprint_dict[2]):
+  print("""
 # (c) Now do the same where instead of choosing a random permutation, you use the hash function: h(x) = 3x + 2 (mod 7).
 """)
 df_hash1 = permutate_hash1_fixed(char_matrix_df)
 first_nonzero_hash1 = first_nonzero_df_dict(df_hash1)
-print(df_hash1)
-print(first_nonzero_hash1)
+if(probprint_dict[2]):
+  print(df_hash1)
+  print(first_nonzero_hash1)
   
     
-print("""
+if(probprint_dict[2]):
+  print("""
 # (d) Generate your own hash functions of the form h(x) = a * x + b (mod 7) by choosing a
 # and b at random from {0,1,...,6}. Doing this 20 times, estimate the Jaccard Similarity
 # of the three sets. How closely do you approximate the true values, computed in the previous exercise?
@@ -286,7 +302,8 @@ def problem2():
 
 
   return
-problem2()
+if(probprint_dict[2]):
+  problem2()
 
 
 
@@ -374,7 +391,8 @@ def problem3():
   minhash_sig_matrix__df = calculate_minhash_sig_matrix__df(char_matrix_df,numhashes,randvals)
   print(minhash_sig_matrix__df)
   return
-problem3()
+if(probprint_dict[3]):
+  problem3()
 """
 4. More MinHash: Shingling
 (a) Figure out how to load the 5 article excerpts in HW3articles-5.txt.
@@ -384,6 +402,7 @@ letters.
 (d) Compute the k-shingles of the documents, for k = 3, where you shingle on characters,
 not words.
 """
+print("4. More MinHash: Shingling")
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -435,13 +454,22 @@ def shingle_words(tkn_list,k_len):
   return shingles
 
 #import ipdb;ipdb.set_trace();
-# (b) Use stopwords from the natural language processing module nltk.corpus to strip the stopwords from the five articles.
-tkns = strip_stopwords(word_list)
-tkns_char_str = ''.join(tkns)
-# (c) Compute the k-shingles of the documents, for k = 2, where you shingle on words, not letters.
-word_shingles = shingle_words(tkns,2)
-# (d) Compute the k-shingles of the documents, for k = 3, where you shingle on characters, not words.
-char_shingles = shingle_words(tkns_char_str,3)
+if(probprint_dict[4]):
+  print("# (b) Use stopwords from the natural language processing module nltk.corpus to strip the stopwords from the five articles.")
+  print("before: %d" % len(word_list))
+  tkns = strip_stopwords(word_list)
+  tkns_char_str = ''.join(tkns)
+  print("after: %d" % len(tkns))
+  print(tkns_char_str[-1])
+  print("# (c) Compute the k-shingles of the documents, for k = 2, where you shingle on words, not letters.")
+  word_shingles = shingle_words(tkns,2)
+  print(len(word_shingles))
+  print(word_shingles[-1])
+  print("# (d) Compute the k-shingles of the documents, for k = 3, where you shingle on characters, not words.")
+  char_shingles = shingle_words(tkns_char_str,3)
+  print(len(char_shingles))
+  print(char_shingles[-1])
+
 
 # print("# data before")
 # print(data)
