@@ -139,7 +139,7 @@ def permutate_hash2_rand(df,randint_range,**kwargs):
   modulo = df.shape[0]
   if("modulo" in kwargs):
     modulo = kwargs["modulo"]
-  for i in range(0,modulo):
+  for i in range(0,df.shape[0]):
     rnd_a = np.random.randint(0,randint_range)
     rnd_b = np.random.randint(1,randint_range)
     value = hash_fn(i,rnd_a,rnd_b,modulo)
