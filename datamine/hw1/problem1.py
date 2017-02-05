@@ -144,10 +144,10 @@ def permutate_hash2_rand(df,randint_range,**kwargs):
     rnd_b = np.random.randint(1,randint_range)
     value = hash_fn(i,rnd_a,rnd_b,modulo)
     permute.append(value)
-  #DEBUG print("# rand 0,6: " + str(permute))
+
+  df2 = DataFrame(df.take(permute))
   # TODO: set 'df2' on permute
   # df2.index=permute
-  df2 = df.take(permute)
   return df2
 
 # inputs: char_matrix_df: characteristic matrix, hash range for random values: randint_range,
