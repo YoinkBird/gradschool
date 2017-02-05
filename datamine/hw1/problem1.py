@@ -103,8 +103,20 @@ def permutate_rand(df):
 
 # hash function
 # hash function of the form h(x) = a * x + b (mod 7)
+dbprint_dict = {}
+dbprint_dict['hash_fn'] = 0
 def hash_fn(x,a,b,modulo):
+  if(dbprint_dict['hash_fn']):
+    print("(%d * %d + %d) %% %d)" % (a, x, b, modulo))
   value = (a * x + b) % modulo
+  return value
+
+# compute one random hash value
+# intended to return the hash value used to generate one row of sig matrix
+def randhash_fn(x_val, randint_range,modulo,**kwargs):
+  rnd_a = np.random.randint(0,randint_range)
+  rnd_b = np.random.randint(1,randint_range)
+  value = hash_fn(x_val,rnd_a,rnd_b,modulo)
   return value
 
 # permuate with hash
@@ -145,13 +157,14 @@ def permutate_hash2_rand(df,randint_range,**kwargs):
     value = hash_fn(i,rnd_a,rnd_b,modulo)
     permute.append(value)
 
-  df2 = DataFrame(df.take(permute))
+  df2 = DataFrame()
+  df2 = df.take(permute)
   # TODO: set 'df2' on permute
   # df2.index=permute
   return df2
 
 # inputs: char_matrix_df: characteristic matrix, hash range for random values: randint_range,
-def calculate_minhash_sig_matrix__df(char_matrix__df, num_hash_fn, randint_range,**kwargs):
+def calculate_minhash_sig_matrix_permute__df(char_matrix__df, num_hash_fn, randint_range,**kwargs):
   # for problem 5
   modulo = char_matrix__df.shape[0]
   if("modulo" in kwargs):
@@ -163,13 +176,13 @@ def calculate_minhash_sig_matrix__df(char_matrix__df, num_hash_fn, randint_range
     # calculate hash signatures
     first_nonzero_hash2_rand = first_nonzero_df_dict(df_hash2_rand)
     #  PANDAS
-    #  src: http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.append.html
-    #  parent 'df' stays empty no matter what
     # convert dict to pd Series to add to the dataframe
     hash_i_pdseries = Series(first_nonzero_hash2_rand, name=i)
     ### could also create dataframe
     ### hash_i_df = DataFrame(first_nonzero_hash2_rand, index=[i])
     # add Series to dataframe
+    #  src: http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.append.html
+    #  have to re-assign each time or else parent 'df' stays empty
     minhash_sig_matrix__df = minhash_sig_matrix__df.append(hash_i_pdseries)
     ### could also add DataFrame to DataFrame
     ### minhash_sig_matrix__df = minhash_sig_matrix__df.append(hash_i_df)
@@ -283,6 +296,85 @@ problem2()
 Repeat the above exercise where instead of permuting the entire characteristic matrix, you
 implement the algorithm described in Chapter 3 of MMDS, for implementing Minhash.
 """
+"""
+1. generate matrix of signatures
+2. process matrix of signatures
+"""
+print("3. Implementing Minhash")
+
+# compute one minhash signature for a characteristic matrix
+# return values for one "row" for the signature matrix
+def calculate_mh_sig__df_dict(df,randint_range,**kwargs):
+  permute = []
+  modulo = df.shape[0]
+  if("modulo" in kwargs):
+    modulo = kwargs["modulo"]
+  for i in range(0,df.shape[0]):
+    rnd_a = np.random.randint(0,randint_range)
+    rnd_b = np.random.randint(1,randint_range)
+    value = hash_fn(i,rnd_a,rnd_b,modulo)
+    permute.append(value)
+
+  df2 = DataFrame()
+  df2 = df.take(permute)
+  # TODO: set 'df2' on permute
+  # df2.index=permute
+  return df2
+# MMDS CH3 page 84
+# However, if c has 1 in row r, then for each i = 1, 2, . . . , n
+#   set SIG(i, c) to the smaller of the current value of SIG(i, c) and h_i(r).
+# i.e. if at r,c there is a 1, compute h_i(r)
+# if h_i(r) < SIG(i,c): SIG(i,c) = h_i(r)
+import math
+def calculate_minhash_sig_matrix__df(char_matrix__df, numhashes, randint_range,**kwargs):
+  # dbprint_dict['hash_fn'] = 1
+  modulo = char_matrix__df.shape[0]
+  if("modulo" in kwargs):
+    modulo = kwargs["modulo"]
+  # init sighash as NaN (equivalent to infinity)
+  # needs one row per hash function, and one column per set from the characteristic matrix
+  sighash = DataFrame(index=range(numhashes),columns=char_matrix__df.columns)
+  # generate n hash functions
+  hashvalues = {}
+  for i in range(numhashes):
+    ## print("#hash number: %d" % i)
+    printflag = 0
+    # get random parameters
+    rnd_a = np.random.randint(0,randint_range)
+    rnd_b = np.random.randint(1,randint_range)
+    # loop through characteristic matrix one row at a time
+    for rownum,row in char_matrix__df.iterrows():
+      # rownum may need conversion from string to int
+      # TODO: this may need to be CRC23'd later
+      rownum = char_matrix__df.index.get_loc(rownum)
+      ## print("#rownum: %d" % rownum)
+      # compute hash value of current row
+      # error: different hash function for each row, not good!
+      cur_hash_val = hash_fn(rownum, rnd_a, rnd_b, modulo)
+      # loop each row of characteristic matrix
+      for colname in row.index:
+        # if characteristic matrix value == 1
+        if(row[colname] == 1):
+        #if( sighash.ix[i][colname] == 1 or (math.isnan(sighash.ix[i][colname])) ):
+          # if hash value of current row,col smaller than value at sighash of i'th hash-row and col
+          # i.e. set the sighash to the smallest value
+          if(cur_hash_val < sighash.ix[i][colname] or (math.isnan(sighash.ix[i][colname])) ):
+            sighash.ix[i][colname] = int(cur_hash_val) # int() just to be safe
+            # print("new hash smaller")
+        else:
+          if(0 and printflag):
+            print("skipping %d" % row[colname])
+    if(printflag):
+      print(sighash)
+  # dbprint_dict['hash_fn'] = 0
+  return sighash
+def problem3():
+  numhashes = 20
+  randvals = 6
+  minhash_sig_matrix__df = calculate_minhash_sig_matrix__df(char_matrix_df,numhashes,randvals)
+  print(minhash_sig_matrix__df)
+  return
+problem3()
 """
 4. More MinHash: Shingling
 (a) Figure out how to load the 5 article excerpts in HW3articles-5.txt.
