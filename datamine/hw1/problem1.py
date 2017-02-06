@@ -436,7 +436,6 @@ for myrow in readme:
   else:
     print("-E-: %s already in docs_dict!" % rex[indx])
     continue
-  print(myrow)
 readme.close()
 # verify
 
@@ -502,11 +501,11 @@ def calculate_char_matrix_docs_dict(docs_dict,shingletype):
   # create new hash as combination of all sets
   # then import hash into pandas
   for doc in docs_dict.keys():
-    matrix_dict[doc] = dict.fromkeys(docs_dict[doc][shingletype])
+    matrix_dict[doc] = dict.fromkeys(docs_dict[doc][shingletype],1)
   # src: http://stackoverflow.com/a/10628728
   df = DataFrame(matrix_dict).T.fillna(0).transpose()
-  print()
   return df
+
 #import ipdb;ipdb.set_trace();
 if(probprint_dict[4]):
   # TODO: convert this to be per-document, i.e. just use docs_dict instead
@@ -587,9 +586,9 @@ def problem5():
   randvals = modulo-1
   char_matrix_docs = calculate_char_matrix_docs_dict(docs_dict, 'shingle_words')
   # works with the original set
-  minhash_sig_matrix__df = calculate_minhash_sig_matrix__df(char_matrix_df,numhashes,randvals, modulo=modulo)
+  # minhash_sig_matrix__df = calculate_minhash_sig_matrix__df(char_matrix_df,numhashes,randvals, modulo=modulo)
   # try with docs
-  # all NaN minhash_sig_matrix__df = calculate_minhash_sig_matrix__df(char_matrix_docs,numhashes,randvals, modulo=modulo)
+  minhash_sig_matrix__df = calculate_minhash_sig_matrix__df(char_matrix_docs,numhashes,randvals, modulo=modulo)
   print(minhash_sig_matrix__df)
   return
 
