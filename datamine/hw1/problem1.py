@@ -459,8 +459,8 @@ for line in data.iterrows():
 
 # TOKENIZE - in-place, per document
 for doc in docs_dict:
-  stripped_doc = nltk.word_tokenize(docs_dict[doc])
-  docs_dict[doc] = stripped_doc
+  tokens = nltk.word_tokenize(docs_dict[doc])
+  docs_dict[doc] = tokens
 
 # strip stopwords
 def strip_stopwords(word_list):
