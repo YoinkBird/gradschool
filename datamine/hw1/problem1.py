@@ -8,7 +8,7 @@ probprint_dict[1] = 0
 probprint_dict[2] = 0
 probprint_dict[3] = 0
 probprint_dict[4] = 1
-probprint_dict[5] = 0
+probprint_dict[5] = 1 # relies on '4'
 
 """
 1. Jaccard Similarity. Compute the Jaccard Similarity of the three sets S1 = {'nike',
@@ -80,7 +80,7 @@ def dict_from_set(keywords,set_s):
     set_dict.setdefault(word,0)
   return set_dict
 
-# create char matrix from sets
+# create characteristic matrix from sets
 def char_matrix_1():
   # set of all keywords
   set_keywords = set.union(S1,S2,S3)
@@ -183,7 +183,7 @@ def calculate_minhash_sig_matrix_permute__df(char_matrix__df, num_hash_fn, randi
   minhash_sig_matrix__df = DataFrame(columns=char_matrix_df.columns)
   for i in range(num_hash_fn):
     # get signature matrix
-    df_hash2_rand = permutate_hash2_rand(char_matrix_df, 6)
+    df_hash2_rand = permutate_hash2_rand(char_matrix_df, randint_range)
     # calculate hash signatures
     first_nonzero_hash2_rand = first_nonzero_df_dict(df_hash2_rand)
     #  PANDAS
@@ -357,8 +357,8 @@ def calculate_minhash_sig_matrix__df(char_matrix__df, numhashes, randint_range,*
     ## print("#hash number: %d" % i)
     printflag = 0
     # get random parameters
-    rnd_a = np.random.randint(0,randint_range)
-    rnd_b = np.random.randint(1,randint_range)
+    rnd_a = np.random.randint(0,randint_range, dtype=np.int64)
+    rnd_b = np.random.randint(1,randint_range, dtype=np.int64)
     # loop through characteristic matrix one row at a time
     for rownum,row in char_matrix__df.iterrows():
       # rownum may need conversion from string to int
@@ -496,6 +496,17 @@ def calculate_jaccard_for_docs_dict(shingletype,docs_dict):
       print("jaccard %s and %s: %f" % (doc, doc2, jacval))
   return
 
+# create characteristic matrix from sets
+def calculate_char_matrix_docs_dict(docs_dict,shingletype):
+  matrix_dict = {}
+  # create new hash as combination of all sets
+  # then import hash into pandas
+  for doc in docs_dict.keys():
+    matrix_dict[doc] = dict.fromkeys(docs_dict[doc][shingletype])
+  # src: http://stackoverflow.com/a/10628728
+  df = DataFrame(matrix_dict).T.fillna(0).transpose()
+  print()
+  return df
 #import ipdb;ipdb.set_trace();
 if(probprint_dict[4]):
   # TODO: convert this to be per-document, i.e. just use docs_dict instead
@@ -553,7 +564,7 @@ if(probprint_dict[4]):
 generate MinHash signatures using 30 hash functions.
 As above, each hash function takes the form h(x) = ax+b(mod p).
 As explained in the book, it is important to choose p to be a prime number.
-Thus, set p = 4;294;967;311, which is a prime number larger than 232-1 (and thus sufficiently large for our purposes).
+Thus, set p = 4;294;967;311, which is a prime number larger than 2^32-1 (and thus sufficiently large for our purposes).
 Uniformly sample n = 30 values of (a, b) element {0;1;2;...; p-1} and compute the corresponding MinHash signatures.
 Note that to do this, multiplication has to be defined.
 You will therefore need to map each of the k-shingles to integers.
@@ -565,9 +576,25 @@ And which worked better: shingling words or characters?
 NOTES:
   shingles are a set, similar to the first problem -> create 5 sets and proceed
 """
+print("5. Even More MinHash: Document Similarity")
 # about "Note that to do this, multiplication has to be defined."
 # previous examples used the size as the modulo, so the 'x' was simply the loop index
 # in this example, it could be any value from the large primes
+
+def problem5():
+  numhashes = 30
+  modulo = 4294967311 # prime 2^32 - 1
+  randvals = modulo-1
+  char_matrix_docs = calculate_char_matrix_docs_dict(docs_dict, 'shingle_words')
+  # works with the original set
+  minhash_sig_matrix__df = calculate_minhash_sig_matrix__df(char_matrix_df,numhashes,randvals, modulo=modulo)
+  # try with docs
+  # all NaN minhash_sig_matrix__df = calculate_minhash_sig_matrix__df(char_matrix_docs,numhashes,randvals, modulo=modulo)
+  print(minhash_sig_matrix__df)
+  return
+
+if(probprint_dict[5]):
+  problem5()
 """
 6. (Bonus) LSH. So far, we have only been exploring comparisons between very few documents.
 What if we wish to compare a very large number of documents? In particular, suppose we
