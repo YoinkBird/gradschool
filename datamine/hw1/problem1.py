@@ -431,7 +431,8 @@ for myrow in readme:
   indx=1
   # TODO: error handling
   if(rex[indx] not in docs_dict):
-    docs_dict[rex[indx]] = rex[indx+1]
+    docs_dict[rex[indx]] = {}
+    docs_dict[rex[indx]]['plntxt'] = rex[indx+1]
   else:
     print("-E-: %s already in docs_dict!" % rex[indx])
     continue
@@ -459,8 +460,8 @@ for line in data.iterrows():
 
 # TOKENIZE - in-place, per document
 for doc in docs_dict:
-  tokens = nltk.word_tokenize(docs_dict[doc])
-  docs_dict[doc] = tokens
+  tokens = nltk.word_tokenize(docs_dict[doc]['plntxt'])
+  docs_dict[doc]['tkns'] = tokens
 
 # strip stopwords
 def strip_stopwords(word_list):
@@ -482,23 +483,62 @@ def shingle_words(tkn_list,k_len):
     shingles.append(shingle_tup)
   return shingles
 
+def calculate_jaccard_for_docs_dict(shingletype,docs_dict):
+  # jaccard
+  totaldocs = list(docs_dict.keys())
+  totaldocs.sort()
+  for i,doc in enumerate(totaldocs):
+    j = i+1
+    if(j > (len(totaldocs) - 1)):
+      continue
+    for doc2 in totaldocs[j:]:
+      jacval = jaccard(docs_dict[doc][shingletype],docs_dict[doc2][shingletype])
+      print("jaccard %s and %s: %f" % (doc, doc2, jacval))
+  return
+
 #import ipdb;ipdb.set_trace();
 if(probprint_dict[4]):
   # TODO: convert this to be per-document, i.e. just use docs_dict instead
+  ########################################
   print("# (b) Use stopwords from the natural language processing module nltk.corpus to strip the stopwords from the five articles.")
   print("before: %d" % len(word_list))
   tkns = strip_stopwords(word_list)
   tkns_char_str = ''.join(tkns)
   print("after: %d" % len(tkns))
   print(tkns_char_str[-1])
+  # new: docs_dict implementation
+  for doc in docs_dict:
+    nostops = strip_stopwords(docs_dict[doc]['tkns'])
+    docs_dict[doc]['nostops'] = nostops
+  ########################################
   print("# (c) Compute the k-shingles of the documents, for k = 2, where you shingle on words, not letters.")
   word_shingles = set(shingle_words(tkns,2))
   print(len(word_shingles))
+  # new: docs_dict implementation
+  for doc in docs_dict:
+    word_shingles = set(shingle_words(docs_dict[doc]['tkns'],2))
+    docs_dict[doc]['shingle_words'] = word_shingles
   #print(word_shingles[-1])
+  ########################################
   print("# (d) Compute the k-shingles of the documents, for k = 3, where you shingle on characters, not words.")
   char_shingles = set(shingle_words(tkns_char_str,3))
   print(len(char_shingles))
   #print(char_shingles[-1])
+  # new: docs_dict implementation
+  for doc in docs_dict:
+    char_shingles = set(shingle_words(''.join(docs_dict[doc]['tkns']),3))
+    docs_dict[doc]['shingle_chars'] = char_shingles
+  ########################################
+  # jaccard
+  # char shingles
+  print("jacard for character shingles")
+  calculate_jaccard_for_docs_dict('shingle_chars',docs_dict)
+  # word shingles
+  print("jacard for word shingles")
+  calculate_jaccard_for_docs_dict('shingle_words',docs_dict)
+  print("")
+
+
 
 
 # print("# data before")
