@@ -471,16 +471,20 @@ def strip_stopwords(word_list):
   return(small_list)
 
 # shingling
+# TODO: convert to tuples
 def shingle_words(tkn_list,k_len):
   shingles = []
   # range is exclusive limit
   lim = (len(tkn_list) - k_len) + 1
   for i in range( lim ):
-    shingles.append( tkn_list[i:i+k_len] )
+    #shingles.append( tkn_list[i:i+k_len] )
+    shingle_tup = tuple( tkn_list[i:i+k_len] )
+    shingles.append(shingle_tup)
   return shingles
 
 #import ipdb;ipdb.set_trace();
 if(probprint_dict[4]):
+  # TODO: convert this to be per-document, i.e. just use docs_dict instead
   print("# (b) Use stopwords from the natural language processing module nltk.corpus to strip the stopwords from the five articles.")
   print("before: %d" % len(word_list))
   tkns = strip_stopwords(word_list)
@@ -488,13 +492,13 @@ if(probprint_dict[4]):
   print("after: %d" % len(tkns))
   print(tkns_char_str[-1])
   print("# (c) Compute the k-shingles of the documents, for k = 2, where you shingle on words, not letters.")
-  word_shingles = shingle_words(tkns,2)
+  word_shingles = set(shingle_words(tkns,2))
   print(len(word_shingles))
-  print(word_shingles[-1])
+  #print(word_shingles[-1])
   print("# (d) Compute the k-shingles of the documents, for k = 3, where you shingle on characters, not words.")
-  char_shingles = shingle_words(tkns_char_str,3)
+  char_shingles = set(shingle_words(tkns_char_str,3))
   print(len(char_shingles))
-  print(char_shingles[-1])
+  #print(char_shingles[-1])
 
 
 # print("# data before")
@@ -516,6 +520,10 @@ You will therefore need to map each of the k-shingles to integers.
 One way to do this is, for example, using the CRC32 hash.
 (b) Which of the five documents is most similar to the first (t121)?
 And which worked better: shingling words or characters?
+"""
+"""
+NOTES:
+  shingles are a set, similar to the first problem -> create 5 sets and proceed
 """
 # about "Note that to do this, multiplication has to be defined."
 # previous examples used the size as the modulo, so the 'x' was simply the loop index
