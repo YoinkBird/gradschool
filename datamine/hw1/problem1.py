@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 from pandas import *
 
 probprint_dict = {}
-probprint_dict[1] = 0
-probprint_dict[2] = 0
-probprint_dict[3] = 0
+probprint_dict[1] = 1
+probprint_dict[2] = 1
+probprint_dict[3] = 1
 probprint_dict[4] = 1
 probprint_dict[5] = 1 # relies on '4'
 
@@ -147,6 +147,10 @@ def char_matrix_1():
 # a: characteristic matrix
 char_matrix_df = char_matrix_1()
 if(probprint_dict[2]):
+  print("""
+# (a) For the example above, create the characteristic matrix where the alphabet is taken to be
+the seven words {'nike', 'running', 'shoe','black','blue','jacket','adidas'}.
+""")
   print(char_matrix_df)
 
 # create permutation
@@ -285,7 +289,9 @@ first non-zero element of each column (i.e., of each set), under the permutation
 df_rand = permutate_rand(char_matrix_df)
 first_nonzero_rand = first_nonzero_df_dict(df_rand)
 if(probprint_dict[2]):
+  print("# random permutation:")
   print(df_rand)
+  print"# first non-zero element of each column:")
   print(first_nonzero_rand)
 
 # first_nonzero_matrix={}
@@ -298,7 +304,9 @@ if(probprint_dict[2]):
 df_hash1 = permutate_hash1_fixed(char_matrix_df)
 first_nonzero_hash1 = first_nonzero_df_dict(df_hash1)
 if(probprint_dict[2]):
+  print("# hash permutation 'h(x) = 3x + 2 (mod 7)'  :")
   print(df_hash1)
+  print"# first non-zero element of each column:")
   print(first_nonzero_hash1)
   
     
