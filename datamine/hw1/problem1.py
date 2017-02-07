@@ -495,6 +495,20 @@ def calculate_jaccard_for_docs_dict(shingletype,docs_dict):
       print("jaccard %s and %s: %f" % (doc, doc2, jacval))
   return
 
+def calculate_jaccard_for_signature_matrix__df_print(shingletype,sig_matrix):
+  # jaccard
+  totaldocs = list(sig_matrix.columns)
+  totaldocs.sort()
+  for i,doc in enumerate(totaldocs):
+    j = i+1
+    if(j > (len(totaldocs) - 1)):
+      continue
+    for doc2 in totaldocs[j:]:
+      # not sure if supposed to make a set out of the column, or whether to consider duplicates, etc
+      jacval = jaccard(set(sig_matrix[doc]),set(sig_matrix[doc2]))
+      print("jaccard %s and %s: %f" % (doc, doc2, jacval))
+  return
+
 # create characteristic matrix from sets
 def calculate_char_matrix_docs_dict(docs_dict,shingletype):
   matrix_dict = {}
@@ -581,15 +595,23 @@ print("5. Even More MinHash: Document Similarity")
 # in this example, it could be any value from the large primes
 
 def problem5():
+  db_use_simple_set=1
   numhashes = 30
   modulo = 4294967311 # prime 2^32 - 1
   randvals = modulo-1
-  char_matrix_docs = calculate_char_matrix_docs_dict(docs_dict, 'shingle_words')
+  shingle_type = "shingle_words"
+  print("#5a Minhash signature matrix for %s" % shingle_type)
+  char_matrix_docs = calculate_char_matrix_docs_dict(docs_dict, shingle_type)
+  minhash_sig_matrix__df = DataFrame()
   # works with the original set
-  # minhash_sig_matrix__df = calculate_minhash_sig_matrix__df(char_matrix_df,numhashes,randvals, modulo=modulo)
+  if(db_use_simple_set == 1):
+    minhash_sig_matrix__df = calculate_minhash_sig_matrix__df(char_matrix_df,numhashes,randvals, modulo=modulo)
   # try with docs
-  minhash_sig_matrix__df = calculate_minhash_sig_matrix__df(char_matrix_docs,numhashes,randvals, modulo=modulo)
+  else:
+    minhash_sig_matrix__df = calculate_minhash_sig_matrix__df(char_matrix_docs,numhashes,randvals, modulo=modulo)
   print(minhash_sig_matrix__df)
+  print("#5b jaccard similarity")
+  calculate_jaccard_for_signature_matrix__df_print(shingle_type, minhash_sig_matrix__df)
   return
 
 if(probprint_dict[5]):
