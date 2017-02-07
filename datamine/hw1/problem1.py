@@ -595,23 +595,23 @@ print("5. Even More MinHash: Document Similarity")
 # in this example, it could be any value from the large primes
 
 def problem5():
-  db_use_simple_set=1
+  db_use_simple_set=0
   numhashes = 30
   modulo = 4294967311 # prime 2^32 - 1
   randvals = modulo-1
-  shingle_type = "shingle_words"
-  print("#5a Minhash signature matrix for %s" % shingle_type)
-  char_matrix_docs = calculate_char_matrix_docs_dict(docs_dict, shingle_type)
-  minhash_sig_matrix__df = DataFrame()
-  # works with the original set
-  if(db_use_simple_set == 1):
-    minhash_sig_matrix__df = calculate_minhash_sig_matrix__df(char_matrix_df,numhashes,randvals, modulo=modulo)
-  # try with docs
-  else:
-    minhash_sig_matrix__df = calculate_minhash_sig_matrix__df(char_matrix_docs,numhashes,randvals, modulo=modulo)
-  print(minhash_sig_matrix__df)
-  print("#5b jaccard similarity")
-  calculate_jaccard_for_signature_matrix__df_print(shingle_type, minhash_sig_matrix__df)
+  for shingle_type in ['shingle_words','shingle_chars']:
+    print("#5a Minhash signature matrix for %s" % shingle_type)
+    char_matrix_docs = calculate_char_matrix_docs_dict(docs_dict, shingle_type)
+    minhash_sig_matrix__df = DataFrame()
+    # works with the original set
+    if(db_use_simple_set == 1):
+      minhash_sig_matrix__df = calculate_minhash_sig_matrix__df(char_matrix_df,numhashes,randvals, modulo=modulo)
+    # try with docs
+    else:
+      minhash_sig_matrix__df = calculate_minhash_sig_matrix__df(char_matrix_docs,numhashes,randvals, modulo=modulo)
+    print(minhash_sig_matrix__df)
+    print("#5b jaccard similarity")
+    calculate_jaccard_for_signature_matrix__df_print(shingle_type, minhash_sig_matrix__df)
   return
 
 if(probprint_dict[5]):
