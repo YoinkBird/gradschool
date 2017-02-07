@@ -30,7 +30,10 @@ def jaccard(set_S, set_T):
   set_inter = set_S.intersection(set(set_T))
   set_union = set_S.union(set_T)
   total = len(set_S) + len(set_T)
-  similarity = len(set_inter) / len(set_union)
+  # avoid "ZeroDivisionError: division by zero" for empty sets:
+  # 1     0.00 [  0%]     0.00 [  0%]     0.00 [  0%]
+  if(set_union):
+    similarity = len(set_inter) / len(set_union)
   return similarity
 
 def calculate_jaccard_for_docs_dict(shingletype,docs_dict,printout=0):
@@ -81,9 +84,6 @@ def jaccard_calibrate():
 
 def problem1():
   prob1_jaccard_dict = {}
-  prob1_jaccard_dict['S1_S2'] = jaccard(S1,S2)
-  prob1_jaccard_dict['S1_S3'] = jaccard(S1,S3)
-  prob1_jaccard_dict['S2_S3'] = jaccard(S2,S3)
   prob1_jaccard_dict[('S1','S2')] = jaccard(S1,S2)
   prob1_jaccard_dict[('S1','S3')] = jaccard(S1,S3)
   prob1_jaccard_dict[('S2','S3')] = jaccard(S2,S3)
@@ -92,8 +92,15 @@ def problem1():
 
 prob1_jaccard_dict = problem1()
 if(probprint_dict[1]):
+  print("""
+# 1. Jaccard Similarity. Compute the Jaccard Similarity of the three sets using the intersection and union of lists in Python.
+S1 = {'nike', 'running', 'shoe'}
+S2 = {'nike', 'black', 'running', 'shoe'}
+S3 = {'nike', 'blue', 'jacket', 'adidas'}
+""")
   jaccard_calibrate()
-  print(prob1_jaccard_dict)
+  for jacprob in prob1_jaccard_dict:
+    print("%s : %2.2f" % (jacprob, prob1_jaccard_dict[jacprob]))
 
 """
 2. Minhash
@@ -306,7 +313,7 @@ def problem2():
   #       if the latter, simply convert each sets_dict to a series, then add to a dataframe and use the methods from problem5
   print("jaccard similarity for 20 random hash functions")
   print("hash fn\tS1,S2\tS1,S3\tS2,S3")
-  print("#true\t%02.2f (fit)\t%02.2f (fit)\t%02.2f (fit)" % (prob1_jaccard_dict['S1_S2'], prob1_jaccard_dict['S1_S3'],prob1_jaccard_dict['S2_S3']))
+  print("#true\t%02.2f (fit)\t%02.2f (fit)\t%02.2f (fit)" % (prob1_jaccard_dict[('S1','S2')], prob1_jaccard_dict[('S1','S3')], prob1_jaccard_dict[('S2','S3')]))
   print("---------------------------")
   for i in range(20):
     # get minhashed values
