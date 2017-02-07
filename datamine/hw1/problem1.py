@@ -33,6 +33,42 @@ def jaccard(set_S, set_T):
   similarity = len(set_inter) / len(set_union)
   return similarity
 
+def calculate_jaccard_for_docs_dict(shingletype,docs_dict,printout=0):
+  # jaccard
+  totaldocs = list(docs_dict.keys())
+  totaldocs.sort()
+  jaccard_dict = {}
+  jaccard_dict['order'] = []
+  if printout:
+    print("jaccard:")
+  for i,doc in enumerate(totaldocs):
+    j = i+1
+    if(j > (len(totaldocs) - 1)):
+      continue
+    for doc2 in totaldocs[j:]:
+      jacval = jaccard(docs_dict[doc][shingletype],docs_dict[doc2][shingletype])
+      jaccard_dict[(doc,doc2)] = jacval
+      jaccard_dict['order'].append((doc,doc2))
+      if printout:
+        print("%s and %s: %f" % (doc, doc2, jacval))
+  return jaccard_dict
+
+def calculate_jaccard_for_signature_matrix__df_print(shingletype,sig_matrix,printout=1):
+  # jaccard
+  totaldocs = list(sig_matrix.columns)
+  totaldocs.sort()
+  if printout:
+    print("jaccard:")
+  for i,doc in enumerate(totaldocs):
+    j = i+1
+    if(j > (len(totaldocs) - 1)):
+      continue
+    for doc2 in totaldocs[j:]:
+      # not sure if supposed to make a set out of the column, or whether to consider duplicates, etc
+      jacval = jaccard(set(sig_matrix[doc]),set(sig_matrix[doc2]))
+      print("%s , %s: %f" % (doc, doc2, jacval))
+  return
+
 
 '''
 Calibrate jaccard function based on Ex3.1 from MMDS CH3
@@ -48,6 +84,9 @@ def problem1():
   prob1_jaccard_dict['S1_S2'] = jaccard(S1,S2)
   prob1_jaccard_dict['S1_S3'] = jaccard(S1,S3)
   prob1_jaccard_dict['S2_S3'] = jaccard(S2,S3)
+  prob1_jaccard_dict[('S1','S2')] = jaccard(S1,S2)
+  prob1_jaccard_dict[('S1','S3')] = jaccard(S1,S3)
+  prob1_jaccard_dict[('S2','S3')] = jaccard(S2,S3)
   return prob1_jaccard_dict
 
 
@@ -263,6 +302,8 @@ if(probprint_dict[2]):
 # of the three sets. How closely do you approximate the true values, computed in the previous exercise?
 """)
 def problem2():
+  # TODO: is this "calculate similarity 20 times for random hash functions" or "calculate the proper signature matrix and then the similarity"?
+  #       if the latter, simply convert each sets_dict to a series, then add to a dataframe and use the methods from problem5
   print("jaccard similarity for 20 random hash functions")
   print("hash fn\tS1,S2\tS1,S3\tS2,S3")
   print("#true\t%02.2f (fit)\t%02.2f (fit)\t%02.2f (fit)" % (prob1_jaccard_dict['S1_S2'], prob1_jaccard_dict['S1_S3'],prob1_jaccard_dict['S2_S3']))
@@ -272,8 +313,9 @@ def problem2():
     df_hash2_rand = permutate_hash2_rand(char_matrix_df, 6)
     # TODO: convert to function
     # convert to sets
-    set_mat = {}
+    sets_dict = {}
     for set_name in df_hash2_rand.columns:
+      sets_dict[set_name] = {}
       # get key-value
       hash2_rand_dict = df_hash2_rand[set_name].to_dict()
       # correlate key with entry, i.e. convert series to set
@@ -281,24 +323,20 @@ def problem2():
       for key in hash2_rand_dict:
         if hash2_rand_dict[key] >= 1.0:
           tmpset.add(key)
-      set_mat[set_name] = tmpset
+      sets_dict[set_name]['tkns'] = tmpset
 
     # calculate jaccard
-    jaccard_dict = {}
-    jaccard_dict['S1_S2'] = jaccard( set_mat['S1'],set_mat['S2'])
-    jaccard_dict['S1_S3'] = jaccard( set_mat['S1'],set_mat['S3'])
-    jaccard_dict['S2_S3'] = jaccard( set_mat['S2'],set_mat['S3'])
-    # weird - calculate percent difference to true values
-    # S1_S2_err = 100 * (abs(prob1_jaccard_dict['S1_S2'] - jaccard_dict['S1_S2']) / prob1_jaccard_dict['S1_S2'])
-    # S1_S3_err = 100 * (abs(prob1_jaccard_dict['S1_S3'] - jaccard_dict['S1_S3']) / prob1_jaccard_dict['S1_S3'])
-    # S2_S3_err = 100 * (abs(prob1_jaccard_dict['S2_S3'] - jaccard_dict['S2_S3']) / prob1_jaccard_dict['S2_S3'])
-    # simple percentage
-    S1_S2_err = 100 * (jaccard_dict['S1_S2'] / prob1_jaccard_dict['S1_S2'])
-    S1_S3_err = 100 * (jaccard_dict['S1_S3'] / prob1_jaccard_dict['S1_S3'])
-    S2_S3_err = 100 * (jaccard_dict['S2_S3'] / prob1_jaccard_dict['S2_S3'])
-
+    jaccard_dict = calculate_jaccard_for_docs_dict('tkns',sets_dict)
+    # generate string for print-out
+    jacprint = "#%02s\t" % i
+    for jacval in jaccard_dict['order']:
+      # weird - calculate percent difference to true values
+      # tmperr = 100 * ( abs(prob1_jaccard_dict[jacval] - jaccard_dict[jacval]) / prob1_jaccard_dict[jacval])
+      # simple percentage
+      tmperr = 100 * (jaccard_dict[jacval] / prob1_jaccard_dict[jacval])
+      jacprint += "%02.2f [%3d%%]\t" % (jaccard_dict[jacval],tmperr)
     # print results
-    print("#%02s\t%02.2f [%3d%%]\t%02.2f [%3d%%]\t%02.2f [%3d%%]" % (i, jaccard_dict['S1_S2'], S1_S2_err, jaccard_dict['S1_S3'], S1_S3_err, jaccard_dict['S2_S3'], S2_S3_err))
+    print(jacprint)
 
 
   return
@@ -482,33 +520,6 @@ def shingle_words(tkn_list,k_len):
     shingles.append(shingle_tup)
   return shingles
 
-def calculate_jaccard_for_docs_dict(shingletype,docs_dict):
-  # jaccard
-  totaldocs = list(docs_dict.keys())
-  totaldocs.sort()
-  for i,doc in enumerate(totaldocs):
-    j = i+1
-    if(j > (len(totaldocs) - 1)):
-      continue
-    for doc2 in totaldocs[j:]:
-      jacval = jaccard(docs_dict[doc][shingletype],docs_dict[doc2][shingletype])
-      print("jaccard %s and %s: %f" % (doc, doc2, jacval))
-  return
-
-def calculate_jaccard_for_signature_matrix__df_print(shingletype,sig_matrix):
-  # jaccard
-  totaldocs = list(sig_matrix.columns)
-  totaldocs.sort()
-  for i,doc in enumerate(totaldocs):
-    j = i+1
-    if(j > (len(totaldocs) - 1)):
-      continue
-    for doc2 in totaldocs[j:]:
-      # not sure if supposed to make a set out of the column, or whether to consider duplicates, etc
-      jacval = jaccard(set(sig_matrix[doc]),set(sig_matrix[doc2]))
-      print("jaccard %s and %s: %f" % (doc, doc2, jacval))
-  return
-
 # create characteristic matrix from sets
 def calculate_char_matrix_docs_dict(docs_dict,shingletype):
   matrix_dict = {}
@@ -556,10 +567,10 @@ if(probprint_dict[4]):
   # jaccard
   # char shingles
   print("jacard for character shingles")
-  calculate_jaccard_for_docs_dict('shingle_chars',docs_dict)
+  jaccard_dict = calculate_jaccard_for_docs_dict('shingle_chars',docs_dict,1) # '1' is for print
   # word shingles
   print("jacard for word shingles")
-  calculate_jaccard_for_docs_dict('shingle_words',docs_dict)
+  calculate_jaccard_for_docs_dict('shingle_words',docs_dict,1) # '1' is for print
   print("")
 
 
