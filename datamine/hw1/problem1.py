@@ -291,7 +291,7 @@ first_nonzero_rand = first_nonzero_df_dict(df_rand)
 if(probprint_dict[2]):
   print("# random permutation:")
   print(df_rand)
-  print"# first non-zero element of each column:")
+  print("# first non-zero element of each column:")
   print(first_nonzero_rand)
 
 # first_nonzero_matrix={}
@@ -306,7 +306,7 @@ first_nonzero_hash1 = first_nonzero_df_dict(df_hash1)
 if(probprint_dict[2]):
   print("# hash permutation 'h(x) = 3x + 2 (mod 7)'  :")
   print(df_hash1)
-  print"# first non-zero element of each column:")
+  print("# first non-zero element of each column:")
   print(first_nonzero_hash1)
   
     
