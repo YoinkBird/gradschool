@@ -112,6 +112,39 @@ top_names_from_year(data, input_year, knames)
 print("""
 Write a program that on input Name returns the frequency for men and women of the name Name.
 """)
+def freq_names(df, name):
+  # type enforce
+  name = str(name)
+  # df with the matching name, and without the column 'name'
+  names_df = df.loc[df['name'] == str(name),['gndr','freq','year']]
+  # for both genders - use -1 as NaN
+  gndr_frq = {'F':np.nan,'M':np.nan}
+  for gender in gndr_frq.keys():
+    gndr_df = names_df.loc[names_df['gndr'] == gender,['freq','year']]
+    # totol frequency: sum of all yearly frequencies of the name
+    gndr_total = int(gndr_df['freq'].sum())
+    gndr_frq[gender] = gndr_total
+    # relative frequency: each year's frequency / total frequency
+    gndr_df['relfrq'] = gndr_df['freq'].divide(gndr_total)
+    # plot it
+    plt.plot(gndr_df['year'],gndr_df['freq'],label=gender)
+
+  plt.legend()
+  plt.xlabel('year')
+  plt.ylabel('relative frequency')
+  plt.title("relative frequency for the name: %s" % name)
+  plt.show()
+  print("frequency Females: %d" % gndr_frq['F'])
+  print("frequency Males: %d" % gndr_frq['M'])
+
+  return gndr_frq
+
+name="Mary"
+freq_names(data, name)
+name="John"
+freq_names(data, name)
+name="Kelly"
+freq_names(data, name)
 
 
 
