@@ -89,8 +89,23 @@ print("""
 Write a program that on input k and XXXX, returns the top k names from year XXXX.
 """)
 # return avg freq from year
+# TODO: can this be done with pivot_table ?
+# e.g. data.pivot_table('freq',index="year").loc[input_year]
+def top_names_from_year(df, year, knames):
+  # series of indices (row numbers) with matching years
+  year_ds = df['year'] == int(year)
+  # dataframe containing all rows with matching years, i.e. without non-matching years
+  # .sort_values: sorted descending by frequency
+  years_df = df[year_ds].sort_values(['freq'], ascending=False)
+  # return the top k names
+  return( years_df[0:int(knames)] )
+
+# get top k names from year XXXX
+# TODO: remove hard-coding
 input_year = 1882
-data.pivot_table('freq',index="year").loc[input_year]
+input_year = 1880 # testing: use value that's at the top
+knames = 3
+top_names_from_year(data, input_year, knames)
 
 # In[ ]:
 
