@@ -1,7 +1,32 @@
+
+# coding: utf-8
+
+# In[ ]:
+
+
+
+
+# In[ ]:
+
+
+
+
+# In[ ]:
+
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from pandas import *
+
+# coding guidelines:
+# within "problems", use descriptive varnames
+# within subroutines, try to use short varnames
+# http://pandas.pydata.org/pandas-docs/stable/dsintro.html
+# df: dataframe
+# ds: (data) series (want to avoid one-char var)
+
+# In[ ]:
+
 
 # omit years ]1890,2005[
 use_simplified_dataset=0
@@ -15,6 +40,8 @@ where to put the gender?
 """
 def read_names_pandas__df(filepath):
   name_data = DataFrame()
+  # next time use glob
+  # https://docs.python.org/3/library/glob.html
   startyear = 1880
   endyear = 2015
   years = [(startyear,endyear)]
@@ -45,17 +72,18 @@ if(use_simplified_dataset):
 data = DataFrame()
 if(re_read_all_csv):
   data = read_names_pandas__df(parent_dir_path_rel)
-  import ipdb; ipdb.set_trace()
   data.to_csv(path_or_buf=all_names_csv_path_rel)
 else:
   data = pd.read_csv(all_names_csv_path_rel)
 # test
-import ipdb; ipdb.set_trace()
 pt_freq = data.pivot_table('freq', index='year', columns='gndr')
 print(pt_freq.tail())
 #also vik
 # name_data.groupby('gndr').freq.sum()
 ########################################
+
+
+# In[ ]:
 
 print("""
 Write a program that on input k and XXXX, returns the top k names from year XXXX.
@@ -64,12 +92,36 @@ Write a program that on input k and XXXX, returns the top k names from year XXXX
 input_year = 1882
 data.pivot_table('freq',index="year").loc[input_year]
 
+# In[ ]:
 
-# tmpser = data.pivot_table('freq',index="year")
+print("""
+Write a program that on input Name returns the frequency for men and women of the name Name.
+""")
 
-# dis for breakpoitns
-print("")
 
 
-yob1880.txt
-yob2015.txt
+# In[ ]:
+
+print("""
+It could be that names are more diverse now than they were in 1880, so that a name
+may be relatively the most popular, though its frequency may have been decreasing over
+the years. Modify the above to return the relative frequency.
+""")
+
+
+
+# In[ ]:
+
+print("""
+Find all the names that used to be more popular for one gender, but then became more
+popular for another gender.
+""")
+
+
+
+# In[ ]:
+
+print("""
+(Optional) Find something cool about this data set.
+""")
+
