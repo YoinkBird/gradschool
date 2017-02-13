@@ -89,6 +89,23 @@ def _mmds_p420():
     np.array(SIG_mat),
     np.array(U_mat),
     )
+def _example_np_linalg_svd():
+  a = np.random.randn(9, 6) + 1j*np.random.randn(9, 6)
+  print("Reconstruction based on full SVD:")
+
+  U, s, V = np.linalg.svd(a, full_matrices=True)
+  U.shape, V.shape, s.shape
+
+  S = np.zeros((9, 6), dtype=complex)
+  S[:6, :6] = np.diag(s)
+  SV = np.dot(S, V)
+  a2 = np.dot(U, SV))
+  #np.allclose(a, np.dot(U, np.dot(S, V)))
+  a1 = a
+  print("expect:[%s]M  = [(%d, xxx)]U [(xxx,)]S [(xxx, %d)]VT" % (a1.shape, a1.shape[0], a1.shape[1]))
+  print("[fm=0] [%s]M2 = [%s]U [%s]S [%s]VT  " % (a2.shape, U.shape , s.shape , V.shape ))
+  print("Partial SVD reconstruction? %s" % np.allclose(a1,a2))
+
 #def compare_np_linalg(A_mat,U_mat,SIG_mat,VT_mat):
 # pass method: http://stackoverflow.com/a/706735
 def compare_np_linalg(runmethod):
@@ -129,5 +146,6 @@ def compare_np_linalg(runmethod):
   print("")
 
 
+_example_np_linalg_svd()
 compare_np_linalg(_mmds_p420)
 compare_np_linalg(_mmds_p421)
