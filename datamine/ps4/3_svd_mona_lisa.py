@@ -93,8 +93,9 @@ def print_full_svd_reconstruction(arr1):
   return(U,s,V)
 
 
-detail = ""
-file_relpath = "mona_lisa%s.png" % detail
+file_subject = "mona_lisa"
+detail = "" # original file, mona_lisa.png
+file_relpath = "%s%s.png" % (file_subject, detail)
 #load_img_to_arr(file_relpath)
 # https://docs.scipy.org/doc/scipy/reference/generated/scipy.misc.imread.html
 img_arr = scipy.misc.imread(file_relpath, flatten=True)
@@ -106,14 +107,22 @@ U,s,V = print_partial_svd_reconstruction(img_arr)
 
 # Full SVD
 U,s,V = print_full_svd_reconstruction(img_arr)
+# from PIL import Image
+# im_u = Image.fromarray(U).convert('RGB')
+# im_u.save("svd_concept_u.png")
+# im_v = Image.fromarray(V).convert('RGB')
+# im_v.save("svd_concept_v.png")
 
 #  Show the best rank k = 2, k = 5 and k = 10 approximation to Mona Lisa.
-kval = 2
-S2 = expand_s_to_S(img_arr, s[:kval])
-arrk = svd_reconstruct(U,S2,V)
+kvals = [2,5,10,20,100,200,len(s)]
+for kval in kvals:
+  S2 = expand_s_to_S(img_arr, s[:kval])
+  arrk = svd_reconstruct(U,S2,V)
+  # im_s = Image.fromarray(S2).convert('RGB')
+  # im_s.save("svd_concept_s_%s.png" % kval)
 
-from PIL import Image
-# have to RGB in order to save. src: http://stackoverflow.com/a/18879396
-im  = Image.fromarray(arrk).convert('RGB')
-img_out_relpath = "svd_%d%s.png" % (kval,detail)
-# im.save(img_out_relpath)
+  from PIL import Image
+  # have to RGB in order to save. src: http://stackoverflow.com/a/18879396
+  im  = Image.fromarray(arrk).convert('RGB')
+  img_out_relpath = "svd_%s%d%s.png" % (file_subject,kval,detail)
+  im.save(img_out_relpath)
