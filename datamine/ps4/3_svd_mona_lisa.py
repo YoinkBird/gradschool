@@ -50,6 +50,22 @@ def round_to_zero(matrix):
   matrix[np.isclose(matrix,0)] = 0
   return matrix
 
+def expand_s_to_S(arr, s, full_matrices=True):
+  S = np.zeros((arr.shape))#, dtype=complex)
+  if(full_matrices):
+    S[:len(s), :len(s)] = np.diag(s)
+  else:
+    S = np.diag(s)
+  return S
+
+def svd_reconstruct(U, S, V, full_matrices=True):
+  SV = np.dot(S,V)
+  np.dot(U, SV)
+  arr2 = np.dot(U, np.dot(S,V))
+#  if(full_matrices):
+#  else:
+  return arr2
+
 def print_partial_svd_reconstruction(arr1):
   # partial SVD
   U,s,V = np.linalg.svd(arr1, full_matrices=False)
@@ -62,6 +78,7 @@ def print_partial_svd_reconstruction(arr1):
   print("expect:[%s]M  = [(%d, _)]U [(_,)]S [(_, %d)]VT" % (arr1.shape, arr1.shape[0], arr1.shape[1]))
   print("[fm=0] [%s]M2 = [%s]U [%s]S [%s]VT  " % (arr2.shape, U.shape , s.shape , V.shape ))
   return(U,s,V)
+
 def print_full_svd_reconstruction(arr1):
   # Full SVD
   U,s,V = np.linalg.svd(arr1, full_matrices=True)
@@ -76,7 +93,8 @@ def print_full_svd_reconstruction(arr1):
   return(U,s,V)
 
 
-file_relpath = "mona_lisa.png"
+detail = ""
+file_relpath = "mona_lisa%s.png" % detail
 #load_img_to_arr(file_relpath)
 # https://docs.scipy.org/doc/scipy/reference/generated/scipy.misc.imread.html
 img_arr = scipy.misc.imread(file_relpath, flatten=True)
@@ -88,3 +106,14 @@ U,s,V = print_partial_svd_reconstruction(img_arr)
 
 # Full SVD
 U,s,V = print_full_svd_reconstruction(img_arr)
+
+#  Show the best rank k = 2, k = 5 and k = 10 approximation to Mona Lisa.
+kval = 2
+S2 = expand_s_to_S(img_arr, s[:kval])
+arrk = svd_reconstruct(U,S2,V)
+
+from PIL import Image
+# have to RGB in order to save. src: http://stackoverflow.com/a/18879396
+im  = Image.fromarray(arrk).convert('RGB')
+img_out_relpath = "svd_%d%s.png" % (kval,detail)
+# im.save(img_out_relpath)
