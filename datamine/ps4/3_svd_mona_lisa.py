@@ -50,6 +50,32 @@ def round_to_zero(A2_mat):
   A2_mat[np.isclose(A2_mat,0)] = 0
   return A2_mat
 
+def print_partial_svd_reconstruction(arr1):
+  # partial SVD
+  U,s,V = np.linalg.svd(arr1, full_matrices=False)
+  S = np.zeros((arr1.shape), dtype=complex)
+  S = np.diag(s)
+  SV = np.dot(S,V)
+  np.dot(U, SV)
+  arr2 = np.dot(U, np.dot(S,V))
+  print("Reconstruction from Partial SVD? %s" % np.allclose(arr1,arr2))
+  print("expect:[%s]M  = [(%d, _)]U [(_,)]S [(_, %d)]VT" % (arr1.shape, arr1.shape[0], arr1.shape[1]))
+  print("[fm=0] [%s]M2 = [%s]U [%s]S [%s]VT  " % (arr2.shape, U.shape , s.shape , V.shape ))
+  return(U,s,V)
+def print_full_svd_reconstruction(arr1):
+  # Full SVD
+  U,s,V = np.linalg.svd(arr1, full_matrices=True)
+  S = np.zeros((arr1.shape), dtype=complex)
+  S[:len(s), :len(s)] = np.diag(s)
+  SV = np.dot(S,V)
+  np.dot(U, SV)
+  arr2 = np.dot(U, np.dot(S,V))
+  print("Reconstruction from Full SVD? %s" % np.allclose(arr1,arr2))
+  print("expect:[%s]M  = [(%d, _)]U [(_,)]S [(_, %d)]VT" % (arr1.shape, arr1.shape[0], arr1.shape[1]))
+  print("[fm=0] [%s]M2 = [%s]U [%s]S [%s]VT  " % (arr2.shape, U.shape , s.shape , V.shape ))
+  return(U,s,V)
+
+
 file_relpath = "mona_lisa.png"
 #load_img_to_arr(file_relpath)
 # https://docs.scipy.org/doc/scipy/reference/generated/scipy.misc.imread.html
@@ -57,21 +83,23 @@ img_arr = scipy.misc.imread(file_relpath, flatten=True)
 
 # https://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.svd.html
 # create U,s,V and then re-create the original matrix for verification
-U,s,V = np.linalg.svd(img_arr, full_matrices=False)
-S = np.diag(s)
-img2_arr = np.dot(np.dot(U,np.diag(s)),V)
-print("Reconstruction from Partial SVD? %s" % np.allclose(img_arr,img2_arr))
-print("expect:[%s]M  = [(%d, x)]U [(x,)]S [(x, %d)]VT" % (img_arr.shape, img_arr.shape[0], img_arr.shape[1]))
-print("[fm=0] [%s]M2 = [%s]U [%s]S [%s]VT  " % (img2_arr.shape, U.shape , s.shape , V.shape ))
+U,s,V = print_partial_svd_reconstruction(img_arr)
+# U,s,V = np.linalg.svd(img_arr, full_matrices=False)
+# S = np.diag(s)
+# img2_arr = np.dot(np.dot(U,np.diag(s)),V)
+# print("Reconstruction from Partial SVD? %s" % np.allclose(img_arr,img2_arr))
+# print("expect:[%s]M  = [(%d, ?)]U [(?,)]S [(?, %d)]VT" % (img_arr.shape, img_arr.shape[0], img_arr.shape[1]))
+# print("[fm=0] [%s]M2 = [%s]U [%s]S [%s]VT  " % (img2_arr.shape, U.shape , s.shape , V.shape ))
 
 # https://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.svd.html
 # create U,s,V and then re-create the original matrix for verification
-U,s,V = np.linalg.svd(img_arr, full_matrices=True)
-S = np.zeros((img_arr.shape), dtype=complex)
-S[:len(s), :len(s)] = np.diag(s)
-SV = np.dot(S,V)
-np.dot(U, SV)
-img2_arr = np.dot(U, np.dot(S,V))
-print("Reconstruction from Full SVD? %s" % np.allclose(img_arr,img2_arr))
-print("expect:[%s]M  = [(%d, x)]U [(x,)]S [(x, %d)]VT" % (img_arr.shape, img_arr.shape[0], img_arr.shape[1]))
-print("[fm=0] [%s]M2 = [%s]U [%s]S [%s]VT  " % (img2_arr.shape, U.shape , s.shape , V.shape ))
+U,s,V = print_full_svd_reconstruction(img_arr)
+# U,s,V = np.linalg.svd(img_arr, full_matrices=True)
+# S = np.zeros((img_arr.shape), dtype=complex)
+# S[:len(s), :len(s)] = np.diag(s)
+# SV = np.dot(S,V)
+# np.dot(U, SV)
+# img2_arr = np.dot(U, np.dot(S,V))
+# print("Reconstruction from Full SVD? %s" % np.allclose(img_arr,img2_arr))
+# print("expect:[%s]M  = [(%d, ?)]U [(?,)]S [(?, %d)]VT" % (img_arr.shape, img_arr.shape[0], img_arr.shape[1]))
+# print("[fm=0] [%s]M2 = [%s]U [%s]S [%s]VT  " % (img2_arr.shape, U.shape , s.shape , V.shape ))
