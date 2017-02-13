@@ -44,11 +44,11 @@ def compare_np_linalg(runmethod):
   print("[fm=0]  %s vs %s vs %s  " % (u2.shape , v2.shape , s2.shape ))
   print("")
 
-def round_to_zero(A2_mat):
+def round_to_zero(matrix):
   # filter out values close to zero
   #   [src: http://stackoverflow.com/a/33306495 (isclose) ; src: http://stackoverflow.com/a/28279557 (mask and =0) ]
-  A2_mat[np.isclose(A2_mat,0)] = 0
-  return A2_mat
+  matrix[np.isclose(matrix,0)] = 0
+  return matrix
 
 def print_partial_svd_reconstruction(arr1):
   # partial SVD
@@ -83,23 +83,8 @@ img_arr = scipy.misc.imread(file_relpath, flatten=True)
 
 # https://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.svd.html
 # create U,s,V and then re-create the original matrix for verification
+# Partial SVD
 U,s,V = print_partial_svd_reconstruction(img_arr)
-# U,s,V = np.linalg.svd(img_arr, full_matrices=False)
-# S = np.diag(s)
-# img2_arr = np.dot(np.dot(U,np.diag(s)),V)
-# print("Reconstruction from Partial SVD? %s" % np.allclose(img_arr,img2_arr))
-# print("expect:[%s]M  = [(%d, ?)]U [(?,)]S [(?, %d)]VT" % (img_arr.shape, img_arr.shape[0], img_arr.shape[1]))
-# print("[fm=0] [%s]M2 = [%s]U [%s]S [%s]VT  " % (img2_arr.shape, U.shape , s.shape , V.shape ))
 
-# https://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.svd.html
-# create U,s,V and then re-create the original matrix for verification
+# Full SVD
 U,s,V = print_full_svd_reconstruction(img_arr)
-# U,s,V = np.linalg.svd(img_arr, full_matrices=True)
-# S = np.zeros((img_arr.shape), dtype=complex)
-# S[:len(s), :len(s)] = np.diag(s)
-# SV = np.dot(S,V)
-# np.dot(U, SV)
-# img2_arr = np.dot(U, np.dot(S,V))
-# print("Reconstruction from Full SVD? %s" % np.allclose(img_arr,img2_arr))
-# print("expect:[%s]M  = [(%d, ?)]U [(?,)]S [(?, %d)]VT" % (img_arr.shape, img_arr.shape[0], img_arr.shape[1]))
-# print("[fm=0] [%s]M2 = [%s]U [%s]S [%s]VT  " % (img2_arr.shape, U.shape , s.shape , V.shape ))
