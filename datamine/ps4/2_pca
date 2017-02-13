@@ -1,0 +1,75 @@
+# thingy?
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+import numpy as np
+import scipy.misc
+
+
+def generate_samples(numsamples, mean, cov):
+  samples = [np.random.multivariate_normal(mean,cov) for i in range(numsamples)]
+
+  df = pd.DataFrame(samples)
+  print("covariance of sample")
+  print(np.cov(df.T))
+  return df
+
+# label 2
+l1_samples = 20
+l1_mean = (0,0,0)
+l1_cov = [
+   #X1, X2, X3
+    [0.5,  0,  0],   #X1
+    [0,  0.5,  0],   #X2
+    [0,  0,  0.7]    #X3
+]
+l1_cov = np.diag([0.5,0.5,0.7])
+
+# label 1
+l2_samples = 20
+l2_samples = l1_samples
+l2_mean = (1,1,1)
+l2_cov = [
+   #X1, X2, X3
+    [0.5,  0,  0],   #X1
+    [0,  0.5,  0],   #X2
+    [0,  0,  0.1]    #X3
+]
+l2_cov = np.diag([0.5,0.5,0.1])
+
+print(l1_cov)
+print(l2_cov)
+l1_points = generate_samples(l1_samples, l1_mean, l1_cov)
+l2_points = generate_samples(l2_samples, l2_mean, l2_cov)
+
+print("""
+Create a three dimensional plot of the clouds of data points, labeled with the two labels.
+""")
+# start: http://matplotlib.org/mpl_toolkits/mplot3d/tutorial.html#scatter-plots
+# legend: http://stackoverflow.com/questions/4270301/matplotlib-multiple-datasets-on-the-same-scatter-plot
+from mpl_toolkits.mplot3d import Axes3D
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.scatter3D(l1_points[0],l1_points[1],l1_points[2],c='b',marker='o')
+#ax2 = fig.add_subplot(111, projection='3d')
+ax.scatter3D(l2_points[0],l2_points[1],l2_points[2],c='r',marker='^')
+
+ax.set_xlabel('x label')
+ax.set_ylabel('y label')
+ax.set_zlabel('z label')
+#############
+#fig, axes = plt.subplots(ncols=2)
+#ax0,ax1 = axes.flat
+#ax0.scatter(l1_points)
+#ax1.scatter(l2_points)
+
+# plt.show()
+
+print("""
+3. Concatenate all the points and ignore the labels for now.
+You have created an X matrix with 40 data points in d = 3 dimensions.
+Find the covariance matrix of this dataset.
+""")
+all_points = l1_points.append(l2_points)
+print(np.cov(all_points.T))
+
