@@ -116,11 +116,13 @@ U,s,V = print_partial_svd_reconstruction(img_arr)
 
 # Full SVD
 U,s,V = print_full_svd_reconstruction(img_arr)
-# from PIL import Image
-# im_u = Image.fromarray(U).convert('RGB')
-# im_u.save("svd_concept_u.png")
-# im_v = Image.fromarray(V).convert('RGB')
-# im_v.save("svd_concept_v.png")
+dumpExtra = False
+from PIL import Image
+if(dumpExtra):
+  im_u = Image.fromarray(U).convert('RGB')
+  im_v = Image.fromarray(V).convert('RGB')
+  im_u.save("svd_concept_u.png")
+  im_v.save("svd_concept_v.png")
 
 #  Show the best rank k = 2, k = 5 and k = 10 approximation to Mona Lisa.
 kvals = [2,5,10,20,100,200,len(s)]
@@ -128,13 +130,17 @@ for kval in kvals:
   size = svd_size(U,kval,V)
   S2 = expand_s_to_S(img_arr, s[:kval])
   arrk = svd_reconstruct(U,S2,V)
-  # im_s = Image.fromarray(S2).convert('RGB')
-  # im_s.save("svd_concept_s_%s.png" % kval)
+  if(dumpExtra):
+    im_s = Image.fromarray(S2).convert('RGB')
+    im_s.save("out/" + "svd_concept_s_%s.png" % kval)
+
 
   print("array: %d ; rank: %d ; size: %d ;" % (len(s),kval,size))
-  from PIL import Image
-  # have to RGB in order to save. src: http://stackoverflow.com/a/18879396
-  im  = Image.fromarray(arrk).convert('RGB')
-  img_out_relpath = "svd_%s%d%s.png" % (file_subject,kval,detail)
   # plt.imshow(im_s)
-  im.save(img_out_relpath)
+  dumpImg = True
+  if(dumpImg):
+    # have to RGB in order to save. src: http://stackoverflow.com/a/18879396
+    im  = Image.fromarray(arrk).convert('RGB')
+    img_out_relpath = "svd_%s%d%s.png" % (file_subject,kval,detail)
+    img_out_relpath = "out/" + img_out_relpath
+    im.save(img_out_relpath)
