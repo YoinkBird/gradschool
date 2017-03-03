@@ -103,7 +103,12 @@ def print_full_svd_reconstruction(arr1):
 
 
 file_subject = "mona_lisa"
+detail = "_5x9_solid_838383"
+detail = "_5x9"
+detail = "_solid_838383_19x21"
+detail = "_sleeve_19x21"
 detail = "" # original file, mona_lisa.png
+#detail = "_corrupt"
 file_relpath = "%s%s.png" % (file_subject, detail)
 #load_img_to_arr(file_relpath)
 # https://docs.scipy.org/doc/scipy/reference/generated/scipy.misc.imread.html
