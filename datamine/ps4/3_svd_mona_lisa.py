@@ -66,6 +66,15 @@ def svd_reconstruct(U, S, V, full_matrices=True):
 #  else:
   return arr2
 
+# 'blocksize' in bits
+# 'krank' is the rank
+def svd_size(U, krank, V, blocksize=16):
+  size = 0
+  size += (blocksize * krank)
+  size += (blocksize * krank * U.shape[0])
+  size += (blocksize * krank * V.shape[1])
+  return size
+
 def print_partial_svd_reconstruction(arr1):
   # partial SVD
   U,s,V = np.linalg.svd(arr1, full_matrices=False)
@@ -116,13 +125,16 @@ U,s,V = print_full_svd_reconstruction(img_arr)
 #  Show the best rank k = 2, k = 5 and k = 10 approximation to Mona Lisa.
 kvals = [2,5,10,20,100,200,len(s)]
 for kval in kvals:
+  size = svd_size(U,kval,V)
   S2 = expand_s_to_S(img_arr, s[:kval])
   arrk = svd_reconstruct(U,S2,V)
   # im_s = Image.fromarray(S2).convert('RGB')
   # im_s.save("svd_concept_s_%s.png" % kval)
 
+  print("array: %d ; rank: %d ; size: %d ;" % (len(s),kval,size))
   from PIL import Image
   # have to RGB in order to save. src: http://stackoverflow.com/a/18879396
   im  = Image.fromarray(arrk).convert('RGB')
   img_out_relpath = "svd_%s%d%s.png" % (file_subject,kval,detail)
+  # plt.imshow(im_s)
   im.save(img_out_relpath)
