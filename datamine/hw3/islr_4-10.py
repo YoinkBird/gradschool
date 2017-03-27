@@ -48,7 +48,7 @@ Use the full data set to perform a logistic regression with Direction as the res
 Use the summary function to print the results.
 Do any of the predictors appear to be statistically significant? If so, which ones?
 """)
-if(0): # not working eyt
+if(0): # not working yet
   model = make_pipeline(LogisticRegression()) #Ridge())
   if(1):
     xcolname = 'direction'
