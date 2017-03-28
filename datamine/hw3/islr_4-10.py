@@ -62,14 +62,14 @@ Do any of the predictors appear to be statistically significant? If so, which on
 """)
 predictors = ['lag1','lag2','lag3','lag4','lag5','volume']
 if(1): # not working yet
-  y = data['direction']
-  x = sm.add_constant(data[['lag1','lag2','lag3','lag4','lag5','volume']])
-  est = smf.Logit(y,x).fit()
+  y_full = data['direction']
+  x_full = sm.add_constant(data[predictors])
+  est = smf.Logit(y_full,x_full).fit()
   print(est.summary())
-  lda2 = LinearDiscriminantAnalysis()
-  pred2 = lda2.fit(x,y).predict(x)
-  print(confusion_matrix(y, pred2))
-  print(classification_report(y,pred2,digits=3))
+  lda_full = LinearDiscriminantAnalysis()
+  pred_full = lda_full.fit(x_full,y_full).predict(x_full)
+  print(confusion_matrix(y_full, pred_full))
+  print(classification_report(y_full,pred_full,digits=3))
   if(0):
     model = make_pipeline(LogisticRegression()) #Ridge())
 #    xcolname = 'direction'
