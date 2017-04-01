@@ -114,6 +114,29 @@ else:
 print('''
 (d) Fit a lasso model on the training set, with 'lamda' chosen by cross-validation. Report the test error obtained, along with the number of non-zero coefficient estimates.
 ''')
+if(1):
+  # http://scikit-learn.org/stable/modules/linear_model.html
+  n_lambdas = 200
+  lambdas = np.linspace(10, -2, n_lambdas)
+  lambdas = np.logspace(-10, -2, n_lambdas)
+  lambdas = 10**np.linspace(10, -2, 100) * 0.5
+
+  # choose lambda with cross-validation
+  reg_lassocv = linear_model.LassoCV(alphas=lambdas)
+  # must scale
+  reg_lassocv.fit(scale(X_train),y_train)
+  y_pred = reg_lassocv.predict(scale(X_test))
+
+  print("lambda: %s" % (reg_lassocv.alpha_))
+  clf = linear_model.Lasso(alpha=reg_lassocv.alpha_, fit_intercept=False)
+  clf.fit(scale(X_train), y_train)
+  y_pred = clf.predict(scale(X_test))
+  mse = mean_squared_error(y_test, y_pred)
+  print("mse: %s" % (mse))
+  print("rmse: %s" % (np.sqrt(mse)))
+else:
+  print("-I-: Skipping...")
+
 print('''
 (e) Fit a PCR model on the training set, with M chosen by cross-validation. Report the test error obtained, along with the value of M selected by cross-validation.
 ''')
