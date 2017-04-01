@@ -30,7 +30,14 @@ print(data.head())
 seed = 42
 np.random.seed(seed)
 
-print("Fit a logistic regression model that uses 'income' and 'balance' to predict 'default'")
+print('''
+5. In Chapter 4, we used logistic regression to predict the probability of default using income and balance on the Default data set.
+We will now estimate the test error of this logistic regression model using the validation set approach.
+Do not forget to set a random seed before beginning your analysis.
+''')
+print('''
+(a) Fit a multiple logistic regression model that uses 'income' and 'balance' to predict the probability of 'default', using only the observations.
+''')
 if(1):
   model = make_pipeline(LogisticRegression()) #Ridge())
   if(1):
@@ -50,3 +57,21 @@ if(1):
 else:
   print("-I-: Skipping...")
 
+print('''
+(b) Using the validation set approach, estimate the test error of this model.
+In order to do this, you must perform the following steps:
+''')
+print("i. Split the sample set into a training set and a validation set.")
+print("ii. Fit a multiple logistic regression model using only the training observations.")
+print("iii. Obtain a prediction of default status for each individual in the validation set by computing the posterior probability of")
+print("default for that individual, and classifying the individual to the default category if the posterior probability equals 0.5.")
+print("iv. Compute the validation set error, which is the fraction of the observations in the validation set that are misclassified.")
+print('''
+(c) Repeat the process in (b) three times, using three different splits of the observations into a training set and a validation set.
+Comment on the results obtained.
+''')
+print('''
+(d) Now consider a logistic regression model that predicts the probability of default using income, balance, and a dummy variable for student.
+Estimate the test error for this model using the validation set approach.
+Comment on whether or not including a dummy variable for student leads to a reduction in the test error rate.
+''')
