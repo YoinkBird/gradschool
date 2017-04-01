@@ -56,9 +56,28 @@ print(
 '''
 (a) Split the data set into a training set and a test set.
 ''')
+X_train, X_test, y_train, y_test = model_selection.train_test_split(data.drop(['apps'],axis=1),data.apps, test_size=0.2)
+print("train X vs y: %s | %s" % (X_train.shape, y_train.shape))
+print("test  X vs y: %s | %s" % (X_test.shape, y_test.shape))
 print('''
 (b) Fit a linear model using least squares on the training set, and report the test error obtained.
 ''')
+reg = linear_model.LinearRegression()
+reg.fit(X_train,y_train)
+y_pred = reg.predict(X_test)
+# test error
+from sklearn.metrics import mean_squared_error
+from math import sqrt
+mse  = mean_squared_error(y_test, y_pred)
+rmse = sqrt(mse)
+print("mse: %s | rmse root(%s)" % (mse, rmse))
+print("manual method:")
+# mean squared error - mean_squared_error
+print("mse: " , np.mean((y_pred - y_test) ** 2))
+# http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html#sklearn.linear_model.LinearRegression.score
+print("R^2 score: " , reg.score(X_test,y_test))
+
+
 print('''
 (c) Fit a ridge regression model on the training set, with 'lambda' chosen by cross-validation. Report the test error obtained.
 ''')
