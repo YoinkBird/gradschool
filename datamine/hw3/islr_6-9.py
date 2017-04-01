@@ -74,8 +74,13 @@ print("mse: %s | rmse root(%s)" % (mse, rmse))
 print("manual method:")
 # mean squared error - mean_squared_error
 print("mse: " , np.mean((y_pred - y_test) ** 2))
+## R^2 score:
 # http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html#sklearn.linear_model.LinearRegression.score
-print("R^2 score: " , reg.score(X_test,y_test))
+# R^2: 1 - ((y_pred - y_test)**2).sum() / ((y_test - y_test.mean())**2).sum()
+regression_ss = ((y_test - y_pred)**2).sum()
+residual_ss = ((y_test - y_test.mean())**2).sum()
+r2_manual = 1 - (regression_ss / residual_ss)
+print("R^2 score: %s | manual: %s" % (reg.score(X_test,y_test), r2_manual))
 
 
 print('''
