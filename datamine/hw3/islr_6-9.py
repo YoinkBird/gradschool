@@ -121,3 +121,11 @@ print('''
 (g) Comment on the results obtained. How accurately can we predict the number of college applications received? Is there much difference among the test errors resulting from these five approaches?
 ''')
 
+
+# sources:
+'''
+# linear regression / least squares
+http://scikit-learn.org/stable/auto_examples/linear_model/plot_ols.html
+http://scikit-learn.org/stable/auto_examples/linear_model/plot_ols_ridge_variance.html
+'''
+
