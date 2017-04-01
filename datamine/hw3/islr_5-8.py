@@ -40,6 +40,7 @@ y = y.reshape(-1,1)
 print('''
 (b) Create a scatterplot of X against Y . Comment on what you find.
 ''')
+plt.show()
 plt.scatter(x,y)
 plt.show()
 print('''
@@ -52,19 +53,14 @@ iv.  Y = B_0 + B_1X + B_2X2 + B_3X3 + B_4X4 + err
 ''')
 from sklearn import model_selection, cross_validation
 from sklearn import linear_model
-# http://scikit-learn.org/stable/modules/cross_validation.html#leave-one-out-loo
-# http://stackoverflow.com/questions/24890684/leave-one-out-cross-validation
-loo = cross_validation.LeaveOneOut(x.shape[0])
+def loocv_errors(x,y, seed):
+  # http://scikit-learn.org/stable/modules/cross_validation.html#leave-one-out-loo
+  # http://stackoverflow.com/questions/24890684/leave-one-out-cross-validation
+  loo = cross_validation.LeaveOneOut(x.shape[0])
 
-colors = ['teal', 'yellowgreen', 'gold', 'red','green']
-if(1):
-  # x.shape|y.shape Out[83]: (100, 1)
-  polydegrees = [1,2,3,4,5]
-if(0):
   scores = list()
   regr = linear_model.LinearRegression()
-  plt.scatter(x,y)
-  plt.show()
+  polydegrees = [1,2,3,4,5]
   for count, degree in enumerate(polydegrees[:]):
     poly = PolynomialFeatures(degree)
     X_poly = poly.fit_transform(x)
@@ -73,6 +69,11 @@ if(0):
     print(score)
   plt.plot(polydegrees,np.array(scores)*-1)
   plt.show()
+if(1):
+  seed = 42
+  loocv_errors(x,y,seed)
+
+colors = ['teal', 'yellowgreen', 'gold', 'red','green']
 if(1):
   scores = list()
   plt.scatter(x,y)
@@ -125,6 +126,8 @@ if(1):
 #    plt.plot(x.reshape(-1,1), regr.predict(x.reshape(-1,1)))
 # TODO: would need to use axes for super-imposing
 #plt.scatter(x,y)
+plt.show()
+plt.close()
 
 # thought: how to generate 'np.random.normal' from 'np.random.multivariate_normal'
 # note: random.normal uses loc=0.0 for 'mean' of dist, 'scale=1.0' for std dev
