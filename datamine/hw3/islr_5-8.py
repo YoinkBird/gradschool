@@ -14,6 +14,19 @@ from sklearn.pipeline import make_pipeline
 
 # save with:
 #%history -f session.py
+print('''
+Ch6 intro: If n >> p - that is, if n, the number of
+observations, is much larger than p, the number of variables
+
+8. We will now perform cross-validation on a simulated data set.
+(a) Generate a simulated data set as follows:
+> set . seed (1)
+> y= rnorm (100)
+> x= rnorm (100)
+> y=x -2* x^2+ rnorm (100)
+In this data set, what is n and what is p?
+Write out the model used to generate the data in equation form.
+''')
 # BEGIN:
 samplesize = 10
 samplesize = 100
@@ -25,6 +38,19 @@ y = x - 2*x**2 + np.random.normal(size=samplesize)
 x = x.reshape(-1,1)
 y = y.reshape(-1,1)
 #plt.scatter(x,y)
+print('''
+(b) Create a scatterplot of X against Y . Comment on what you find.
+''')
+plt.scatter(x,y)
+plt.show()
+print('''
+(c) Set a random seed, and then compute the LOOCV errors that
+result from fitting the following four models using least squares:
+i.   Y = B_0 + B_1X + err
+ii.  Y = B_0 + B_1X + B_2X2 + err
+iii. Y = B_0 + B_1X + B_2X2 + B_3X3 + err
+iv.  Y = B_0 + B_1X + B_2X2 + B_3X3 + B_4X4 + err
+''')
 from sklearn import model_selection, cross_validation
 from sklearn import linear_model
 # http://scikit-learn.org/stable/modules/cross_validation.html#leave-one-out-loo
@@ -91,3 +117,17 @@ if(1):
 # note: random.normal uses loc=0.0 for 'mean' of dist, 'scale=1.0' for std dev
 # np.random.normal(100) ==
 #  np.random.multivariate_normal([0,0],[[0,1],[1,0]],100)
+
+print('''
+(d) Repeat (c) using another random seed, and report your results.
+Are your results the same as what you got in (c)? Why?
+''')
+print('''
+(e) Which of the models in (c) had the smallest LOOCV error? Is
+this what you expected? Explain your answer.
+''')
+print('''
+(f) Comment on the statistical significance of the coefficient estimates that
+ results from fitting each of the models in (c) using least squares.
+Do these results agree with the conclusions drawn based on the cross-validation results?
+''')
