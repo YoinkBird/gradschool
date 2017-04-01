@@ -95,12 +95,13 @@ if(1):
   lambdas = 10**np.linspace(10, -2, 100) * 0.5
 
   # choose lambda with cross-validation
-  reg2 = linear_model.RidgeCV(alphas=lambdas,store_cv_values=True)
+  reg_ridgecv = linear_model.RidgeCV(alphas=lambdas,store_cv_values=True)
   # must scale
-  reg2.fit(scale(X_train),y_train)
-  y_pred = reg2.predict(scale(X_test))
+  reg_ridgecv.fit(scale(X_train),y_train)
+  y_pred = reg_ridgecv.predict(scale(X_test))
 
-  clf = linear_model.Ridge(alpha=reg2.alpha_, fit_intercept=False)
+  print("lambda: %s" % (reg_ridgecv.alpha_))
+  clf = linear_model.Ridge(alpha=reg_ridgecv.alpha_, fit_intercept=False)
   clf.fit(scale(X_train), y_train)
   y_pred = clf.predict(scale(X_test))
   mse = mean_squared_error(y_test, y_pred)
