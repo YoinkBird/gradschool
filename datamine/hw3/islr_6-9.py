@@ -86,6 +86,27 @@ print("R^2 score: %s | manual: %s" % (reg.score(X_test,y_test), r2_manual))
 print('''
 (c) Fit a ridge regression model on the training set, with 'lambda' chosen by cross-validation. Report the test error obtained.
 ''')
+if(1):
+  # http://scikit-learn.org/stable/modules/linear_model.html
+  n_lambdas = 200
+  lambdas = np.linspace(10, -2, n_lambdas)
+  lambdas = np.logspace(-10, -2, n_lambdas)
+  lambdas = 10**np.linspace(10, -2, 100) * 0.5
+
+  # choose lambda with cross-validation
+  reg2 = linear_model.RidgeCV(alphas=lambdas,store_cv_values=True)
+  # must scale
+  reg2.fit(scale(X_train),y_train)
+  y_pred = reg2.predict(scale(X_test))
+
+  clf = linear_model.Ridge(alpha=reg2.alpha_, fit_intercept=False)
+  clf.fit(scale(X_train), y_train)
+  y_pred = clf.predict(scale(X_test))
+  mse = mean_squared_error(y_test, y_pred)
+  print("mse: %s" % (mse))
+  print("rmse: %s" % (np.sqrt(mse)))
+
+
 print('''
 (d) Fit a lasso model on the training set, with 'lamda' chosen by cross-validation. Report the test error obtained, along with the number of non-zero coefficient estimates.
 ''')
