@@ -37,7 +37,6 @@ y = x - 2*x**2
 y = x - 2*x**2 + np.random.normal(size=samplesize)
 x = x.reshape(-1,1)
 y = y.reshape(-1,1)
-#plt.scatter(x,y)
 print('''
 (b) Create a scatterplot of X against Y . Comment on what you find.
 ''')
@@ -56,23 +55,37 @@ from sklearn import linear_model
 # http://scikit-learn.org/stable/modules/cross_validation.html#leave-one-out-loo
 # http://stackoverflow.com/questions/24890684/leave-one-out-cross-validation
 loo = cross_validation.LeaveOneOut(x.shape[0])
-loo = cross_validation.LeaveOneOut(7)
 
-# quick test - what am I doing wrong?
 colors = ['teal', 'yellowgreen', 'gold', 'red','green']
-plt.scatter(x,y)
-plt.show()
-# x.shape|y.shape Out[83]: (100, 1)
-polydegrees = [1,2,3,4,5]
 if(1):
+  # x.shape|y.shape Out[83]: (100, 1)
+  polydegrees = [1,2,3,4,5]
+if(0):
+  scores = list()
+  regr = linear_model.LinearRegression()
   plt.scatter(x,y)
-  for count, degree in enumerate(polydegrees[:2]):
+  plt.show()
+  for count, degree in enumerate(polydegrees[:]):
+    poly = PolynomialFeatures(degree)
+    X_poly = poly.fit_transform(x)
+    score = model_selection.cross_val_score(regr, X_poly, y, cv=loo, scoring='neg_mean_squared_error').mean()
+    scores.append(score)
+    print(score)
+  plt.plot(polydegrees,np.array(scores)*-1)
+  plt.show()
+if(1):
+  scores = list()
+  plt.scatter(x,y)
+  #for count, degree in enumerate(polydegrees[:2]): #limit to 2
+  for count, degree in enumerate(polydegrees[:]):
       model = make_pipeline(PolynomialFeatures(degree), LinearRegression()) #Ridge())
       if(1):
         model.fit(x[:10],y[:10])
         y_pred = model.predict(x)
         plt.plot(x, y_pred, color=colors[count], marker='.')
-      print(model.score(x,y))
+      score = model.score(x,y)
+      scores.append(score)
+      print(score)
   plt.show()
 ### # see also http://nbviewer.jupyter.org/github/ipython/ipython/blob/1.x/examples/notebooks/Part%203%20-%20Plotting%20with%20Matplotlib.ipynb
 ### fig = plt.figure()
