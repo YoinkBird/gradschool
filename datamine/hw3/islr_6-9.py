@@ -11,6 +11,7 @@ import scipy.misc
 from sklearn import linear_model
 from sklearn.linear_model import *
 from sklearn.preprocessing import PolynomialFeatures
+from sklearn.preprocessing import scale
 from sklearn.pipeline import make_pipeline
 from sklearn import model_selection, cross_validation
 
@@ -105,6 +106,8 @@ if(1):
   mse = mean_squared_error(y_test, y_pred)
   print("mse: %s" % (mse))
   print("rmse: %s" % (np.sqrt(mse)))
+else:
+  print("-I-: Skipping...")
 
 
 print('''
