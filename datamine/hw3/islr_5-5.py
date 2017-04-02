@@ -84,12 +84,13 @@ def validation_set(data, predictors, responsecls, test_sizes):
   for testnum, testsize in enumerate(test_sizes):
     # print("i. Split the sample set into a training set and a validation set.")
     X_train, X_test, y_train, y_test = model_selection.train_test_split(data[predictors],data[responsecls], test_size=testsize)
-    print("TEST: split: %s | train X,y [%s|%s] vs test X,y [%s|%s]" % (testsize, X_train.shape, y_train.shape, X_test.shape, y_test.shape))
+    # print("TEST: split: %s | train X,y [%s|%s] vs test X,y [%s|%s]" % (testsize, X_train.shape, y_train.shape, X_test.shape, y_test.shape))
     # or do this after generation:  y_test.reset_index(level=int,drop=True)
     # print("ii. Fit a multiple logistic regression model using only the training observations.")
     model = make_pipeline(linear_model.LinearRegression())
     model.fit(X_train, y_train)
-    print("fit score:" , model.score(X_test,y_test))
+    score = model.score(X_train,y_train)
+    # print("fit score:" , model.score(X_test,y_test))
     # iii. prediction of default status ....
     y_pred = model.predict(X_test)
     # convert to series, indexed based on y_test
@@ -106,7 +107,9 @@ def validation_set(data, predictors, responsecls, test_sizes):
     # true / total , where 'False' indicates misclassification, i.e. prediction doesn't match y_test
     ratio_f = matching[matching == False].count() / matching.count()
     ratio_t = matching[matching == True].count() / matching.count()
-    print("misclassification: %f | correct: %f | verify sum: %f == 1" % (ratio_f, ratio_t, ratio_t+ratio_f))
+    printstr = ("misclassification: %f | correct: %f | verify sum: %f == 1" % (ratio_f, ratio_t, ratio_t+ratio_f))
+    printstr = "TEST: split: %s | score: %0.4f | %s" % (testsize, score, printstr)
+    print(printstr)
 if(1):
   print('''
   (b) Using the validation set approach, estimate the test error of this model.
