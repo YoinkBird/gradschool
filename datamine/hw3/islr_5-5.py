@@ -143,4 +143,14 @@ print('''
 (d) Now consider a logistic regression model that predicts the probability of default using income, balance, and a dummy variable for student.
 Estimate the test error for this model using the validation set approach.
 Comment on whether or not including a dummy variable for student leads to a reduction in the test error rate.
+i.e. repeat b,c with an extra var for student
 ''')
+if(1):
+  predictors = ['income','balance','student']
+  responsecls = 'default'
+  # loop through values of test_size
+  test_sizes = [0.2,0.3,0.5]         # part c
+  test_sizes = [0.2,0.3,0.5,0.7,0.8] # epanded
+  validation_set(data, predictors, responsecls, test_sizes)
+else:
+  print("-I-: Skipping...")
