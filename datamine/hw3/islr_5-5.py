@@ -87,39 +87,41 @@ In order to do this, you must perform the following steps:
 if(1):
   predictors = ['income','balance']
   responsecls = 'default'
-  print("i. Split the sample set into a training set and a validation set.")
-  X_train, X_test, y_train, y_test = model_selection.train_test_split(data[predictors],data[responsecls], test_size=0.2)
-  # or do this after generation:  y_test.reset_index(level=int,drop=True)
-  print("ii. Fit a multiple logistic regression model using only the training observations.")
-  model = make_pipeline(linear_model.LinearRegression())
-  model.fit(X_train, y_train)
-  print("score:" , model.score(X_test,y_test))
-  print('''
-  iii. Obtain a prediction of default status for each individual in the validation set by computing the posterior probability of default for that individual, and classifying the individual to the default category if the posterior probability equals 0.5.")
-  i.e. convert >0.5 to 1 for default, all other to 0
-  ''')
-  y_pred = model.predict(X_test)
-  # convert to series, indexed based on y_test
-  probs = pd.Series(y_pred,index=y_test.index).round()
-  # convert >0.5 to 1 based on y_test
-  # TODO: verify the threshold, use this instead: probs > 0.5
-  probs.round(decimals=0)
-  # get rid of negatives
-  probs = probs.astype(int)
-
-  print("iv. Compute the validation set error, which is the fraction of the observations in the validation set that are misclassified.")
-  matching = (y_test == probs)
-  # true / total , where 'True' that the arrays were equal
-  ratio_t = matching[matching == True].count() / matching.count()
-  ratio_f = matching[matching == False].count() / matching.count()
-  print("ratio_t: ", ratio_t)
-  print("~ratio_t:", ratio_f)
-  print("verify: ratio_t + ~ratio_t:", ratio_t + ratio_f)
   print('''
   (c) Repeat the process in (b) three times, using three different splits of the observations into a training set and a validation set.
   Comment on the results obtained.
   ''')
   # loop through values of test_size
+  test_sizes = [0.2,0.3,0.5]
+  for testnum, testsize in enumerate(test_sizes):
+    print("i. Split the sample set into a training set and a validation set.")
+    X_train, X_test, y_train, y_test = model_selection.train_test_split(data[predictors],data[responsecls], test_size=testsize)
+    # or do this after generation:  y_test.reset_index(level=int,drop=True)
+    print("ii. Fit a multiple logistic regression model using only the training observations.")
+    model = make_pipeline(linear_model.LinearRegression())
+    model.fit(X_train, y_train)
+    print("score:" , model.score(X_test,y_test))
+    print('''
+    iii. Obtain a prediction of default status for each individual in the validation set by computing the posterior probability of default for that individual, and classifying the individual to the default category if the posterior probability equals 0.5.")
+    i.e. convert >0.5 to 1 for default, all other to 0
+    ''')
+    y_pred = model.predict(X_test)
+    # convert to series, indexed based on y_test
+    probs = pd.Series(y_pred,index=y_test.index).round()
+    # convert >0.5 to 1 based on y_test
+    # TODO: verify the threshold, use this instead: probs > 0.5
+    probs.round(decimals=0)
+    # get rid of negatives
+    probs = probs.astype(int)
+
+    print("iv. Compute the validation set error, which is the fraction of the observations in the validation set that are misclassified.")
+    matching = (y_test == probs)
+    # true / total , where 'True' that the arrays were equal
+    ratio_t = matching[matching == True].count() / matching.count()
+    ratio_f = matching[matching == False].count() / matching.count()
+    print("ratio_t: ", ratio_t)
+    print("~ratio_t:", ratio_f)
+    print("verify: ratio_t + ~ratio_t:", ratio_t + ratio_f)
 else:
   print("-I-: Skipping...")
 print('''
