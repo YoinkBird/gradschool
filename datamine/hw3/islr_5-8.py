@@ -70,11 +70,15 @@ def loocv_errors(x,y, seed):
     print(score)
   plt.plot(polydegrees,np.array(scores)*-1)
   plt.show()
+  return scores
 
 # b
+totalScores = {}
+seed1 = 42
+seed2 = 19
 if(1):
   seed = 42
-  loocv_errors(x,y,seed)
+  totalScores[seed] = pd.Series(loocv_errors(x,y,seed))
 
 print('''
 (d) Repeat (c) using another random seed, and report your results.
@@ -82,16 +86,24 @@ Are your results the same as what you got in (c)? Why?
 ''')
 if(1):
   seed = 19
-  loocv_errors(x,y,seed)
+  totalScores[seed] = pd.Series(loocv_errors(x,y,seed))
+  print("b == c?:" , totalScores[19].equals(totalScores[42]))
+  print("same answer because LOOCV is deterministic, i.e. independent of seed as it doesn't rely on randomness")
 print('''
 (e) Which of the models in (c) had the smallest LOOCV error? Is
 this what you expected? Explain your answer.
 ''')
+if(1):
+  print("usually the second one")
+  print(totalScores[seed1][1] == totalScores[seed1].max())
+
 print('''
 (f) Comment on the statistical significance of the coefficient estimates that
  results from fitting each of the models in (c) using least squares.
 Do these results agree with the conclusions drawn based on the cross-validation results?
 ''')
+# TODO
+
 colors = ['teal', 'yellowgreen', 'gold', 'red','green']
 if(1):
   scores = list()
