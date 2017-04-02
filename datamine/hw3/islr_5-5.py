@@ -80,26 +80,7 @@ if(1):
 else:
   print("-I-: Skipping...")
 
-print('''
-(b) Using the validation set approach, estimate the test error of this model.
-In order to do this, you must perform the following steps:
-''')
-if(1):
-  print('''
-  (c) Repeat the process in (b) three times, using three different splits of the observations into a training set and a validation set.
-  Comment on the results obtained.
-  ''')
-  print("i. Split the sample set into a training set and a validation set.")
-  print("ii. Fit a multiple logistic regression model using only the training observations.")
-  print('''
-  iii. Obtain a prediction of default status for each individual in the validation set by computing the posterior probability of default for that individual, and classifying the individual to the default category if the posterior probability equals 0.5.")
-  i.e. convert >0.5 to 1 for default, all other to 0
-  ''')
-  print("iv. Compute the validation set error, which is the fraction of the observations in the validation set that are misclassified.")
-  predictors = ['income','balance']
-  responsecls = 'default'
-  # loop through values of test_size
-  test_sizes = [0.2,0.3,0.5]         # part c
+def validation_set(data, predictors, responsecls, test_sizes):
   for testnum, testsize in enumerate(test_sizes):
     # print("i. Split the sample set into a training set and a validation set.")
     X_train, X_test, y_train, y_test = model_selection.train_test_split(data[predictors],data[responsecls], test_size=testsize)
@@ -126,6 +107,36 @@ if(1):
     ratio_f = matching[matching == False].count() / matching.count()
     ratio_t = matching[matching == True].count() / matching.count()
     print("misclassification: %f | correct: %f | verify sum: %f == 1" % (ratio_f, ratio_t, ratio_t+ratio_f))
+if(1):
+  print('''
+  (b) Using the validation set approach, estimate the test error of this model.
+  In order to do this, you must perform the following steps:
+  ''')
+  print("i. Split the sample set into a training set and a validation set.")
+  print("ii. Fit a multiple logistic regression model using only the training observations.")
+  print('''
+  iii. Obtain a prediction of default status for each individual in the validation set by computing the posterior probability of default for that individual, and classifying the individual to the default category if the posterior probability equals 0.5.")
+  i.e. convert >0.5 to 1 for default, all other to 0
+  ''')
+  print("iv. Compute the validation set error, which is the fraction of the observations in the validation set that are misclassified.")
+  predictors = ['income','balance']
+  responsecls = 'default'
+  # loop through values of test_size
+  test_sizes = [0.2]                 # part b
+  validation_set(data, predictors, responsecls, test_sizes)
+else:
+  print("-I-: Skipping...")
+print('''
+(c) Repeat the process in (b) three times, using three different splits of the observations into a training set and a validation set.
+Comment on the results obtained.
+''')
+if(1):
+  predictors = ['income','balance']
+  responsecls = 'default'
+  # loop through values of test_size
+  test_sizes = [0.2,0.3,0.5]         # part c
+  test_sizes = [0.2,0.3,0.5,0.7,0.8] # epanded
+  validation_set(data, predictors, responsecls, test_sizes)
 else:
   print("-I-: Skipping...")
 print('''
