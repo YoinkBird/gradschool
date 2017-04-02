@@ -66,11 +66,16 @@ Do any of the predictors appear to be statistically significant? If so, which on
 predictors = ['lag1','lag2','lag3','lag4','lag5','volume']
 if(1):
   #  TODO: determine statistically.for.api.Logit vs sklearn.linear_model.LogisticRegression
-  #  X_full = sm.add_constant(data[predictors])
-  #  y_full = data['direction']
+  X_logit = sm.add_constant(data[predictors])
+  y_logit = data['direction']
 
-  #  est = smf.Logit(y_full,X_full).fit()
-  #  print(est.summary())
+  est = smf.Logit(y_logit,X_logit).fit()
+  # DOC: http://www.statsmodels.org/stable/generated/statsmodels.discrete.discrete_model.LogitResults.summary.html?highlight=logit#statsmodels.discrete.discrete_model.LogitResults.summary
+  print(est.summary())
+  pred_logit = est.predict(X_logit)
+  #  ValueError: Can't handle mix of binary and continuous
+  # => 'direction' is 'binary'
+  #  print(confusion_matrix(y_logit, pred_logit))
 
   X_full = data[:][predictors]
   y_full = data[:]['direction']
