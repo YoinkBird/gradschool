@@ -46,15 +46,18 @@ This data is similar in nature to the Smarket data from this chapter's lab,
 Note: Weekly is 1990-2010. Smarket is 2001-2005
 """)
 print("(a) Produce some numerical and graphical summaries of the Weekly data. Do there appear to be any patterns?")
-data.hist()
-data.corr().plot() # TODO: seaborn
-plt.show()
-# year, vulume: 0.539006
-# plot volume over "index", which loosely corresponds to year:
-plt.scatter(data.index,data['volume'])
-plt.show()
-#plt.plot(data.index,data['year'])
-#plt.show()
+if(1):
+  data.hist()
+  data.corr().plot() # TODO: seaborn
+  plt.show()
+  # year, vulume: 0.539006
+  # plot volume over "index", which loosely corresponds to year:
+  plt.scatter(data.index,data['volume'])
+  plt.show()
+  #plt.plot(data.index,data['year'])
+  #plt.show()
+else:
+  print("-I-: Skipping...")
 print("""
 (b) Use the full data set to perform a logistic regression with Direction as the response and the five lag variables plus Volume as predictors. 
 Use the summary function to print the results.
@@ -62,12 +65,17 @@ Do any of the predictors appear to be statistically significant? If so, which on
 """)
 predictors = ['lag1','lag2','lag3','lag4','lag5','volume']
 if(1):
-  y_full = data['direction']
-  x_full = sm.add_constant(data[predictors])
-  est = smf.Logit(y_full,x_full).fit()
-  print(est.summary())
-  lda_full = LinearDiscriminantAnalysis()
-  pred_full = lda_full.fit(x_full,y_full).predict(x_full)
+  #  TODO: determine statistically.for.api.Logit vs sklearn.linear_model.LogisticRegression
+  #  X_full = sm.add_constant(data[predictors])
+  #  y_full = data['direction']
+
+  #  est = smf.Logit(y_full,X_full).fit()
+  #  print(est.summary())
+
+  X_full = data[:][predictors]
+  y_full = data[:]['direction']
+  regr = linear_model.LogisticRegression()
+  pred_full = regr.fit(X_full,y_full).predict(X_full)
   print(
   '''
   (c) Compute the confusion matrix and overall fraction of correct predictions.
