@@ -30,33 +30,30 @@ print(data.head())
 seed = 42
 np.random.seed(seed)
 
-print('''
-5. In Chapter 4, we used logistic regression to predict the probability of default using income and balance on the Default data set.
-We will now estimate the test error of this logistic regression model using the validation set approach.
-Do not forget to set a random seed before beginning your analysis.
-''')
+print("copypasta to reproduce graph from book")
+# technique for printing graph as in the book
+# caveat: only for one predictor
+if(1):
+  model = make_pipeline(LogisticRegression()) #Ridge())
+  X_full = data.balance.values.reshape(-1,1)
+  X_sorted = X_full.copy()
+  X_sorted.sort(axis=0)
+  y_full = data.default.values#.reshape(-1,1)
+  model.fit(X_full,y_full)
+  y_pred = model.predict(X_sorted)
+  # http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression.predict_proba
+  y_pred = model.predict_proba(X_sorted)
+  plt.scatter(X_full,y_full,color='teal')
+  # y_pred: 	T : array-like, shape = [n_samples, n_classes]
+  plt.plot(X_sorted, y_pred[:,1],color='lightblue')# color=colors[count], marker='.')
+  plt.show()
+  print(model.score(X_full,y_full))
+else:
+  print("-I-: Skipping...")
+
 print('''
 (a) Fit a multiple logistic regression model that uses 'income' and 'balance' to predict the probability of 'default', using only the observations.
 ''')
-if(1):
-  # technique for printing graph as in the book
-  if(1):
-    model = make_pipeline(LogisticRegression()) #Ridge())
-    X_full = data.balance.values.reshape(-1,1)
-    X_sorted = X_full.copy()
-    X_sorted.sort(axis=0)
-    y_full = data.default.values#.reshape(-1,1)
-    model.fit(X_full,y_full)
-    y_pred = model.predict(X_sorted)
-    # http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression.predict_proba
-    y_pred = model.predict_proba(X_sorted)
-    plt.scatter(X_full,y_full,color='teal')
-    # y_pred: 	T : array-like, shape = [n_samples, n_classes]
-    plt.plot(X_sorted, y_pred[:,1],color='lightblue')# color=colors[count], marker='.')
-    plt.show()
-    print(model.score(X_full,y_full))
-else:
-  print("-I-: Skipping...")
 
 print('''
 (b) Using the validation set approach, estimate the test error of this model.
