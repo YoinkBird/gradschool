@@ -98,6 +98,29 @@ Compute the confusion matrix and the overall fraction of correct predictions
 for the held out data (that is, the data from 2009 and 2010).
 Note: Weekly is 1990-2010. Smarket is 2001-2005. => train:2001-2004 hold:2004-2005
 ''')
+if(1):
+  # split into test,train datasets
+  train_lim = '2004'
+  test_start  = '2005'
+  predictors = ['lag2']
+  X_train = data[:'2004'][predictors]
+  y_train = data[:'2004']['direction']
+
+  X_test = data[test_start:][predictors]
+  y_test = data[test_start:]['direction']
+  # est = smf.Logit(y_full,x_full).fit()
+  # print(est.summary())
+  regr = linear_model.LogisticRegression()
+  y_pred = regr.fit(X_train,y_train).predict(X_test)
+
+  print("confusion matrix for held out data")
+  # TODO: maybe? confusion_matrix(y_train, pred).T
+  print(confusion_matrix(y_test, y_pred))
+  print("overall fraction of correct predictions for the held out data")
+  print(classification_report(y_test,y_pred,digits=3))
+else:
+  print("-I-: Skipping...")
+
 print('''
 (e) Repeat (d) using LDA.
 ''')
