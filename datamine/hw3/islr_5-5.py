@@ -39,21 +39,22 @@ print('''
 (a) Fit a multiple logistic regression model that uses 'income' and 'balance' to predict the probability of 'default', using only the observations.
 ''')
 if(1):
-  model = make_pipeline(LogisticRegression()) #Ridge())
+  # technique for printing graph as in the book
   if(1):
-    x = data.balance.values.reshape(-1,1)
-    x2 = x.copy()
-    x2.sort(axis=0)
-    y = data.default.values#.reshape(-1,1)
-    model.fit(x,y)
-    y_pred = model.predict(x2)
+    model = make_pipeline(LogisticRegression()) #Ridge())
+    X_full = data.balance.values.reshape(-1,1)
+    X_sorted = X_full.copy()
+    X_sorted.sort(axis=0)
+    y_full = data.default.values#.reshape(-1,1)
+    model.fit(X_full,y_full)
+    y_pred = model.predict(X_sorted)
     # http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression.predict_proba
-    y_pred = model.predict_proba(x2)
-    plt.scatter(x,y,color='teal')
+    y_pred = model.predict_proba(X_sorted)
+    plt.scatter(X_full,y_full,color='teal')
     # y_pred: 	T : array-like, shape = [n_samples, n_classes]
-    plt.plot(x2, y_pred[:,1],color='lightblue')# color=colors[count], marker='.')
+    plt.plot(X_sorted, y_pred[:,1],color='lightblue')# color=colors[count], marker='.')
     plt.show()
-  print(model.score(x,y))
+    print(model.score(X_full,y_full))
 else:
   print("-I-: Skipping...")
 
