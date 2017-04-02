@@ -85,26 +85,31 @@ print('''
 In order to do this, you must perform the following steps:
 ''')
 if(1):
-  predictors = ['income','balance']
-  responsecls = 'default'
   print('''
   (c) Repeat the process in (b) three times, using three different splits of the observations into a training set and a validation set.
   Comment on the results obtained.
   ''')
+  print("i. Split the sample set into a training set and a validation set.")
+  print("ii. Fit a multiple logistic regression model using only the training observations.")
+  print('''
+  iii. Obtain a prediction of default status for each individual in the validation set by computing the posterior probability of default for that individual, and classifying the individual to the default category if the posterior probability equals 0.5.")
+  i.e. convert >0.5 to 1 for default, all other to 0
+  ''')
+  print("iv. Compute the validation set error, which is the fraction of the observations in the validation set that are misclassified.")
+  predictors = ['income','balance']
+  responsecls = 'default'
   # loop through values of test_size
-  test_sizes = [0.2,0.3,0.5]
+  test_sizes = [0.2,0.3,0.5]         # part c
   for testnum, testsize in enumerate(test_sizes):
-    print("i. Split the sample set into a training set and a validation set.")
+    # print("i. Split the sample set into a training set and a validation set.")
     X_train, X_test, y_train, y_test = model_selection.train_test_split(data[predictors],data[responsecls], test_size=testsize)
+    print("TEST: split: %s | train X,y [%s|%s] vs test X,y [%s|%s]" % (testsize, X_train.shape, y_train.shape, X_test.shape, y_test.shape))
     # or do this after generation:  y_test.reset_index(level=int,drop=True)
-    print("ii. Fit a multiple logistic regression model using only the training observations.")
+    # print("ii. Fit a multiple logistic regression model using only the training observations.")
     model = make_pipeline(linear_model.LinearRegression())
     model.fit(X_train, y_train)
-    print("score:" , model.score(X_test,y_test))
-    print('''
-    iii. Obtain a prediction of default status for each individual in the validation set by computing the posterior probability of default for that individual, and classifying the individual to the default category if the posterior probability equals 0.5.")
-    i.e. convert >0.5 to 1 for default, all other to 0
-    ''')
+    print("fit score:" , model.score(X_test,y_test))
+    # iii. prediction of default status ....
     y_pred = model.predict(X_test)
     # convert to series, indexed based on y_test
     probs = pd.Series(y_pred,index=y_test.index)
@@ -115,14 +120,12 @@ if(1):
     # convert to int
     probs = probs.astype(int)
 
-    print("iv. Compute the validation set error, which is the fraction of the observations in the validation set that are misclassified.")
+    # print("iv. Compute the validation set error, which is the fraction of the observations in the validation set that are misclassified.")
     matching = (y_test == probs)
     # true / total , where 'False' indicates misclassification, i.e. prediction doesn't match y_test
-    ratio_t = matching[matching == True].count() / matching.count()
     ratio_f = matching[matching == False].count() / matching.count()
-    print("ratio_t: ", ratio_t)
-    print("~ratio_t:", ratio_f)
-    print("verify: ratio_t + ~ratio_t:", ratio_t + ratio_f)
+    ratio_t = matching[matching == True].count() / matching.count()
+    print("misclassification: %f | correct: %f | verify sum: %f == 1" % (ratio_f, ratio_t, ratio_t+ratio_f))
 else:
   print("-I-: Skipping...")
 print('''
