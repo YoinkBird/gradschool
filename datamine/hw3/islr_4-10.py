@@ -14,7 +14,7 @@ from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import make_pipeline
 from sklearn import model_selection, cross_validation
 
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
 from sklearn.metrics import confusion_matrix, classification_report, precision_score
 
 import statsmodels.api as sm
@@ -147,6 +147,26 @@ else:
 print('''
 (f) Repeat (d) using QDA.
 ''')
+if(1):
+  # split into test,train datasets
+  train_lim = '2004'
+  test_start  = '2005'
+  predictors = ['lag2']
+  X_train = data[:'2004'][predictors]
+  y_train = data[:'2004']['direction']
+
+  X_test = data[test_start:][predictors]
+  y_test = data[test_start:]['direction']
+
+  qda = QuadraticDiscriminantAnalysis()
+  y_pred = qda.fit(X_train,y_train).predict(X_test)
+  print("confusion matrix for held out data")
+  # maybe? confusion_matrix(y_train, pred).T
+  print(confusion_matrix(y_test, y_pred))
+  print("overall fraction of correct predictions for the held out data")
+  print(classification_report(y_test,y_pred,digits=3))
+else:
+  print("-I-: Skipping...")
 print('''
 (g) Repeat (d) using KNN with K = 1.
 ''')
