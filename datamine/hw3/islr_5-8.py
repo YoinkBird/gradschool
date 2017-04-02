@@ -54,6 +54,7 @@ iv.  Y = B_0 + B_1X + B_2X2 + B_3X3 + B_4X4 + err
 from sklearn import model_selection, cross_validation
 from sklearn import linear_model
 def loocv_errors(x,y, seed):
+  np.random.seed = seed
   # http://scikit-learn.org/stable/modules/cross_validation.html#leave-one-out-loo
   # http://stackoverflow.com/questions/24890684/leave-one-out-cross-validation
   loo = cross_validation.LeaveOneOut(x.shape[0])
@@ -69,10 +70,28 @@ def loocv_errors(x,y, seed):
     print(score)
   plt.plot(polydegrees,np.array(scores)*-1)
   plt.show()
+
+# b
 if(1):
   seed = 42
   loocv_errors(x,y,seed)
 
+print('''
+(d) Repeat (c) using another random seed, and report your results.
+Are your results the same as what you got in (c)? Why?
+''')
+if(1):
+  seed = 19
+  loocv_errors(x,y,seed)
+print('''
+(e) Which of the models in (c) had the smallest LOOCV error? Is
+this what you expected? Explain your answer.
+''')
+print('''
+(f) Comment on the statistical significance of the coefficient estimates that
+ results from fitting each of the models in (c) using least squares.
+Do these results agree with the conclusions drawn based on the cross-validation results?
+''')
 colors = ['teal', 'yellowgreen', 'gold', 'red','green']
 if(1):
   scores = list()
@@ -134,16 +153,3 @@ plt.close()
 # np.random.normal(100) ==
 #  np.random.multivariate_normal([0,0],[[0,1],[1,0]],100)
 
-print('''
-(d) Repeat (c) using another random seed, and report your results.
-Are your results the same as what you got in (c)? Why?
-''')
-print('''
-(e) Which of the models in (c) had the smallest LOOCV error? Is
-this what you expected? Explain your answer.
-''')
-print('''
-(f) Comment on the statistical significance of the coefficient estimates that
- results from fitting each of the models in (c) using least squares.
-Do these results agree with the conclusions drawn based on the cross-validation results?
-''')
