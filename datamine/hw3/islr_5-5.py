@@ -13,6 +13,7 @@ from sklearn.linear_model import *
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import make_pipeline
 from sklearn import model_selection, cross_validation
+from sklearn.metrics import confusion_matrix, classification_report, precision_score
 
 # %matplotlib inline
 datafile="../input/islr_data/Default.csv"
@@ -21,6 +22,8 @@ data = pd.read_csv(datafile,index_col=0)
 # preprocessing
 #data = pd.concat([data,pd.get_dummies(data[['default','student']])],axis=1)
 # http://stackoverflow.com/questions/40901770/is-there-a-simple-way-to-change-a-column-of-yes-no-to-1-0-in-a-pandas-dataframe
+#data.default = data.default.factorize()[0]
+#data.student = data.student.factorize()[0]
 data.default.replace(('Yes','No'),(1,0),inplace=True)
 data.student.replace(('Yes','No'),(1,0),inplace=True)
 print(data.head())
@@ -52,8 +55,30 @@ else:
   print("-I-: Skipping...")
 
 print('''
+5. In Chapter 4, we used logistic regression to predict the probability of default using income and balance on the Default data set.
+We will now estimate the test error of this logistic regression model using the validation set approach.
+Do not forget to set a random seed before beginning your analysis.
+''')
+print('''
 (a) Fit a multiple logistic regression model that uses 'income' and 'balance' to predict the probability of 'default', using only the observations.
 ''')
+if(1):
+  predictors = ['income','balance']
+  responsecls = 'default'
+  X_full = data[:][predictors]
+  y_full = data[:][responsecls]
+
+  regr = linear_model.LogisticRegression()
+  pred_full = regr.fit(X_full,y_full).predict(X_full)
+  print("score:")
+  print(regr.score(X_full,y_full))
+  print("confusion matrix for held out data")
+  print(confusion_matrix(y_full, pred_full))
+  print("overall fraction of correct predictions for the held out data")
+  print(classification_report(y_full,pred_full,digits=3))
+
+else:
+  print("-I-: Skipping...")
 
 print('''
 (b) Using the validation set approach, estimate the test error of this model.
