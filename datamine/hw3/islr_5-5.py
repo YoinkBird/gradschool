@@ -107,16 +107,17 @@ if(1):
     ''')
     y_pred = model.predict(X_test)
     # convert to series, indexed based on y_test
-    probs = pd.Series(y_pred,index=y_test.index).round()
-    # convert >0.5 to 1 based on y_test
-    # TODO: verify the threshold, use this instead: probs > 0.5
-    probs.round(decimals=0)
-    # get rid of negatives
+    probs = pd.Series(y_pred,index=y_test.index)
+    #dumb idea # probs = probs.round()
+    # convert >0.5 to 1 for default, all other to 0
+    probs[probs >= 0.5] = 1
+    probs[probs < 0.5] = 0
+    # convert to int
     probs = probs.astype(int)
 
     print("iv. Compute the validation set error, which is the fraction of the observations in the validation set that are misclassified.")
     matching = (y_test == probs)
-    # true / total , where 'True' that the arrays were equal
+    # true / total , where 'False' indicates misclassification, i.e. prediction doesn't match y_test
     ratio_t = matching[matching == True].count() / matching.count()
     ratio_f = matching[matching == False].count() / matching.count()
     print("ratio_t: ", ratio_t)
