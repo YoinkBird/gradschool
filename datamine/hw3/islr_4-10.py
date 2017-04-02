@@ -75,27 +75,6 @@ if(1):
   ''')
   print(confusion_matrix(y_full, pred_full))
   print(classification_report(y_full,pred_full,digits=3))
-  if(0):
-    model = make_pipeline(LogisticRegression()) #Ridge())
-#    xcolname = 'direction'
-#    x = data['xcolname'].values.reshape(-1,1)
-    data.head()
-    x = data[:'2005'][['lag1','lag2','lag3','lag4','lag5']]
-    x.head()
-    y = data[:'2005']['direction']
-    model.fit(x,y)
-    x2 = x.copy()
-    x2.sort(axis=0)
-    #y = data.default.values#.reshape(-1,1)
-    model.fit(x,y)
-    y_pred = model.predict(x)
-    # http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression.predict_proba
-    y_pred = model.predict_proba(x)
-    plt.scatter(x,y,color='teal')
-    # y_pred: 	T : array-like, shape = [n_samples, n_classes]
-    plt.plot(x, y_pred[:,1],color='lightblue')# color=colors[count], marker='.')
-    plt.show()
-    print(model.score(x,y))
 else:
   print("-I-: Skipping...")
 
