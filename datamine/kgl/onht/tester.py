@@ -46,7 +46,8 @@ def save_results(predictions, filename):
             f.write("%d,%f\n" % (i + 1, pred))
 
 
-def main():
+#def main():
+if(1):
     """
     Fit models and make predictions.
     We'll use one-hot encoding to transform our categorical features
@@ -103,5 +104,25 @@ def main():
       filename="output"
       save_results(preds, filename + ".csv")
 
-if __name__ == '__main__':
-    main()
+#if __name__ == '__main__':
+#     main()
+
+
+'''
+READING:
+  fit_transform - shortcut for fit; transform;
+  http://stackoverflow.com/a/43296172
+
+dummies etc
+http://stackoverflow.com/questions/40336502/want-to-know-the-diff-among-pd-factorize-pd-get-dummies-sklearn-preprocessing?noredirect=1&lq=1
+
+score
+http://stackoverflow.com/questions/40336502/want-to-know-the-diff-among-pd-factorize-pd-get-dummies-sklearn-preprocessing?noredirect=1&lq=1
+
+one hot
+http://stackoverflow.com/a/17470183
+
+
+transform
+http://scikit-learn.org/stable/data_transforms.html
+'''
