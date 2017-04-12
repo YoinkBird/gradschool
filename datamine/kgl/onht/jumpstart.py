@@ -85,6 +85,11 @@ if(1):
     n = 10  # repeat the CV procedure 10 times to get more precise results
     #n = 1 # for testing
     preds = {}
+    # TODO:
+    # * group model by target, i.e. access granted,denied and see if one of these is better
+    # * use stratified k-fold instead of shuffling: scikit-learn.org/stable/modules/generated/sklearn.model_selection.StratifiedKFold.html
+    # * add code after the loop to do CV using python methods instead of looping
+    # * svm with hyperparameter optimisation using GridSearchCV
     for name, model in models.items():
       mean_auc = 0.0
       for i in range(n):
