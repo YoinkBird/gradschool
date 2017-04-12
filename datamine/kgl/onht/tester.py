@@ -13,7 +13,7 @@ Paul Duan <email@paulduan.com>
 from __future__ import division
 
 import numpy as np
-from sklearn import (metrics, cross_validation, linear_model, preprocessing)
+from sklearn import (metrics, model_selection, linear_model, preprocessing)
 
 SEED = 42  # always use a seed for randomized procedures
 
@@ -75,7 +75,7 @@ def main():
     n = 10  # repeat the CV procedure 10 times to get more precise results
     for i in range(n):
         # for each iteration, randomly hold out 20% of the data as CV set
-        X_train, X_cv, y_train, y_cv = cross_validation.train_test_split(
+        X_train, X_cv, y_train, y_cv = model_selection.train_test_split(
             X, y, test_size=.20, random_state=i*SEED)
 
         # if you want to perform feature selection / hyperparameter
