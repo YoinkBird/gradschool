@@ -92,3 +92,7 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# data
+input
+repo_xgb
