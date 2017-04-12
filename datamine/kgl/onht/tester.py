@@ -27,10 +27,11 @@ def load_data(filename, use_labels=True):
     """
 
     # load column 1 to 8 (ignore last one)
-    data = np.loadtxt(open("data/" + filename), delimiter=',',
+    datadir = "../input/kglamzn/"
+    data = np.loadtxt(open(datadir + "/" + filename), delimiter=',',
                       usecols=range(1, 9), skiprows=1)
     if use_labels:
-        labels = np.loadtxt(open("data/" + filename), delimiter=',',
+        labels = np.loadtxt(open(datadir + "/" + filename), delimiter=',',
                             usecols=[0], skiprows=1)
     else:
         labels = np.zeros(data.shape[0])
