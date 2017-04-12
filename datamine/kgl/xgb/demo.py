@@ -4,11 +4,14 @@ from matplotlib import rcParams
 rcParams['figure.figsize'] = 5,5
 # get_ipython().magic('history -t -f demo.py')
 showplt=1 # enable matplotlib calls
+dataset="amzn"
+dataset="demo"
 demodir = "../repo_xgb/demo/data/"
 file_train = demodir + "agaricus.txt.train"
 file_test  = demodir + "agaricus.txt.test"
-if(0):
-  demodir = "../amzn/data/"
+if(dataset == "amzn"):
+  # TODO: expected f312143, f312141, f312138, f312140, f312145, f312144, f312142, f312139, f312153, f312147, f312149, f312137, f312146, f312150, f312152, f312148, f312151 in input data
+  demodir = "../input/kglamzn/"
   file_train = demodir + "train.csv"
   file_test = demodir + "test.csv"
 dtrain = xgb.DMatrix(file_train)
@@ -17,7 +20,8 @@ dtest = xgb.DMatrix(file_test)
 param = {'max_depth':2, 'eta':1, 'silent':1, 'objective':'binary:logistic',
     'eval_metric': ['auc'],
     }
-param['objective'] = 'reg:logistic'
+if(dataset == "amzn"):
+  param['objective'] = 'reg:logistic'
 num_round = 1
 bst=xgb.train(param, dtrain, num_round)
 if(showplt):
