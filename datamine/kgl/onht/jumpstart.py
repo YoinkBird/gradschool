@@ -54,12 +54,11 @@ if(1):
     into binary features.
     y and X will be numpy array objects.
     """
-    model = linear_model.LogisticRegression(C=3)  # the classifier we'll use
 
     # === load data in memory === #
     print("loading data")
     y, X = load_data('train.csv')
-    y_test, X_test = load_data('test.csv', use_labels=False)
+    y_test, X_test = load_data('test.csv', use_labels=False) # test has no meaningful labels
 
     # === one-hot encoding === #
     # we want to encode the category IDs encountered both in
@@ -72,37 +71,49 @@ if(1):
     # if you want to create new features, you'll need to compute them
     # before the encoding, and append them to your dataset after
 
+    models = {
+        'LR'  : linear_model.LogisticRegression(C=3),
+        }
     # === training & metrics === #
-    mean_auc = 0.0
     n = 10  # repeat the CV procedure 10 times to get more precise results
-    for i in range(n):
-        # for each iteration, randomly hold out 20% of the data as CV set
-        X_train, X_cv, y_train, y_cv = model_selection.train_test_split(
-            X, y, test_size=.20, random_state=i*SEED)
+    #n = 1 # for testing
+    preds = {}
+    for name, model in models.items():
+      mean_auc = 0.0
+      for i in range(n):
+          # for each iteration, randomly hold out 20% of the data as CV set
+          # wrapper for: next(ShuffleSplit().split(X, y))
+          # DOC: stratify: If not None, data is split in a stratified fashion, using this as the class labels.
+          # DOC: no empirical benefit to using 'stratify', using anyway though to avoid negative consequences as this is not i.i.d. data
+          X_train, X_cv, y_train, y_cv = model_selection.train_test_split(
+              X, y, test_size=.20, random_state=i*SEED, stratify=y)
 
-        # if you want to perform feature selection / hyperparameter
-        # optimization, this is where you want to do it
+          # if you want to perform feature selection / hyperparameter
+          # optimization, this is where you want to do it
 
-        # train model and make predictions
-        model.fit(X_train, y_train) 
-        preds = model.predict_proba(X_cv)[:, 1]
+          # train model and make predictions
+          model.fit(X_train, y_train) 
+          tmppreds = model.predict_proba(X_cv)[:, 1]
 
-        # compute AUC metric for this CV fold
-        fpr, tpr, thresholds = metrics.roc_curve(y_cv, preds)
-        roc_auc = metrics.auc(fpr, tpr)
-        print("AUC (fold %d/%d): %f" % (i + 1, n, roc_auc))
-        mean_auc += roc_auc
+          # compute AUC metric for this CV fold
+          fpr, tpr, thresholds = metrics.roc_curve(y_cv, tmppreds)
+          roc_auc = metrics.auc(fpr, tpr)
+          #print("AUC (fold %d/%d): %f" % (i + 1, n, roc_auc))
+          mean_auc += roc_auc
 
-    print("Mean AUC: %f" % (mean_auc/n))
+      print("%s Mean AUC: %f" % (name, mean_auc/n))
 
-    # === Predictions === #
-    # When making predictions, retrain the model on the whole training set
-    model.fit(X, y)
-    preds = model.predict_proba(X_test)[:, 1]
+      # === Predictions === #
+      # When making predictions, retrain the model on the whole training set
+      model.fit(X, y)
+      # Note: won't be able to score this prediction because the test data has useless labels
+      preds[name] = model.predict_proba(X_test)[:, 1]
+
     if(0):
       #filename = input("Enter name for submission file: ")
-      filename="output"
-      save_results(preds, filename + ".csv")
+      for name, pred in preds.items():
+        filename="output" + name
+        save_results(pred, filename + ".csv")
 
 #if __name__ == '__main__':
 #     main()
