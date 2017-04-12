@@ -13,7 +13,8 @@ Paul Duan <email@paulduan.com>
 from __future__ import division
 
 import numpy as np
-from sklearn import (metrics, model_selection, linear_model, preprocessing)
+from sklearn import (metrics, model_selection, linear_model, preprocessing, ensemble)
+import xgboost as xgb
 
 SEED = 42  # always use a seed for randomized procedures
 
@@ -71,9 +72,15 @@ if(1):
     # if you want to create new features, you'll need to compute them
     # before the encoding, and append them to your dataset after
 
+    xgb_params =  {'max_depth': 2, 'objective': 'binary:logistic', 'silent': 1}
     models = {
         'LR'  : linear_model.LogisticRegression(C=3),
+        'RFC' : ensemble.RandomForestClassifier(),
+        'XGB' : xgb.XGBClassifier(**xgb_params),
         }
+    #del(models['LR'])
+    #del(models['RFC'])
+    #del(models['XGB'])
     # === training & metrics === #
     n = 10  # repeat the CV procedure 10 times to get more precise results
     #n = 1 # for testing
