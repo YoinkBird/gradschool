@@ -81,8 +81,8 @@ if(1):
     tune_rfc = 0
     tune_xgb = 0
 
-    # LogisticRegression: best avg score from 10 rounds of CV:StratifiedShuffleSplit_train:test=0.2 , but 'C' is arbitrary.
-    lr_params =  {'C':3, 'multi_class':'ovr', 'solver':'sag'}
+    # LogisticRegression: 2nd best avg score from 10 rounds of CV:StratifiedShuffleSplit_train:test=0.2 , but 'C' is arbitrary.
+    lr_params =  {'C':3, 'multi_class':'ovr', 'solver':'liblinear'}
     # XGB: first working conglomeration from tutorial and documentation
     xgb_params =  {'max_depth': 2, 'objective': 'binary:logistic', 'silent': 1}
     models = {
@@ -119,6 +119,7 @@ if(1):
     # * use stratified k-fold instead of shuffling: scikit-learn.org/stable/modules/generated/sklearn.model_selection.StratifiedKFold.html
     # * add code after the loop to do CV using python methods instead of looping
     # * svm with hyperparameter optimisation using GridSearchCV
+    # * LogisticRegression: compare performance of LogisticRegression to statsmodels logit
     n = 10  # repeat the CV procedure 10 times to get more precise results
     #n = 1 # for testing
     split_ratio = 0.20 # 0.2 is best for now; 0.3 reduced score by ~0.08 : from 0.864*** to 0.856***
@@ -201,4 +202,10 @@ LogisticRegressionC3:ovr:lbfgs                Mean AUC: 0.864007
 LogisticRegressionC3:multinomial:newton-cg    Mean AUC: 0.861334
 LogisticRegressionC3:multinomial:lbfgs        Mean AUC: 0.861107
 LogisticRegressionC3:multinomial:sag          Mean AUC: 0.861006
+
+Result: use 2nd best param, liblinear. WHY: sag is best, BUT consistantly not converging
+  sklearn\linear_model\sag.py:286: ConvergenceWarning: The max_iter was reached which means the coef_ did not converge
+  "the coef_ did not converge", ConvergenceWarning
+Also: all of the multinomial (many-to-many) estimators performed much worse than the ovr (many-to-one) estimaters
+Future: test performance of statsmodels logit
 '''
