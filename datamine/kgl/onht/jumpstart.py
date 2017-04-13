@@ -83,10 +83,10 @@ if(1):
 
     # LogisticRegression: 2nd best avg score from 10 rounds of CV:StratifiedShuffleSplit_train:test=0.2 , but 'C' is arbitrary.
     lr_params =  {'C':3, 'multi_class':'ovr', 'solver':'liblinear'}
+    lr_name = "LogisticRegressionC%d:%s:%s" % (lr_params['C'], lr_params['multi_class'], lr_params['solver'])
     # XGB: first working conglomeration from tutorial and documentation
     xgb_params =  {'max_depth': 2, 'objective': 'binary:logistic', 'silent': 1}
-    models = {
-        'LogisticRegressionDefaultC3'         : linear_model.LogisticRegression(C=lr_params['C']),
+    models_global = {
         'LogisticRegressionC3:ovr:liblinear'  : linear_model.LogisticRegression(**lr_params),
         'RFC' : ensemble.RandomForestClassifier(),
         'XGB' : xgb.XGBClassifier(**xgb_params),
@@ -100,14 +100,17 @@ if(1):
       for lr_class in lr_classes:
         for lr_solver in lr_solvers:
           name = "LogisticRegressionC%d:%s:%s" % (lr_c_strength, lr_class, lr_solver)
-          models[name] = linear_model.LogisticRegression(C=lr_c_strength, multi_class=lr_class, solver=lr_solver)
+          models_global[name] = linear_model.LogisticRegression(C=lr_c_strength, multi_class=lr_class, solver=lr_solver)
       # ovm:liblinear - can't create in loop because liblinear doesn't work with multinomial
       lr_params =  {'C':3, 'multi_class':'ovr', 'solver':'liblinear'} # default. Small dataset or L1 penalty
       name = "LogisticRegressionC%d:%s:%s" % (lr_params['C'], lr_params['multi_class'], lr_params['solver'])
-      models[name] = linear_model.LogisticRegression(**lr_params)
+      models_global[name] = linear_model.LogisticRegression(**lr_params)
       # remove other models during tuning. may change later.
-      del(models['RFC'])
-      del(models['XGB'])
+      del(models_global['RFC'])
+      del(models_global['XGB'])
+    # working set
+    models = {}
+    models[lr_name] = models_global[lr_name]
     #del(models['LogisticRegression'])
     #del(models['RFC'])
     #del(models['XGB'])
