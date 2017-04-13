@@ -115,14 +115,46 @@ if(1):
     #del(models['RFC'])
     #del(models['XGB'])
     # === training & metrics === #
-    preds = {}
-    scores = {}
+    ################################################################################
     # TODO:
+    # * generate several cv models to avoid overfitting
     # * group model by target, i.e. access granted,denied and see if one of these is better
     # * use stratified k-fold instead of shuffling: scikit-learn.org/stable/modules/generated/sklearn.model_selection.StratifiedKFold.html
     # * add code after the loop to do CV using python methods instead of looping
     # * svm with hyperparameter optimisation using GridSearchCV
     # * LogisticRegression: compare performance of LogisticRegression to statsmodels logit
+    # * best subset, boot-strapping, etc
+    ################################################################################
+    # exp2: Experiment with GridSearchCV to find the right test split - result: failed, test split just correlates with AUC score
+    preds = {}
+    scores = {}
+    for i in range(1,10):
+      split_ratio=i*0.05
+      name = "GridSearchCV.split:%.02f" % split_ratio
+      print("model %s running %d CV rounds using %.02f train:test StratifiedShuffleSplit" % (name,1, split_ratio))
+      X_train, X_cv, y_train, y_cv = model_selection.train_test_split(X, y, test_size=split_ratio, random_state=0, stratify=y)
+      #gridsearchcv
+      # src: http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html
+      # TODO: scorer
+      parameters = {'C':[0.1,0.5,0.9,1,1.1,1.5,2,3,10]}
+      clf = model_selection.GridSearchCV(linear_model.LogisticRegression(), parameters)
+      clf.fit(X_train,y_train)
+      # train model and make predictions
+      tmppreds = clf.predict_proba(X_cv)[:, 1]
+
+      # compute AUC metric for this CV fold
+      fpr, tpr, thresholds = metrics.roc_curve(y_cv, tmppreds)
+      roc_auc = metrics.auc(fpr, tpr)
+      #print("AUC (fold %d/%d): %f" % (i + 1, n, roc_auc))
+      # record score
+      scores[name] = roc_auc
+    print("-I-: scores")
+    for mdl in sorted(scores, key=scores.get, reverse=True):
+      print("%-45s Mean AUC: %f" % (mdl, scores[mdl]))
+    ################################################################################
+    # exp1: average AUC of random shuffle
+    preds = {}
+    scores = {}
     n = 10  # repeat the CV procedure 10 times to get more precise results
     #n = 1 # for testing
     split_ratio = 0.20 # 0.2 is best for now; 0.3 reduced score by ~0.08 : from 0.864*** to 0.856***
@@ -172,6 +204,8 @@ if(1):
 #if __name__ == '__main__':
 #     main()
 
+# ipython never prints errors, this is the only way to know if the script actually finished.
+print("-I-: done")
 
 '''
 READING:
