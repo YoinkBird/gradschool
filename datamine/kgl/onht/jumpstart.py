@@ -125,7 +125,7 @@ if(1):
     split_ratio = 0.20 # 0.2 is best for now; 0.3 reduced score by ~0.08 : from 0.864*** to 0.856***
     for name, model in models.items():
       mean_auc = 0.0
-      print("model %s running %d CV rounds using %02f train:test StratifiedShuffleSplit" % (name,n, split_ratio))
+      print("model %s running %d CV rounds using %.02f train:test StratifiedShuffleSplit" % (name,n, split_ratio))
       for i in range(n):
           # for each iteration, randomly hold out 20% of the data as CV set
           # wrapper for: next(ShuffleSplit().split(X, y))
