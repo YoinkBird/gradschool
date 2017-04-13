@@ -125,6 +125,17 @@ if(1):
     # * LogisticRegression: compare performance of LogisticRegression to statsmodels logit
     # * best subset, boot-strapping, etc
     ################################################################################
+    print("# exp3: knn cross validation with GridSearchCV")
+    preds = {}
+    scores = {}
+    if(1):
+      cv = model_selection.StratifiedKFold(n_splits=10, shuffle=True, random_state=0)
+      parameters = {'C':[0.1,0.5,0.9,1,1.1,1.5,1.8,1.9,1.99,2,2.01,2.1,2.3,2.5,3,10]}
+      clf_grid = model_selection.GridSearchCV(linear_model.LogisticRegression(), parameters, cv=10, scoring='neg_mean_squared_error')
+      clf_grid.fit(X,y)
+      print("GridSearchCV results")
+      print(clf_grid.grid_scores_)
+      print(clf_grid.best_estimator_)
     ################################################################################
     print("# exp2: Experiment with GridSearchCV to find the right test split - result: failed, test split just correlates with AUC score")
     preds = {}
