@@ -19,6 +19,7 @@ from __future__ import division
 import numpy as np
 from sklearn import (metrics, model_selection, linear_model, preprocessing, ensemble)
 import xgboost as xgb
+import pprint as pp
 
 SEED = 42  # always use a seed for randomized procedures
 
@@ -133,9 +134,11 @@ if(1):
       parameters = {'C':[0.1,0.5,0.9,1,1.1,1.5,1.8,1.9,1.99,2,2.01,2.1,2.3,2.5,3,10]}
       clf_grid = model_selection.GridSearchCV(linear_model.LogisticRegression(), parameters, cv=10, scoring='neg_mean_squared_error')
       clf_grid.fit(X,y)
-      print("GridSearchCV results")
-      print(clf_grid.grid_scores_)
-      print(clf_grid.best_estimator_)
+      print("GridSearchCV results: %s | %s: %f" % (clf_grid.best_params_, clf_grid.scoring, clf_grid.best_score_))
+      print("GridSearchCV cv_results_:")
+      pp.pprint(clf_grid.cv_results_)
+      print("GridSearchCV best estimator:")
+      pp.pprint(clf_grid.best_estimator_)
     ################################################################################
     print("# exp2: Experiment with GridSearchCV to find the right test split - result: failed, test split just correlates with AUC score")
     preds = {}
@@ -154,6 +157,7 @@ if(1):
       clf.fit(X_train,y_train)
       # train model and make predictions
       tmppreds = clf.predict_proba(X_cv)[:, 1]
+      print("GridSearchCV results: %s | %s: %f" % (clf.best_params_, clf.scoring, clf.best_score_))
 
       # MSE
       tmpmse = metrics.mean_squared_error(y_cv,tmppreds)
