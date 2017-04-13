@@ -112,8 +112,6 @@ if(1):
     #del(models['RFC'])
     #del(models['XGB'])
     # === training & metrics === #
-    n = 10  # repeat the CV procedure 10 times to get more precise results
-    #n = 1 # for testing
     preds = {}
     scores = {}
     # TODO:
@@ -121,16 +119,19 @@ if(1):
     # * use stratified k-fold instead of shuffling: scikit-learn.org/stable/modules/generated/sklearn.model_selection.StratifiedKFold.html
     # * add code after the loop to do CV using python methods instead of looping
     # * svm with hyperparameter optimisation using GridSearchCV
+    n = 10  # repeat the CV procedure 10 times to get more precise results
+    #n = 1 # for testing
+    split_ratio = 0.20 # 0.2 is best for now; 0.3 reduced score by ~0.08 : from 0.864*** to 0.856***
     for name, model in models.items():
       mean_auc = 0.0
-      print("model %s running %d CV rounds using 0.2 train:test StratifiedShuffleSplit" % (name,n))
+      print("model %s running %d CV rounds using %02f train:test StratifiedShuffleSplit" % (name,n, split_ratio))
       for i in range(n):
           # for each iteration, randomly hold out 20% of the data as CV set
           # wrapper for: next(ShuffleSplit().split(X, y))
           # DOC: stratify: If not None, data is split in a stratified fashion, using this as the class labels.
           # DOC: no empirical benefit to using 'stratify', using anyway though to avoid negative consequences as this is not i.i.d. data
           X_train, X_cv, y_train, y_cv = model_selection.train_test_split(
-              X, y, test_size=.20, random_state=i*SEED, stratify=y)
+              X, y, test_size=split_ratio, random_state=i*SEED, stratify=y)
 
           # if you want to perform feature selection / hyperparameter
           # optimization, this is where you want to do it
