@@ -75,11 +75,15 @@ if(1):
 
     # if you want to create new features, you'll need to compute them
     # before the encoding, and append them to your dataset after
-    tune_lr = 1
+
+    # tuning: enable/disable individual model's tuning section
+    tune_lr = 0
     tune_rfc = 0
     tune_xgb = 0
 
-    lr_params =  {'C':3, 'multi_class':'ovr', 'solver':'liblinear'} # default. Small dataset or L1 penalty
+    # LogisticRegression: best avg score from 10 rounds of CV:StratifiedShuffleSplit_train:test=0.2 , but 'C' is arbitrary.
+    lr_params =  {'C':3, 'multi_class':'ovr', 'solver':'sag'}
+    # XGB: first working conglomeration from tutorial and documentation
     xgb_params =  {'max_depth': 2, 'objective': 'binary:logistic', 'silent': 1}
     models = {
         'LogisticRegressionDefaultC3'         : linear_model.LogisticRegression(C=lr_params['C']),
@@ -97,7 +101,11 @@ if(1):
         for lr_solver in lr_solvers:
           name = "LogisticRegressionC%d:%s:%s" % (lr_c_strength, lr_class, lr_solver)
           models[name] = linear_model.LogisticRegression(C=lr_c_strength, multi_class=lr_class, solver=lr_solver)
-      #del(models['LogisticRegression'])
+      # ovm:liblinear - can't create in loop because liblinear doesn't work with multinomial
+      lr_params =  {'C':3, 'multi_class':'ovr', 'solver':'liblinear'} # default. Small dataset or L1 penalty
+      name = "LogisticRegressionC%d:%s:%s" % (lr_params['C'], lr_params['multi_class'], lr_params['solver'])
+      models[name] = linear_model.LogisticRegression(**lr_params)
+      # remove other models during tuning. may change later.
       del(models['RFC'])
       del(models['XGB'])
     #del(models['LogisticRegression'])
@@ -177,4 +185,19 @@ http://stackoverflow.com/a/17470183
 
 transform
 http://scikit-learn.org/stable/data_transforms.html
+'''
+
+'''
+TMP RESULTS
+'''
+'''
+model LogisticRegression average score from 10 rounds CV using StratifiedShuffleSplit wth 0.2 train:test split
+LogisticRegressionC3:ovr:sag                  Mean AUC: 0.864274
+LogisticRegressionC3:ovr:liblinear            Mean AUC: 0.864177
+LogisticRegressionDefaultC3                   Mean AUC: 0.864177
+LogisticRegressionC3:ovr:newton-cg            Mean AUC: 0.864063
+LogisticRegressionC3:ovr:lbfgs                Mean AUC: 0.864007
+LogisticRegressionC3:multinomial:newton-cg    Mean AUC: 0.861334
+LogisticRegressionC3:multinomial:lbfgs        Mean AUC: 0.861107
+LogisticRegressionC3:multinomial:sag          Mean AUC: 0.861006
 '''
