@@ -125,9 +125,11 @@ if(1):
     # * LogisticRegression: compare performance of LogisticRegression to statsmodels logit
     # * best subset, boot-strapping, etc
     ################################################################################
-    # exp2: Experiment with GridSearchCV to find the right test split - result: failed, test split just correlates with AUC score
+    ################################################################################
+    print("# exp2: Experiment with GridSearchCV to find the right test split - result: failed, test split just correlates with AUC score")
     preds = {}
     scores = {}
+    scores_mse = {}
     for i in range(1,10):
       split_ratio=i*0.05
       name = "GridSearchCV.split:%.02f" % split_ratio
@@ -142,24 +144,31 @@ if(1):
       # train model and make predictions
       tmppreds = clf.predict_proba(X_cv)[:, 1]
 
+      # MSE
+      tmpmse = metrics.mean_squared_error(y_cv,tmppreds)
       # compute AUC metric for this CV fold
       fpr, tpr, thresholds = metrics.roc_curve(y_cv, tmppreds)
       roc_auc = metrics.auc(fpr, tpr)
       #print("AUC (fold %d/%d): %f" % (i + 1, n, roc_auc))
       # record score
       scores[name] = roc_auc
+      scores_mse[name] = tmpmse
     print("-I-: scores")
     for mdl in sorted(scores, key=scores.get, reverse=True):
       print("%-45s Mean AUC: %f" % (mdl, scores[mdl]))
+    for mdl in sorted(scores_mse, key=scores.get, reverse=True):
+      print("%-45s Mean MSE: %f" % (mdl, scores_mse[mdl]))
     ################################################################################
-    # exp1: average AUC of random shuffle
+    print("# exp1: average of random shuffle")
     preds = {}
     scores = {}
+    scores_mse = {}
     n = 10  # repeat the CV procedure 10 times to get more precise results
     #n = 1 # for testing
     split_ratio = 0.20 # 0.2 is best for now; 0.3 reduced score by ~0.08 : from 0.864*** to 0.856***
     for name, model in models.items():
       mean_auc = 0.0
+      mean_mse = 0.0
       print("model %s running %d CV rounds using %.02f train:test StratifiedShuffleSplit" % (name,n, split_ratio))
       for i in range(n):
           # for each iteration, randomly hold out 20% of the data as CV set
@@ -176,6 +185,10 @@ if(1):
           model.fit(X_train, y_train) 
           tmppreds = model.predict_proba(X_cv)[:, 1]
 
+          # MSE
+          tmpmse = metrics.mean_squared_error(y_cv,tmppreds)
+          #print("MSE:" , metrics.mean_squared_error(y_cv,tmppreds))
+          mean_mse += tmpmse
           # compute AUC metric for this CV fold
           fpr, tpr, thresholds = metrics.roc_curve(y_cv, tmppreds)
           roc_auc = metrics.auc(fpr, tpr)
@@ -183,6 +196,7 @@ if(1):
           mean_auc += roc_auc
       # record mean score
       scores[name] = mean_auc/n
+      scores_mse[name] = mean_mse/n
       #print("%-45s Mean AUC: %f" % (name, mean_auc/n))
 
       # === Predictions === #
@@ -195,6 +209,8 @@ if(1):
     print("-I-: scores")
     for mdl in sorted(scores, key=scores.get, reverse=True):
       print("%-45s Mean AUC: %f" % (mdl, scores[mdl]))
+    for mdl in sorted(scores_mse, key=scores.get, reverse=True):
+      print("%-45s Mean MSE: %f" % (mdl, scores_mse[mdl]))
     if(0):
       #filename = input("Enter name for submission file: ")
       for name, pred in preds.items():
