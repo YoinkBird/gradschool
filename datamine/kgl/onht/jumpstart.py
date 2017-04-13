@@ -10,6 +10,10 @@ pointers on where to go next.
 Paul Duan <email@paulduan.com>
 """
 
+## TODO: clear ipython env before running
+##  print("resetting ipython namespace to avoid accidents")
+##  get_ipython().magic('reset -f')
+
 from __future__ import division
 
 import numpy as np
@@ -71,20 +75,39 @@ if(1):
 
     # if you want to create new features, you'll need to compute them
     # before the encoding, and append them to your dataset after
+    tune_lr = 1
+    tune_rfc = 0
+    tune_xgb = 0
 
+    lr_params =  {'C':3, 'multi_class':'ovr', 'solver':'liblinear'} # default. Small dataset or L1 penalty
     xgb_params =  {'max_depth': 2, 'objective': 'binary:logistic', 'silent': 1}
     models = {
-        'LR'  : linear_model.LogisticRegression(C=3),
+        'LogisticRegressionDefaultC3'         : linear_model.LogisticRegression(C=lr_params['C']),
+        'LogisticRegressionC3:ovr:liblinear'  : linear_model.LogisticRegression(**lr_params),
         'RFC' : ensemble.RandomForestClassifier(),
         'XGB' : xgb.XGBClassifier(**xgb_params),
         }
-    #del(models['LR'])
+    # Logistic Regression Parameters
+    # src: http://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+    if(tune_lr): # set to '1' for "tuning", then disable once optimal params are found
+      lr_classes = ['ovr', 'multinomial']
+      lr_solvers = ['newton-cg', 'sag', 'lbfgs'] # Multinomial loss or large dataset
+      lr_c_strength=lr_params['C']
+      for lr_class in lr_classes:
+        for lr_solver in lr_solvers:
+          name = "LogisticRegressionC%d:%s:%s" % (lr_c_strength, lr_class, lr_solver)
+          models[name] = linear_model.LogisticRegression(C=lr_c_strength, multi_class=lr_class, solver=lr_solver)
+      #del(models['LogisticRegression'])
+      del(models['RFC'])
+      del(models['XGB'])
+    #del(models['LogisticRegression'])
     #del(models['RFC'])
     #del(models['XGB'])
     # === training & metrics === #
     n = 10  # repeat the CV procedure 10 times to get more precise results
     #n = 1 # for testing
     preds = {}
+    scores = {}
     # TODO:
     # * group model by target, i.e. access granted,denied and see if one of these is better
     # * use stratified k-fold instead of shuffling: scikit-learn.org/stable/modules/generated/sklearn.model_selection.StratifiedKFold.html
@@ -92,6 +115,7 @@ if(1):
     # * svm with hyperparameter optimisation using GridSearchCV
     for name, model in models.items():
       mean_auc = 0.0
+      print("model %s running %d CV rounds using 0.2 train:test StratifiedShuffleSplit" % (name,n))
       for i in range(n):
           # for each iteration, randomly hold out 20% of the data as CV set
           # wrapper for: next(ShuffleSplit().split(X, y))
@@ -112,15 +136,20 @@ if(1):
           roc_auc = metrics.auc(fpr, tpr)
           #print("AUC (fold %d/%d): %f" % (i + 1, n, roc_auc))
           mean_auc += roc_auc
-
-      print("%s Mean AUC: %f" % (name, mean_auc/n))
+      # record mean score
+      scores[name] = mean_auc/n
+      #print("%-45s Mean AUC: %f" % (name, mean_auc/n))
 
       # === Predictions === #
       # When making predictions, retrain the model on the whole training set
       model.fit(X, y)
       # Note: won't be able to score this prediction because the test data has useless labels
       preds[name] = model.predict_proba(X_test)[:, 1]
-
+    # "rank" the scores in descending order
+    # src: http://stackoverflow.com/a/16773816 # perl wins at this...
+    print("-I-: scores")
+    for mdl in sorted(scores, key=scores.get, reverse=True):
+      print("%-45s Mean AUC: %f" % (mdl, scores[mdl]))
     if(0):
       #filename = input("Enter name for submission file: ")
       for name, pred in preds.items():
