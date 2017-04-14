@@ -1,13 +1,9 @@
 """ Amazon Access Challenge Starter Code
 
-These files provide some starter code using 
-the scikit-learn library. It provides some examples on how
-to design a simple algorithm, including pre-processing,
-training a logistic regression classifier on the data,
-assess its performance through cross-validation and some 
-pointers on where to go next.
-
-Paul Duan <email@paulduan.com>
+original version obtained at:
+https://www.kaggle.com/c/amazon-employee-access-challenge/discussion/4797
+main leftovers: data loading and onehot encoding
+otherwise mostly changed
 """
 
 ## TODO: clear ipython env before running
