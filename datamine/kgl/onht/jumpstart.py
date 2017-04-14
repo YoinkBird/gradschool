@@ -20,9 +20,11 @@ import numpy as np
 from sklearn import (metrics, model_selection, linear_model, preprocessing, ensemble)
 import xgboost as xgb
 import pprint as pp
+import re
 
 SEED = 42  # always use a seed for randomized procedures
 
+save_files = 0
 
 def load_data(filename, use_labels=True):
     """
@@ -46,10 +48,23 @@ def load_data(filename, use_labels=True):
 
 def save_results(predictions, filename):
     """Given a vector of predictions, save results in CSV format."""
+    required_shape = 58921
+    if(predictions.shape[0] != required_shape):
+      print("-E-: shape should be %d, is %d" % (required_shape, predictions.shape[0]))
+      return
+
     with open(filename, 'w') as f:
         f.write("id,ACTION\n")
         for i, pred in enumerate(predictions):
             f.write("%d,%f\n" % (i + 1, pred))
+
+# dump hash of predictions to a file
+def save_all_results(predictions):
+  for name, pred in preds.items():
+    filename="output" + name
+    filename = re.sub(':', '_', filename)
+    save_results(pred, filename + ".csv")
+  return
 
 
 #def main():
