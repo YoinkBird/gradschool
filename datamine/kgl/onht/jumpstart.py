@@ -236,8 +236,9 @@ if(1):
       # TODO: scorer
       parameters = {'C':[0.1,0.5,0.9,1,1.1,1.5,2,3,10]}
       clf = model_selection.GridSearchCV(linear_model.LogisticRegression(), parameters)
-      clf.fit(X_train,y_train)
       # train model and make predictions
+      clf.fit(X_train,y_train)
+      y_cv_roc = metrics.roc_auc_score(y_cv, clf.predict_proba(X_cv)[:,1])
       tmppreds = clf.predict_proba(X_validation)[:, 1]
       print("GridSearchCV results: %s | %s: %f" % (clf.best_params_, clf.scoring, clf.best_score_))
 
