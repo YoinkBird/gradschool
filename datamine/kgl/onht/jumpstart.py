@@ -251,10 +251,12 @@ if(1):
       scores[name] = roc_auc
       scores_mse[name] = tmpmse
     print("-I-: scores")
+    print("%-45s Mean AUC:" % ("model"))
     for mdl in sorted(scores, key=scores.get, reverse=True):
-      print("%-45s Mean AUC: %f" % (mdl, scores[mdl]))
+      print("%-45s : %f" % (mdl, scores[mdl]))
+    print("%-45s Mean MSE:" % ("model"))
     for mdl in sorted(scores_mse, key=scores.get, reverse=True):
-      print("%-45s Mean MSE: %f" % (mdl, scores_mse[mdl]))
+      print("%-45s : %f" % (mdl, scores_mse[mdl]))
     ################################################################################
     print("# exp1: average of random shuffle")
     preds = {}
@@ -304,10 +306,12 @@ if(1):
     # "rank" the scores in descending order
     # src: http://stackoverflow.com/a/16773816 # perl wins at this...
     print("-I-: scores")
+    print("%-45s Mean AUC:" % ("model"))
     for mdl in sorted(scores, key=scores.get, reverse=True):
-      print("%-45s Mean AUC: %f" % (mdl, scores[mdl]))
+      print("%-45s : %f" % (mdl, scores[mdl]))
+    print("%-45s Mean MSE:" % ("model"))
     for mdl in sorted(scores_mse, key=scores.get, reverse=True):
-      print("%-45s Mean MSE: %f" % (mdl, scores_mse[mdl]))
+      print("%-45s : %f" % (mdl, scores_mse[mdl]))
     if(0):
       #filename = input("Enter name for submission file: ")
       for name, pred in preds.items():
