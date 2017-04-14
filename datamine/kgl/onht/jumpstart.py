@@ -254,16 +254,14 @@ if(1):
       y_cv_roc = metrics.roc_auc_score(y_cv, clf.predict_proba(X_cv)[:,1])
       # score for hold-out validation
       tmppreds = clf.predict_proba(X_validation)[:, 1]
+      roc_y_val = metrics.roc_y_val_score(y_validation,tmppreds)
 
       # MSE
       tmpmse = metrics.mean_squared_error(y_validation,tmppreds)
-      # compute AUC metric for this CV fold
-      tmp_roc = metrics.roc_auc_score(y_validation,tmppreds)
-      fpr, tpr, thresholds = metrics.roc_curve(y_validation, tmppreds)
-      roc_auc = metrics.auc(fpr, tpr)
-      print("%-.002f | %-*s | %f | %f | %f" % (split_ratio, colwidth_params, clf.best_params_, clf.best_score_, y_cv_roc, tmp_roc))
+      outstr = ("%-.002f | %-*s | %f | %f | %f |" % (split_ratio, colwidth_params, clf.best_params_, clf.best_score_, y_cv_roc, roc_y_val))
+      print(outstr)
       # record score
-      scores[name] = roc_auc
+      scores[name] = roc_y_val
       scores_mse[name] = tmpmse
     print("-I-: scores")
     print("%-45s Mean AUC:" % ("model"))
