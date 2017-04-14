@@ -106,8 +106,8 @@ if(1):
     # split data from 'train.csv' into three sets
     # "train+test":"validation" 80:20
 
-    validation_size=0.20 # marginally worse score on kaggle
-    validation_size=0.15 # marginally best  score on kaggle
+    validation_size=0.15 # kaggle: marginally best  score # locally: no optimal train/test though
+    validation_size=0.20 # kaggle: marginally worse score # locally: allows for optimal train/test to be found
     print("validation hold-out set size: %f" % validation_size)
     if(validation_size != 0):
       print("setting aside %f percent of the train.csv data for validation")
@@ -218,12 +218,13 @@ if(1):
         filename = re.sub(':', '_', filename)
         save_results(pred, filename + ".csv")
     ################################################################################
-    print("# exp2: Experiment with GridSearchCV to find the right test split - result: failed, test split just correlates with AUC score")
+    print("# exp2: Experiment with GridSearchCV+LogisticRegresstion to find the right test split\n\t\t- result: potentially optimal ratio for train:test:validation of 7:1:2")
     preds = {}
     scores = {}
     scores_mse = {}
     # try train/test ratios from 0.05 through 0.45
     split_ratios =  np.arange(5, 50, 5) / 100
+    split_ratios = [0.1] # consistently results in local max CV score combined with current validation set
     # replaces: for i in range(1,10): split_ratio=i*0.05
     print("# trying split_ratios: %s" % split_ratios)
     print("scoring: %s" % ("roc_auc"))
@@ -233,7 +234,7 @@ if(1):
     # header:
     # split | params     | roc_auc CV | roc_auc train | roc_auc global-holdout
     # :0.05 | {'C': 2.5} | 0.836104   | 0.884519      | 0.874113
-    colwidth_params=11
+    colwidth_params=20
     print("%-s | %-*s | %-8s | %-8s | %-8s %.03f" % ("split" , colwidth_params, "params" , "CV KFold" , "train" , "validation", validation_size))
     for split_ratio in (split_ratios):
       model = linear_model.LogisticRegression()
@@ -248,7 +249,10 @@ if(1):
       clf = model_selection.GridSearchCV(model, parameters, scoring='roc_auc')
       # train model and make predictions
       clf.fit(X_train,y_train)
+      # compute AUC metric for this CV fold
+      # score for cross-validation
       y_cv_roc = metrics.roc_auc_score(y_cv, clf.predict_proba(X_cv)[:,1])
+      # score for hold-out validation
       tmppreds = clf.predict_proba(X_validation)[:, 1]
 
       # MSE
@@ -373,4 +377,21 @@ Result: use 2nd best param, liblinear. WHY: sag is best, BUT consistantly not co
   "the coef_ did not converge", ConvergenceWarning
 Also: all of the multinomial (many-to-many) estimators performed much worse than the ovr (many-to-one) estimaters
 Future: test performance of statsmodels logit
+'''
+'''
+train:test Split:
+  notice the local max CV KFold at 0.10
+scoring: roc_auc
+split: StratifiedShuffleSplit
+model: LogisticRegression
+split | params     | CV KFold | train    | validation 0.200
+0.05 | {'C': 2.5}  | 0.836104 | 0.884519 | 0.874113
+0.10 | {'C': 3}    | 0.844486 | 0.836512 | 0.872174
+0.15 | {'C': 2.5}  | 0.834175 | 0.835599 | 0.870892
+0.20 | {'C': 2.01} | 0.828790 | 0.843344 | 0.868624
+0.25 | {'C': 2.5}  | 0.825378 | 0.838450 | 0.865420
+0.30 | {'C': 2.3}  | 0.817830 | 0.839385 | 0.861690
+0.35 | {'C': 3}    | 0.819672 | 0.837765 | 0.850022
+0.40 | {'C': 3}    | 0.813203 | 0.835388 | 0.843198
+0.45 | {'C': 3}    | 0.819064 | 0.831954 | 0.839426
 '''
