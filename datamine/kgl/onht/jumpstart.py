@@ -226,16 +226,23 @@ if(1):
     preds = {}
     scores = {}
     scores_mse = {}
-    for i in range(1,10):
-      split_ratio=i*0.05
-      name = "GridSearchCV.split:%.02f" % split_ratio
+    # try train/test ratios from 0.05 through 0.45
+    split_ratios =  np.arange(5, 50, 5) / 100
+    # replaces: for i in range(1,10): split_ratio=i*0.05
+    print("# trying split_ratios: %s" % split_ratios)
+    for split_ratio in (split_ratios):
+      model = linear_model.LogisticRegression()
+      modelname = "LogisticRegression"
+      # GridSearchCV with default cv (kfold==3) running on test-split
+      name = "StratifiedShuffleSplit:%.02f:GridSearchCV:%s" % (split_ratio, modelname)
       print("model %s running %d CV rounds using %.02f train:test StratifiedShuffleSplit" % (name,1, split_ratio))
       X_train, X_cv, y_train, y_cv = model_selection.train_test_split(X_train_test, y_train_test, test_size=split_ratio, random_state=0, stratify=y_train_test)
       #gridsearchcv
       # src: http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html
       # TODO: scorer
       parameters = {'C':[0.1,0.5,0.9,1,1.1,1.5,2,3,10]}
-      clf = model_selection.GridSearchCV(linear_model.LogisticRegression(), parameters)
+      parameters = {'C':[0.1,0.5,0.9,1,1.1,1.5,1.8,1.9,1.99,2,2.01,2.1,2.3,2.5,3,10]}
+      clf = model_selection.GridSearchCV(model, parameters, scoring='roc_auc')
       # train model and make predictions
       clf.fit(X_train,y_train)
       y_cv_roc = metrics.roc_auc_score(y_cv, clf.predict_proba(X_cv)[:,1])
