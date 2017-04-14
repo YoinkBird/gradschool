@@ -79,19 +79,54 @@ if(1):
     # === load data in memory === #
     print("loading data")
     y, X = load_data('train.csv')
-    y_test, X_test = load_data('test.csv', use_labels=False) # test has no meaningful labels
+    y_kaggle, X_kaggle = load_data('test.csv', use_labels=False) # test has no meaningful labels
 
     # === one-hot encoding === #
     # we want to encode the category IDs encountered both in
     # the training and the test set, so we fit the encoder on both
     encoder = preprocessing.OneHotEncoder()
-    encoder.fit(np.vstack((X, X_test)))
+    encoder.fit(np.vstack((X, X_kaggle)))
     X = encoder.transform(X)  # Returns a sparse matrix (see numpy.sparse)
-    X_test = encoder.transform(X_test)
+    X_kaggle = encoder.transform(X_kaggle)
 
     # if you want to create new features, you'll need to compute them
     # before the encoding, and append them to your dataset after
+    print("START splitting data")
 
+    # allow for train:test:validation split
+    # default: no actual "validation" hold-out set:
+    #          refer to kaggle as validation set, refer to X,y as the set containing train+test
+    validation_size=0.0
+    X_train_test = X
+    y_train_test = y
+    X_validation = X_kaggle
+    y_validation = y_kaggle
+
+    # otherwise: set validation_size to >0 to use part of 'X' as a validation hold-out set
+    #            and split the remainder into train+test as needed
+    # this is because the 'y_kaggle' is not labelled and thus cannot be used for scoring
+    # create hold-out validation set by splitting into two sets: "train+test" and "validatoin"
+    # strategy:
+    # split data from 'train.csv' into three sets
+    # "train+test":"validation" 80:20
+
+    validation_size=0.20 # marginally worse score on kaggle
+    validation_size=0.15 # marginally best  score on kaggle
+    print("validation hold-out set size: %f" % validation_size)
+    if(validation_size != 0):
+      print("setting aside %f percent of the train.csv data for validation")
+      X_train_test, X_validation, y_train_test, y_validation = model_selection.train_test_split(X, y, test_size=validation_size, random_state=0, stratify=y)
+    print("manually verify data format by visual inspection:")
+    for data in [ X_train_test, X_validation, y_train_test, y_validation ]:
+      print("data shape: %s type: %s" % (data.shape,type(data)))
+    print("X shape: %s type: %s" % (X.shape,type(X)))
+    print("y shape: %s type: %s" % (y.shape,type(y)))
+    print("X_train_test shape: %s type: %s" % (X_train_test.shape,type(X_train_test)))
+    print("y_train_test shape: %s type: %s" % (y_train_test.shape,type(y_train_test)))
+    print("X_validation shape: %s type: %s" % (X_validation.shape,type(X_validation)))
+    print("y_validation shape: %s type: %s" % (y_validation.shape,type(y_validation)))
+
+    print("DONE splitting data")
     # tuning: enable/disable individual model's tuning section
     tune_lr = 0
     tune_rfc = 0
@@ -141,19 +176,51 @@ if(1):
     # * LogisticRegression: compare performance of LogisticRegression to statsmodels logit
     # * best subset, boot-strapping, etc
     ################################################################################
-    print("# exp3: knn cross validation with GridSearchCV")
+    print("# exp3: kfold cross validation with GridSearchCV")
     preds = {}
     scores = {}
     if(1):
       cv = model_selection.StratifiedKFold(n_splits=10, shuffle=True, random_state=0)
       parameters = {'C':[0.1,0.5,0.9,1,1.1,1.5,1.8,1.9,1.99,2,2.01,2.1,2.3,2.5,3,10]}
-      clf_grid = model_selection.GridSearchCV(linear_model.LogisticRegression(), parameters, cv=10, scoring='neg_mean_squared_error')
-      clf_grid.fit(X,y)
-      print("GridSearchCV results: %s | %s: %f" % (clf_grid.best_params_, clf_grid.scoring, clf_grid.best_score_))
-      print("GridSearchCV cv_results_:")
-      pp.pprint(clf_grid.cv_results_)
-      print("GridSearchCV best estimator:")
-      pp.pprint(clf_grid.best_estimator_)
+      gridsearch_scorer = 'neg_mean_squared_error'
+      gridsearch_scorer = 'roc_auc'
+      clf_grid = model_selection.GridSearchCV(linear_model.LogisticRegression(), parameters, cv=10, scoring=gridsearch_scorer)
+      print("# ideallistic fit on original 'train','test' data set: fit(X,y);predict_proba(X_kaggle)")
+      print("finding the traintest:validation split - this one: %.02f" % validation_size)
+      # TMP: hijacking to fit on the train/test real quick in order to use kaggle to verify the train/test split
+      if(1):
+        # testing against entire dataset with NO split to establish some sort of baseline - didn't submit to kaggle yet, want to try with best model
+        #clf_grid.fit(X,y)
+        # testing against test+train dataset split, submitted to kaggle with vals of 0.15 and 0.20 for validation set size
+        clf_grid.fit(X_train_test,y_train_test)
+        tmppreds = clf_grid.predict_proba(X_kaggle)[:,1]
+        preds["GridSearchCV_kaggleset_%.02f" % validation_size] = tmppreds
+        print("GridSearchCV results: %s | %s: %f" % (clf_grid.best_params_, clf_grid.scoring, clf_grid.best_score_))
+        print("GridSearchCV best estimator:")
+        pp.pprint(clf_grid.best_estimator_)
+        #print("GridSearchCV cv_results_:")
+        #pp.pprint(clf_grid.cv_results_)
+      else:
+        print("-I-: Skipping...")
+      print("# ideallistic fit on 'train+test','validation' set: fit(X_train_test,y_train_test); predict_proba(X_validation)")
+      if(1):
+        # testing against smaller validation dataset - don't save this result to 'preds'
+        clf_grid.fit(X_train_test,y_train_test)
+        tmppreds = clf_grid.predict_proba(X_validation)[:,1]
+        print("GridSearchCV results: %s | %s: %f" % (clf_grid.best_params_, clf_grid.scoring, clf_grid.best_score_))
+        print("GridSearchCV best estimator:")
+        pp.pprint(clf_grid.best_estimator_)
+        #print("GridSearchCV cv_results_:")
+        #pp.pprint(clf_grid.cv_results_)
+      else:
+        print("-I-: Skipping...")
+    else:
+      print("-I-: Skipping...")
+    if(save_files):
+      for name, pred in preds.items():
+        filename="output" + name
+        filename = re.sub(':', '_', filename)
+        save_results(pred, filename + ".csv")
     ################################################################################
     print("# exp2: Experiment with GridSearchCV to find the right test split - result: failed, test split just correlates with AUC score")
     preds = {}
