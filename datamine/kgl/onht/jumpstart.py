@@ -230,7 +230,7 @@ if(1):
       split_ratio=i*0.05
       name = "GridSearchCV.split:%.02f" % split_ratio
       print("model %s running %d CV rounds using %.02f train:test StratifiedShuffleSplit" % (name,1, split_ratio))
-      X_train, X_cv, y_train, y_cv = model_selection.train_test_split(X, y, test_size=split_ratio, random_state=0, stratify=y)
+      X_train, X_cv, y_train, y_cv = model_selection.train_test_split(X_train_test, y_train_test, test_size=split_ratio, random_state=0, stratify=y_train_test)
       #gridsearchcv
       # src: http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html
       # TODO: scorer
@@ -238,13 +238,14 @@ if(1):
       clf = model_selection.GridSearchCV(linear_model.LogisticRegression(), parameters)
       clf.fit(X_train,y_train)
       # train model and make predictions
-      tmppreds = clf.predict_proba(X_cv)[:, 1]
+      tmppreds = clf.predict_proba(X_validation)[:, 1]
       print("GridSearchCV results: %s | %s: %f" % (clf.best_params_, clf.scoring, clf.best_score_))
 
       # MSE
-      tmpmse = metrics.mean_squared_error(y_cv,tmppreds)
+      tmpmse = metrics.mean_squared_error(y_validation,tmppreds)
       # compute AUC metric for this CV fold
-      fpr, tpr, thresholds = metrics.roc_curve(y_cv, tmppreds)
+      tmp_roc = metrics.roc_auc_score(y_validation,tmppreds)
+      fpr, tpr, thresholds = metrics.roc_curve(y_validation, tmppreds)
       roc_auc = metrics.auc(fpr, tpr)
       #print("AUC (fold %d/%d): %f" % (i + 1, n, roc_auc))
       # record score
