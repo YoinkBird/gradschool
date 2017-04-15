@@ -13,7 +13,7 @@ otherwise mostly changed
 from __future__ import division
 
 import numpy as np
-from sklearn import (metrics, model_selection, linear_model, preprocessing, ensemble)
+from sklearn import (metrics, model_selection, linear_model, preprocessing, ensemble, neighbors)
 import xgboost as xgb
 import pprint as pp
 import re
@@ -219,6 +219,7 @@ if(1):
         save_results(pred, filename + ".csv")
     ################################################################################
     print("# exp2: Experiment with GridSearchCV+LogisticRegresstion to find the right test split\n\t\t- result: potentially optimal ratio for train:test:validation of 7:1:2")
+    print("# exp4: Use test-split from exp2 and GridSearchCV to find best models")
     preds = {}
     scores = {}
     scores_mse = {}
@@ -238,6 +239,7 @@ if(1):
     print("%-s | %-*s | %-8s | %-8s | %-8s %.03f" % ("split" , colwidth_params, "params" , "CV KFold" , "train" , "validation", validation_size))
     for split_ratio in (split_ratios):
       model = linear_model.LogisticRegression()
+      model = neighbors.KNeighborsClassifier(n_neighbors=3)
       # GridSearchCV with default cv (kfold==3) running on test-split
       name = "StratifiedShuffleSplit:%.02f:GridSearchCV:%s" % (split_ratio, modelname)
       X_train, X_cv, y_train, y_cv = model_selection.train_test_split(X_train_test, y_train_test, test_size=split_ratio, random_state=0, stratify=y_train_test)
@@ -246,6 +248,8 @@ if(1):
       # TODO: scorer
       parameters = {'C':[0.1,0.5,0.9,1,1.1,1.5,2,3,10]}
       parameters = {'C':[0.1,0.5,0.9,1,1.1,1.5,1.8,1.9,1.99,2,2.01,2.1,2.3,2.5,3,10]}
+      parameters = {'n_neighbors':[3,5,10]} # original
+      parameters = {'n_neighbors':[6]} # chosen after CV evaluated 5,6,7
       clf = model_selection.GridSearchCV(model, parameters, scoring='roc_auc')
       # train model and make predictions
       clf.fit(X_train,y_train)
@@ -254,7 +258,11 @@ if(1):
       y_cv_roc = metrics.roc_auc_score(y_cv, clf.predict_proba(X_cv)[:,1])
       # score for hold-out validation
       tmppreds = clf.predict_proba(X_validation)[:, 1]
-      roc_y_val = metrics.roc_y_val_score(y_validation,tmppreds)
+      roc_y_val = metrics.roc_auc_score(y_validation,tmppreds)
+      # generate prediction
+      if(0): #can't for knn - memory error
+        tmppreds = clf.predict_proba(X_kaggle)[:,1]
+        preds["KNN_GridSearchCV_kaggleset_%.02f" % validation_size] = tmppreds
 
       # MSE
       tmpmse = metrics.mean_squared_error(y_validation,tmppreds)
@@ -270,6 +278,11 @@ if(1):
     print("%-45s Mean MSE:" % ("model"))
     for mdl in sorted(scores_mse, key=scores.get, reverse=True):
       print("%-45s : %f" % (mdl, scores_mse[mdl]))
+    if(save_files):
+      for name, pred in preds.items():
+        filename="output" + name
+        filename = re.sub(':', '_', filename)
+        save_results(pred, filename + ".csv")
     ################################################################################
     print("# exp1: average of random shuffle")
     preds = {}
