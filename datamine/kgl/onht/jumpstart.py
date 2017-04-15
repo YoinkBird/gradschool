@@ -208,12 +208,33 @@ if(1):
           X_train, X_cv, y_train, y_cv = model_selection.train_test_split(X_train_test, y_train_test, test_size=split_ratio, random_state=0, stratify=y_train_test)
           #gridsearchcv
           # src: http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html
-          # initial values
+          # initial parameters
           parameters = {
-              'n_estimators' : [2, 100, 200, 300],
+              'n_estimators' : [2, 100, 200, 300,500],
               'colsample_bytree' : [0.5,1],
-              'max_depth': [2],
+              'max_depth': [2,3,5,10],
               }
+          # rslt: 0.10 | {'n_estimators': 500, 'max_depth': 10, 'colsample_bytree': 1} | 0.831286 | 0.829814 | 0.864375 |
+
+          parameters['n_estimators'] = [500,600]
+          parameters['colsample_bytree'] = [0.5,0.75,1]
+          parameters['max_depth'] = [10,15]
+          # rslt: 0.10 | {'n_estimators': 600, 'max_depth': 15, 'colsample_bytree': 0.75} | 0.840337 | 0.826703 | 0.870705 |
+
+          # (current) final values for reproducibility - todo: should be pickling or something
+          parameters['n_estimators'] = [600]
+          parameters['colsample_bytree'] = [0.75]
+          parameters['max_depth'] = [15]
+          # rslt:
+
+          # defaults - re-specify to make the output more clear
+          if(0):
+            parameters = {}
+            parameters['n_estimators']     =  [ xgb_params['n_estimators'] ]
+            parameters['colsample_bytree'] =  [ xgb_params['colsample_bytree'] ]
+            parameters['max_depth']        =  [ xgb_params['max_depth'] ]
+
+
           # TODO: implement RandomizedSearchCV
           clf = model_selection.GridSearchCV(model, parameters, cv=5, scoring='roc_auc')
           # train model and make predictions
@@ -224,18 +245,17 @@ if(1):
           # score for hold-out validation
           tmppreds = clf.predict_proba(X_validation)[:, 1]
           roc_y_val = metrics.roc_auc_score(y_validation,tmppreds)
-          # generate prediction for kaggle
-          if(0):
+          mse_y_val = metrics.mean_squared_error(y_validation,tmppreds) # not needed, but brings a bit of comfort
+          # generate prediction
+          if(1):
             tmppreds = clf.predict_proba(X_kaggle)[:,1]
             preds["XGB_GridSearchCV_kaggleset_%.02f" % validation_size] = tmppreds
 
-          # MSE
-          tmpmse = metrics.mean_squared_error(y_validation,tmppreds)
           outstr = ("%-.002f | %-*s | %f | %f | %f |" % (split_ratio, colwidth_params, clf.best_params_, clf.best_score_, y_cv_roc, roc_y_val))
           print(outstr)
           # record score
           scores[name] = roc_y_val
-          scores_mse[name] = tmpmse
+          scores_mse[name] = mse_y_val
       print("%-s | %-*s | %-8s | %-8s | %-8s %.03f" % ("split" , colwidth_params, "params" , "CV KFold" , "train" , "validation", validation_size))
       print("^^^^^^^^^^^^^")
       print("-I-: scores")
@@ -369,6 +389,8 @@ if(1):
           filename="output" + name
           filename = re.sub(':', '_', filename)
           save_results(pred, filename + ".csv")
+    else:
+      print("-I-: Skipping...")
     ################################################################################
     print("# exp1: average of random shuffle")
     preds = {}
@@ -503,4 +525,12 @@ split | params     | CV KFold | train    | validation 0.200
 0.35 | {'C': 3}    | 0.819672 | 0.837765 | 0.850022
 0.40 | {'C': 3}    | 0.813203 | 0.835388 | 0.843198
 0.45 | {'C': 3}    | 0.819064 | 0.831954 | 0.839426
+'''
+
+'''
+XGB tuning notes
+# model                                         Mean AUC:
+# StratifiedShuffleSplit:0.10:GridSearchCV:XGB  : 0.864375
+# 0.10 | {'n_estimators': 500, 'max_depth': 10, 'colsample_bytree': 1}    | 0.831286 | 0.829814 | 0.864375 |
+# 0.10 | {'n_estimators': 600, 'max_depth': 15, 'colsample_bytree': 0.75} | 0.840337 | 0.826703 | 0.870705 |
 '''
