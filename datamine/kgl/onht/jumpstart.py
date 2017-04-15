@@ -127,6 +127,7 @@ if(1):
     tune_lr = 0
     tune_rfc = 0
     tune_xgb = 0
+    tune_knn = 0
 
     # LogisticRegression: 2nd best avg score from 10 rounds of CV:StratifiedShuffleSplit_train:test=0.2 , but 'C' is arbitrary.
     lr_params =  {'C':3, 'multi_class':'ovr', 'solver':'liblinear'}
@@ -137,7 +138,10 @@ if(1):
         'LogisticRegressionC3:ovr:liblinear'  : linear_model.LogisticRegression(**lr_params),
         'RFC' : ensemble.RandomForestClassifier(),
         'XGB' : xgb.XGBClassifier(**xgb_params),
+        'KNN' : neighbors.KNeighborsClassifier(n_neighbors=3),
         }
+    # KNN
+    knn_params = {'n_neighbors':[6]} # chosen after CV evaluated 5,6,7
     # Logistic Regression Parameters
     # src: http://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
     if(tune_lr): # set to '1' for "tuning", then disable once optimal params are found
@@ -199,7 +203,7 @@ if(1):
       else:
         print("-I-: Skipping...")
       print("# ideallistic fit on 'train+test','validation' set: fit(X_train_test,y_train_test); predict_proba(X_validation)")
-      if(1):
+      if(0):
         # testing against smaller validation dataset - don't save this result to 'preds'
         clf_grid.fit(X_train_test,y_train_test)
         tmppreds = clf_grid.predict_proba(X_validation)[:,1]
@@ -238,40 +242,43 @@ if(1):
       # :0.05 | {'C': 2.5} | 0.836104   | 0.884519      | 0.874113
       colwidth_params=20
       print("%-s | %-*s | %-8s | %-8s | %-8s %.03f" % ("split" , colwidth_params, "params" , "CV KFold" , "train" , "validation", validation_size))
+      #models['LR'] = models_global['LR']
+      models['KNN'] = models_global['KNN']
       for split_ratio in (split_ratios):
-        model = linear_model.LogisticRegression()
-        model = neighbors.KNeighborsClassifier(n_neighbors=3)
-        # GridSearchCV with default cv (kfold==3) running on test-split
-        name = "StratifiedShuffleSplit:%.02f:GridSearchCV:%s" % (split_ratio, modelname)
-        X_train, X_cv, y_train, y_cv = model_selection.train_test_split(X_train_test, y_train_test, test_size=split_ratio, random_state=0, stratify=y_train_test)
-        #gridsearchcv
-        # src: http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html
-        # TODO: scorer
-        parameters = {'C':[0.1,0.5,0.9,1,1.1,1.5,2,3,10]}
-        parameters = {'C':[0.1,0.5,0.9,1,1.1,1.5,1.8,1.9,1.99,2,2.01,2.1,2.3,2.5,3,10]}
-        parameters = {'n_neighbors':[3,5,10]} # original
-        parameters = {'n_neighbors':[6]} # chosen after CV evaluated 5,6,7
-        clf = model_selection.GridSearchCV(model, parameters, scoring='roc_auc')
-        # train model and make predictions
-        clf.fit(X_train,y_train)
-        # compute AUC metric for this CV fold
-        # score for cross-validation
-        y_cv_roc = metrics.roc_auc_score(y_cv, clf.predict_proba(X_cv)[:,1])
-        # score for hold-out validation
-        tmppreds = clf.predict_proba(X_validation)[:, 1]
-        roc_y_val = metrics.roc_auc_score(y_validation,tmppreds)
-        # generate prediction
-        if(0): #can't for knn - memory error
-          tmppreds = clf.predict_proba(X_kaggle)[:,1]
-          preds["KNN_GridSearchCV_kaggleset_%.02f" % validation_size] = tmppreds
+        for name, model in models.items():
+          model = linear_model.LogisticRegression()
+          model = neighbors.KNeighborsClassifier(n_neighbors=3)
+          # GridSearchCV with default cv (kfold==3) running on test-split
+          name = "StratifiedShuffleSplit:%.02f:GridSearchCV:%s" % (split_ratio, modelname)
+          X_train, X_cv, y_train, y_cv = model_selection.train_test_split(X_train_test, y_train_test, test_size=split_ratio, random_state=0, stratify=y_train_test)
+          #gridsearchcv
+          # src: http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html
+          # TODO: scorer
+          parameters = {'C':[0.1,0.5,0.9,1,1.1,1.5,2,3,10]}
+          parameters = {'C':[0.1,0.5,0.9,1,1.1,1.5,1.8,1.9,1.99,2,2.01,2.1,2.3,2.5,3,10]}
+          parameters = {'n_neighbors':[3,5,10]} # original
+          parameters = {'n_neighbors':[6]} # chosen after CV evaluated 5,6,7
+          clf = model_selection.GridSearchCV(model, parameters, scoring='roc_auc')
+          # train model and make predictions
+          clf.fit(X_train,y_train)
+          # compute AUC metric for this CV fold
+          # score for cross-validation
+          y_cv_roc = metrics.roc_auc_score(y_cv, clf.predict_proba(X_cv)[:,1])
+          # score for hold-out validation
+          tmppreds = clf.predict_proba(X_validation)[:, 1]
+          roc_y_val = metrics.roc_auc_score(y_validation,tmppreds)
+          # generate prediction
+          if(0): #can't for knn - memory error
+            tmppreds = clf.predict_proba(X_kaggle)[:,1]
+            preds["KNN_GridSearchCV_kaggleset_%.02f" % validation_size] = tmppreds
 
-        # MSE
-        tmpmse = metrics.mean_squared_error(y_validation,tmppreds)
-        outstr = ("%-.002f | %-*s | %f | %f | %f |" % (split_ratio, colwidth_params, clf.best_params_, clf.best_score_, y_cv_roc, roc_y_val))
-        print(outstr)
-        # record score
-        scores[name] = roc_y_val
-        scores_mse[name] = tmpmse
+          # MSE
+          tmpmse = metrics.mean_squared_error(y_validation,tmppreds)
+          outstr = ("%-.002f | %-*s | %f | %f | %f |" % (split_ratio, colwidth_params, clf.best_params_, clf.best_score_, y_cv_roc, roc_y_val))
+          print(outstr)
+          # record score
+          scores[name] = roc_y_val
+          scores_mse[name] = tmpmse
       print("-I-: scores")
       print("%-45s Mean AUC:" % ("model"))
       for mdl in sorted(scores, key=scores.get, reverse=True):
