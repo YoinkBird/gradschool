@@ -296,67 +296,68 @@ if(1):
     preds = {}
     scores = {}
     scores_mse = {}
-    n = 10  # repeat the CV procedure 10 times to get more precise results
-    #n = 1 # for testing
-    split_ratio = 0.20 # 0.2 is best for now; 0.3 reduced score by ~0.08 : from 0.864*** to 0.856***
-    for name, model in models.items():
-      mean_auc = 0.0
-      mean_mse = 0.0
-      print("model %s running %d CV rounds using %.02f train:test StratifiedShuffleSplit" % (name,n, split_ratio))
-      for i in range(n):
-          # for each iteration, randomly hold out 20% of the data as CV set
-          # wrapper for: next(ShuffleSplit().split(X, y))
-          # DOC: stratify: If not None, data is split in a stratified fashion, using this as the class labels.
-          # DOC: no empirical benefit to using 'stratify', using anyway though to avoid negative consequences as this is not i.i.d. data
-          X_train, X_cv, y_train, y_cv = model_selection.train_test_split(
-              X_train_test, y_train_test, test_size=split_ratio, random_state=i*SEED, stratify=y_train_test)
-
-          # if you want to perform feature selection / hyperparameter
-          # optimization, this is where you want to do it
-
-          # train model and make predictions
-          model.fit(X_train, y_train) 
-          # compute AUC metric for this CV loop
-          # score for cross-validation
-          y_cv_roc = metrics.roc_auc_score(y_cv, clf.predict_proba(X_cv)[:,1])
-          # score for hold-out validation
-          tmppreds = model.predict_proba(X_validation)[:, 1]
-
-          # MSE
-          tmpmse = metrics.mean_squared_error(y_validation,tmppreds)
-          #print("MSE:" , tmpmse )
-          mean_mse += tmpmse
-          # compute AUC metric for this CV fold
-          roc_y_val = metrics.roc_auc_score(y_validation, tmppreds)
-          fpr, tpr, thresholds = metrics.roc_curve(y_validation, tmppreds)
-          roc_auc = metrics.auc(fpr, tpr)
-          #print("AUC (fold %d/%d): %f" % (i + 1, n, roc_auc))
-          mean_auc += roc_auc
-      # record mean score
-      scores[name] = mean_auc/n
-      scores_mse[name] = mean_mse/n
-      #print("%-45s Mean AUC: %f" % (name, mean_auc/n))
-
-      # === Predictions === #
-      # When making predictions, retrain the model on the whole training set
-      model.fit(X, y)
-      # Note: won't be able to score this prediction because the test data has useless labels
-      preds[name] = model.predict_proba(X_kaggle)[:, 1]
-    # "rank" the scores in descending order
-    # src: http://stackoverflow.com/a/16773816 # perl wins at this...
-    print("-I-: scores")
-    print("%-45s Mean AUC:" % ("model"))
-    for mdl in sorted(scores, key=scores.get, reverse=True):
-      print("%-45s : %f" % (mdl, scores[mdl]))
-    print("%-45s Mean MSE:" % ("model"))
-    for mdl in sorted(scores_mse, key=scores.get, reverse=True):
-      print("%-45s : %f" % (mdl, scores_mse[mdl]))
     if(0):
-      #filename = input("Enter name for submission file: ")
-      for name, pred in preds.items():
-        filename="output" + name
-        filename = re.sub(':', '_', filename)
-        save_results(pred, filename + ".csv")
+      n = 10  # repeat the CV procedure 10 times to get more precise results
+      #n = 1 # for testing
+      split_ratio = 0.20 # 0.2 is best for now; 0.3 reduced score by ~0.08 : from 0.864*** to 0.856***
+      for name, model in models.items():
+        mean_auc = 0.0
+        mean_mse = 0.0
+        print("model %s running %d CV rounds using %.02f train:test StratifiedShuffleSplit" % (name,n, split_ratio))
+        for i in range(n):
+            # for each iteration, randomly hold out 20% of the data as CV set
+            # wrapper for: next(ShuffleSplit().split(X, y))
+            # DOC: stratify: If not None, data is split in a stratified fashion, using this as the class labels.
+            # DOC: no empirical benefit to using 'stratify', using anyway though to avoid negative consequences as this is not i.i.d. data
+            X_train, X_cv, y_train, y_cv = model_selection.train_test_split(
+                X_train_test, y_train_test, test_size=split_ratio, random_state=i*SEED, stratify=y_train_test)
+
+            # if you want to perform feature selection / hyperparameter
+            # optimization, this is where you want to do it
+
+            # train model and make predictions
+            model.fit(X_train, y_train) 
+            # compute AUC metric for this CV loop
+            # score for cross-validation
+            y_cv_roc = metrics.roc_auc_score(y_cv, clf.predict_proba(X_cv)[:,1])
+            # score for hold-out validation
+            tmppreds = model.predict_proba(X_validation)[:, 1]
+
+            # MSE
+            tmpmse = metrics.mean_squared_error(y_validation,tmppreds)
+            #print("MSE:" , tmpmse )
+            mean_mse += tmpmse
+            # compute AUC metric for this CV fold
+            roc_y_val = metrics.roc_auc_score(y_validation, tmppreds)
+            fpr, tpr, thresholds = metrics.roc_curve(y_validation, tmppreds)
+            roc_auc = metrics.auc(fpr, tpr)
+            #print("AUC (fold %d/%d): %f" % (i + 1, n, roc_auc))
+            mean_auc += roc_auc
+        # record mean score
+        scores[name] = mean_auc/n
+        scores_mse[name] = mean_mse/n
+        #print("%-45s Mean AUC: %f" % (name, mean_auc/n))
+
+        # === Predictions === #
+        # When making predictions, retrain the model on the whole training set
+        model.fit(X, y)
+        # Note: won't be able to score this prediction because the test data has useless labels
+        preds[name] = model.predict_proba(X_kaggle)[:, 1]
+      # "rank" the scores in descending order
+      # src: http://stackoverflow.com/a/16773816 # perl wins at this...
+      print("-I-: scores")
+      print("%-45s Mean AUC:" % ("model"))
+      for mdl in sorted(scores, key=scores.get, reverse=True):
+        print("%-45s : %f" % (mdl, scores[mdl]))
+      print("%-45s Mean MSE:" % ("model"))
+      for mdl in sorted(scores_mse, key=scores.get, reverse=True):
+        print("%-45s : %f" % (mdl, scores_mse[mdl]))
+      if(1):
+        #filename = input("Enter name for submission file: ")
+        for name, pred in preds.items():
+          filename="output" + name
+          filename = re.sub(':', '_', filename)
+          save_results(pred, filename + ".csv")
 
 #if __name__ == '__main__':
 #     main()
