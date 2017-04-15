@@ -183,12 +183,12 @@ if(1):
       clf_grid = model_selection.GridSearchCV(linear_model.LogisticRegression(), parameters, cv=10, scoring=gridsearch_scorer)
       print("# ideallistic fit on original 'train','test' data set: fit(X,y);predict_proba(X_kaggle)")
       print("finding the traintest:validation split - this one: %.02f" % validation_size)
-      # TMP: hijacking to fit on the train/test real quick in order to use kaggle to verify the train/test split
-      if(1):
+      if(0):
         # testing against entire dataset with NO split to establish some sort of baseline - didn't submit to kaggle yet, want to try with best model
-        #clf_grid.fit(X,y)
-        # testing against test+train dataset split, submitted to kaggle with vals of 0.15 and 0.20 for validation set size
-        clf_grid.fit(X_train_test,y_train_test)
+        clf_grid.fit(X,y)
+        # TMP: fit on X,y, testing against test+train dataset split to determine best split
+        #     submitted to kaggle with vals of 0.15 and 0.20 for validation set size
+        # clf_grid.fit(X_train_test,y_train_test)
         tmppreds = clf_grid.predict_proba(X_kaggle)[:,1]
         preds["GridSearchCV_kaggleset_%.02f" % validation_size] = tmppreds
         print("GridSearchCV results: %s | %s: %f" % (clf_grid.best_params_, clf_grid.scoring, clf_grid.best_score_))
