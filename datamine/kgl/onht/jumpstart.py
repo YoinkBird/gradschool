@@ -288,21 +288,26 @@ if(1):
           # DOC: stratify: If not None, data is split in a stratified fashion, using this as the class labels.
           # DOC: no empirical benefit to using 'stratify', using anyway though to avoid negative consequences as this is not i.i.d. data
           X_train, X_cv, y_train, y_cv = model_selection.train_test_split(
-              X, y, test_size=split_ratio, random_state=i*SEED, stratify=y)
+              X_train_test, y_train_test, test_size=split_ratio, random_state=i*SEED, stratify=y_train_test)
 
           # if you want to perform feature selection / hyperparameter
           # optimization, this is where you want to do it
 
           # train model and make predictions
           model.fit(X_train, y_train) 
-          tmppreds = model.predict_proba(X_cv)[:, 1]
+          # compute AUC metric for this CV loop
+          # score for cross-validation
+          y_cv_roc = metrics.roc_auc_score(y_cv, clf.predict_proba(X_cv)[:,1])
+          # score for hold-out validation
+          tmppreds = model.predict_proba(X_validation)[:, 1]
 
           # MSE
-          tmpmse = metrics.mean_squared_error(y_cv,tmppreds)
-          #print("MSE:" , metrics.mean_squared_error(y_cv,tmppreds))
+          tmpmse = metrics.mean_squared_error(y_validation,tmppreds)
+          #print("MSE:" , tmpmse )
           mean_mse += tmpmse
           # compute AUC metric for this CV fold
-          fpr, tpr, thresholds = metrics.roc_curve(y_cv, tmppreds)
+          roc_y_val = metrics.roc_auc_score(y_validation, tmppreds)
+          fpr, tpr, thresholds = metrics.roc_curve(y_validation, tmppreds)
           roc_auc = metrics.auc(fpr, tpr)
           #print("AUC (fold %d/%d): %f" % (i + 1, n, roc_auc))
           mean_auc += roc_auc
@@ -315,7 +320,7 @@ if(1):
       # When making predictions, retrain the model on the whole training set
       model.fit(X, y)
       # Note: won't be able to score this prediction because the test data has useless labels
-      preds[name] = model.predict_proba(X_test)[:, 1]
+      preds[name] = model.predict_proba(X_kaggle)[:, 1]
     # "rank" the scores in descending order
     # src: http://stackoverflow.com/a/16773816 # perl wins at this...
     print("-I-: scores")
@@ -329,6 +334,7 @@ if(1):
       #filename = input("Enter name for submission file: ")
       for name, pred in preds.items():
         filename="output" + name
+        filename = re.sub(':', '_', filename)
         save_results(pred, filename + ".csv")
 
 #if __name__ == '__main__':
@@ -375,6 +381,11 @@ Result: use 2nd best param, liblinear. WHY: sag is best, BUT consistantly not co
   "the coef_ did not converge", ConvergenceWarning
 Also: all of the multinomial (many-to-many) estimators performed much worse than the ovr (many-to-one) estimaters
 Future: test performance of statsmodels logit
+
+kaggle:
+outputLogisticRegressionC3_ovr_liblinear.csv
+private public
+0.88205 0.88515
 '''
 '''
 train:test Split:
