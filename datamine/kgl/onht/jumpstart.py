@@ -223,66 +223,67 @@ if(1):
     preds = {}
     scores = {}
     scores_mse = {}
-    # try train/test ratios from 0.05 through 0.45
-    split_ratios =  np.arange(5, 50, 5) / 100
-    split_ratios = [0.1] # consistently results in local max CV score combined with current validation set
-    # replaces: for i in range(1,10): split_ratio=i*0.05
-    print("# trying split_ratios: %s" % split_ratios)
-    print("scoring: %s" % ("roc_auc"))
-    print("split: %s" % "StratifiedShuffleSplit")
-    modelname = "LogisticRegression"
-    print("model: %s" % (modelname))
-    # header:
-    # split | params     | roc_auc CV | roc_auc train | roc_auc global-holdout
-    # :0.05 | {'C': 2.5} | 0.836104   | 0.884519      | 0.874113
-    colwidth_params=20
-    print("%-s | %-*s | %-8s | %-8s | %-8s %.03f" % ("split" , colwidth_params, "params" , "CV KFold" , "train" , "validation", validation_size))
-    for split_ratio in (split_ratios):
-      model = linear_model.LogisticRegression()
-      model = neighbors.KNeighborsClassifier(n_neighbors=3)
-      # GridSearchCV with default cv (kfold==3) running on test-split
-      name = "StratifiedShuffleSplit:%.02f:GridSearchCV:%s" % (split_ratio, modelname)
-      X_train, X_cv, y_train, y_cv = model_selection.train_test_split(X_train_test, y_train_test, test_size=split_ratio, random_state=0, stratify=y_train_test)
-      #gridsearchcv
-      # src: http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html
-      # TODO: scorer
-      parameters = {'C':[0.1,0.5,0.9,1,1.1,1.5,2,3,10]}
-      parameters = {'C':[0.1,0.5,0.9,1,1.1,1.5,1.8,1.9,1.99,2,2.01,2.1,2.3,2.5,3,10]}
-      parameters = {'n_neighbors':[3,5,10]} # original
-      parameters = {'n_neighbors':[6]} # chosen after CV evaluated 5,6,7
-      clf = model_selection.GridSearchCV(model, parameters, scoring='roc_auc')
-      # train model and make predictions
-      clf.fit(X_train,y_train)
-      # compute AUC metric for this CV fold
-      # score for cross-validation
-      y_cv_roc = metrics.roc_auc_score(y_cv, clf.predict_proba(X_cv)[:,1])
-      # score for hold-out validation
-      tmppreds = clf.predict_proba(X_validation)[:, 1]
-      roc_y_val = metrics.roc_auc_score(y_validation,tmppreds)
-      # generate prediction
-      if(0): #can't for knn - memory error
-        tmppreds = clf.predict_proba(X_kaggle)[:,1]
-        preds["KNN_GridSearchCV_kaggleset_%.02f" % validation_size] = tmppreds
+    if(0):
+      # try train/test ratios from 0.05 through 0.45
+      split_ratios =  np.arange(5, 50, 5) / 100
+      split_ratios = [0.1] # consistently results in local max CV score combined with current validation set
+      # replaces: for i in range(1,10): split_ratio=i*0.05
+      print("# trying split_ratios: %s" % split_ratios)
+      print("scoring: %s" % ("roc_auc"))
+      print("split: %s" % "StratifiedShuffleSplit")
+      modelname = "LogisticRegression"
+      print("model: %s" % (modelname))
+      # header:
+      # split | params     | roc_auc CV | roc_auc train | roc_auc global-holdout
+      # :0.05 | {'C': 2.5} | 0.836104   | 0.884519      | 0.874113
+      colwidth_params=20
+      print("%-s | %-*s | %-8s | %-8s | %-8s %.03f" % ("split" , colwidth_params, "params" , "CV KFold" , "train" , "validation", validation_size))
+      for split_ratio in (split_ratios):
+        model = linear_model.LogisticRegression()
+        model = neighbors.KNeighborsClassifier(n_neighbors=3)
+        # GridSearchCV with default cv (kfold==3) running on test-split
+        name = "StratifiedShuffleSplit:%.02f:GridSearchCV:%s" % (split_ratio, modelname)
+        X_train, X_cv, y_train, y_cv = model_selection.train_test_split(X_train_test, y_train_test, test_size=split_ratio, random_state=0, stratify=y_train_test)
+        #gridsearchcv
+        # src: http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html
+        # TODO: scorer
+        parameters = {'C':[0.1,0.5,0.9,1,1.1,1.5,2,3,10]}
+        parameters = {'C':[0.1,0.5,0.9,1,1.1,1.5,1.8,1.9,1.99,2,2.01,2.1,2.3,2.5,3,10]}
+        parameters = {'n_neighbors':[3,5,10]} # original
+        parameters = {'n_neighbors':[6]} # chosen after CV evaluated 5,6,7
+        clf = model_selection.GridSearchCV(model, parameters, scoring='roc_auc')
+        # train model and make predictions
+        clf.fit(X_train,y_train)
+        # compute AUC metric for this CV fold
+        # score for cross-validation
+        y_cv_roc = metrics.roc_auc_score(y_cv, clf.predict_proba(X_cv)[:,1])
+        # score for hold-out validation
+        tmppreds = clf.predict_proba(X_validation)[:, 1]
+        roc_y_val = metrics.roc_auc_score(y_validation,tmppreds)
+        # generate prediction
+        if(0): #can't for knn - memory error
+          tmppreds = clf.predict_proba(X_kaggle)[:,1]
+          preds["KNN_GridSearchCV_kaggleset_%.02f" % validation_size] = tmppreds
 
-      # MSE
-      tmpmse = metrics.mean_squared_error(y_validation,tmppreds)
-      outstr = ("%-.002f | %-*s | %f | %f | %f |" % (split_ratio, colwidth_params, clf.best_params_, clf.best_score_, y_cv_roc, roc_y_val))
-      print(outstr)
-      # record score
-      scores[name] = roc_y_val
-      scores_mse[name] = tmpmse
-    print("-I-: scores")
-    print("%-45s Mean AUC:" % ("model"))
-    for mdl in sorted(scores, key=scores.get, reverse=True):
-      print("%-45s : %f" % (mdl, scores[mdl]))
-    print("%-45s Mean MSE:" % ("model"))
-    for mdl in sorted(scores_mse, key=scores.get, reverse=True):
-      print("%-45s : %f" % (mdl, scores_mse[mdl]))
-    if(save_files):
-      for name, pred in preds.items():
-        filename="output" + name
-        filename = re.sub(':', '_', filename)
-        save_results(pred, filename + ".csv")
+        # MSE
+        tmpmse = metrics.mean_squared_error(y_validation,tmppreds)
+        outstr = ("%-.002f | %-*s | %f | %f | %f |" % (split_ratio, colwidth_params, clf.best_params_, clf.best_score_, y_cv_roc, roc_y_val))
+        print(outstr)
+        # record score
+        scores[name] = roc_y_val
+        scores_mse[name] = tmpmse
+      print("-I-: scores")
+      print("%-45s Mean AUC:" % ("model"))
+      for mdl in sorted(scores, key=scores.get, reverse=True):
+        print("%-45s : %f" % (mdl, scores[mdl]))
+      print("%-45s Mean MSE:" % ("model"))
+      for mdl in sorted(scores_mse, key=scores.get, reverse=True):
+        print("%-45s : %f" % (mdl, scores_mse[mdl]))
+      if(save_files):
+        for name, pred in preds.items():
+          filename="output" + name
+          filename = re.sub(':', '_', filename)
+          save_results(pred, filename + ".csv")
     ################################################################################
     print("# exp1: average of random shuffle")
     preds = {}
