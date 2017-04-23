@@ -4,6 +4,10 @@ import seaborn as sns
 import pandas as pd
 import numpy as np
 import scipy.misc
+from PIL import Image  # for any issues, see 'troubleshooting' at end of file
+
+showImg = 1
+dumpImg = False
 
 #def compare_np_linalg(A_mat,U_mat,SIG_mat,VT_mat):
 # pass method: http://stackoverflow.com/a/706735
@@ -122,13 +126,16 @@ U,s,V = print_partial_svd_reconstruction(img_arr)
 # Full SVD
 U,s,V = print_full_svd_reconstruction(img_arr)
 dumpExtra = False
-from PIL import Image
+dumpImg = False
 if(dumpExtra):
   im_u = Image.fromarray(U).convert('RGB')
   im_v = Image.fromarray(V).convert('RGB')
-  im_u.save("svd_concept_u.png")
-  im_v.save("svd_concept_v.png")
+  if(dumpImg):
+    im_u.save("svd_concept_u.png")
+    im_v.save("svd_concept_v.png")
 
+dumpImg = True
+dumpImg = False
 #  Show the best rank k = 2, k = 5 and k = 10 approximation to Mona Lisa.
 kvals = [2,5,10,20,100,200,len(s)]
 for kval in kvals:
@@ -142,10 +149,28 @@ for kval in kvals:
 
   print("array: %d ; rank: %d ; size: %d ;" % (len(s),kval,size))
   # plt.imshow(im_s)
-  dumpImg = True
+  im  = Image.fromarray(arrk).convert('RGB')
+  if(showImg):
+    plt.imshow(im)
+    plt.grid(False)
+    plt.title("rank: %s ; size: %s bits" % (kval,size))
+  plt.show()
   if(dumpImg):
     # have to RGB in order to save. src: http://stackoverflow.com/a/18879396
     im  = Image.fromarray(arrk).convert('RGB')
     img_out_relpath = "svd_%s%d%s.png" % (file_subject,kval,detail)
     img_out_relpath = "out/" + img_out_relpath
     im.save(img_out_relpath)
+
+
+# troubleshooting
+# had to downgrade pillow: conda install pillow=4.0.0
+# due to the following error:
+'''
+Traceback (most recent call last):
+  File "ps4/3_svd_mona_lisa.py", line 7, in <module>
+    from PIL import Image
+  File "<install_path>/miniconda3/lib/python3.6/site-packages/PIL/Image.py", line 56, in <module>
+    from . import _imaging as core
+ImportError: <install_path>/miniconda3/lib/python3.6/site-packages/PIL/_imaging.cpython-36m-x86_64-linux-gnu.so: undefined symbol: PySlice_Unpack
+'''
