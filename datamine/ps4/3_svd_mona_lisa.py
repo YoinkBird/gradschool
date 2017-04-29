@@ -114,7 +114,7 @@ detail = "_solid_838383_19x21"
 detail = "_sleeve_19x21"
 detail = "" # original file, mona_lisa.png
 #detail = "_corrupt"
-file_relpath = "%s%s.png" % (file_subject, detail)
+file_relpath = "../input/%s%s.png" % (file_subject, detail)
 #load_img_to_arr(file_relpath)
 # https://docs.scipy.org/doc/scipy/reference/generated/scipy.misc.imread.html
 img_arr = scipy.misc.imread(file_relpath, flatten=True)
