@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import scipy.misc
 from PIL import Image  # for any issues, see 'troubleshooting' at end of file
+from sklearn import (decomposition)
 
 showImg = 1
 dumpImg = False
@@ -122,9 +123,13 @@ img_arr = scipy.misc.imread(file_relpath, flatten=True)
 # create U,s,V and then re-create the original matrix for verification
 # Partial SVD
 U,s,V = print_partial_svd_reconstruction(img_arr)
+if(showImg):
+  plt.plot(np.log(s)); plt.show()
 
 # Full SVD
 U,s,V = print_full_svd_reconstruction(img_arr)
+if(showImg):
+  plt.plot(np.log(s)); plt.show()
 dumpExtra = False
 dumpImg = False
 if(dumpExtra):
@@ -174,3 +179,10 @@ Traceback (most recent call last):
     from . import _imaging as core
 ImportError: <install_path>/miniconda3/lib/python3.6/site-packages/PIL/_imaging.cpython-36m-x86_64-linux-gnu.so: undefined symbol: PySlice_Unpack
 '''
+
+'''
+sklearn PCA experiment
+'''
+pca = decomposition.PCA(svd_solver='full')
+imgskl = pca.fit(img_arr).transform(img_arr)
+Image.fromarray(imgskl).convert('RGB')
