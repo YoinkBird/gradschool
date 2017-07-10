@@ -1,0 +1,2 @@
+datamine/kgl/repo_xgb -> <>/devtools/pythonlib/xgboost/
+datamine/kgl/input -> <gdrive>/<...>/datamining/input/
